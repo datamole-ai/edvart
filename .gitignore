@@ -1,0 +1,34 @@
+# Byte-compiled / optimized files
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*$py.class
+
+# build files
+*.egg-info/
+build/
+dist/
+
+# jupyter cache
+.ipynb_checkpoints/
+
+# conda env dir
+.condaenv/
+
+# venv directories
+.venv/
+
+# IDE directories
+.vscode/
+
+# pytest coverage file
+.coverage
+
+# docs build
+docs/_build
+docs/source
+
+# environment files
+.env
+.env.secrets
+

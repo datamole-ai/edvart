@@ -1,0 +1,37 @@
+[FORMAT]
+max-line-length=100
+ignore-long-lines=\s*(# )?<?https?://\S+>?
+max-module-lines=1500
+
+[MESSAGES]
+disable=duplicate-code,
+        missing-module-docstring,
+        unspecified-encoding,
+        too-few-public-methods,
+        reimported,
+        use-dict-literal,
+
+[BASIC]
+good-names=i,
+           j,
+           k,
+           n,
+           x,
+           y,
+           ax,
+           df,
+           nb,
+
+[SIMILARITIES]
+min-similarity-lines=10
+
+[DESIGN]
+
+# Maximum number of arguments for function / method.
+max-args=15
+
+# Maximum number of attributes for a class (see R0902).
+max-attributes=10
+
+# Maximum number of locals for function / method body.
+max-locals=20

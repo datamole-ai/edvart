@@ -1,0 +1,477 @@
+import datetime
+import warnings
+from contextlib import redirect_stdout
+
+import pytest
+
+import edvart
+from edvart.report_sections import timeseries_analysis
+from edvart.report_sections.code_string_formatting import get_code
+from edvart.report_sections.timeseries_analysis import BoxplotsOverTime, TimeseriesAnalysis
+
+
+def test_default_config_verbosity():
+    timeseries_section = TimeseriesAnalysis()
+    assert timeseries_section.verbosity == 0, "Verbosity should be 0"
+    for s in timeseries_section.subsections:
+        assert s.verbosity == 0, "Verbosity should be 0"
+
+
+def test_high_verobisities():
+    with pytest.raises(ValueError):
+        TimeseriesAnalysis(verbosity=3)
+    with pytest.raises(ValueError):
+        TimeseriesAnalysis(verbosity_time_analysis_plot=3)
+    with pytest.raises(ValueError):
+        TimeseriesAnalysis(verbosity_stationarity_tests=5)
+    with pytest.raises(ValueError):
+        TimeseriesAnalysis(verbosity_rolling_statistics=10)
+
+
+def test_global_verbosity_overriding():
+    timeseries_section = TimeseriesAnalysis(
+        verbosity=0,
+        verbosity_autocorrelation=2,
+        verbosity_stationarity_tests=1,
+        verbosity_rolling_statistics=2,
+        verbosity_time_analysis_plot=1,
+    )
+
+    assert timeseries_section.verbosity == 0
+    for subsec in timeseries_section.subsections:
+        if isinstance(subsec, timeseries_analysis.Autocorrelation):
+            assert subsec.verbosity == 2, "Verbosity of autocorrelation should be 2"
+        elif isinstance(subsec, timeseries_analysis.StationarityTests):
+            assert subsec.verbosity == 1, "Verbosity of stationarity tests should be 1"
+        elif isinstance(subsec, timeseries_analysis.RollingStatistics):
+            assert subsec.verbosity == 2, "Verbosity of rolling stats should be 2"
+        elif isinstance(subsec, timeseries_analysis.TimeAnalysisPlot):
+            assert subsec.verbosity == 1, "Verbosity of timeanalysis plot should be 1"
+        else:
+            assert subsec.verbosity == 0, "Verbosity of other sections should be 0"
+
+
+def test_verbosity_propagation():
+    timeseries_section = TimeseriesAnalysis(verbosity=2)
+    assert timeseries_section.verbosity == 2, "Timeseries analysis global verbosity should be 2."
+
+    for subsec in timeseries_section.subsections:
+        assert subsec.verbosity == 2, f"{type(subsec)} verbosity should be 2."
+
+
+def test_negative_verbosities():
+    with pytest.raises(ValueError):
+        TimeseriesAnalysis(verbosity=-2)
+    with pytest.raises(ValueError):
+        TimeseriesAnalysis(verbosity_rolling_statistics=-2)
+    with pytest.raises(ValueError):
+        TimeseriesAnalysis(verbosity_seasonal_decomposition=-1)
+    with pytest.raises(ValueError):
+        TimeseriesAnalysis(verbosity_boxplots_over_time=-3)
+
+
+def test_section_adding():
+    bivariate_section = TimeseriesAnalysis(
+        subsections=[
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.SeasonalDecomposition,
+        ]
+    )
+    assert isinstance(
+        bivariate_section.subsections[0], timeseries_analysis.RollingStatistics
+    ), "Subsection should be RollingStatistics"
+    assert isinstance(
+        bivariate_section.subsections[1], timeseries_analysis.BoxplotsOverTime
+    ), "Subsection should be BoxplotsOverTime"
+    assert isinstance(
+        bivariate_section.subsections[2], timeseries_analysis.StationarityTests
+    ), "Subsection should be StationarityTests"
+    assert isinstance(
+        bivariate_section.subsections[3], timeseries_analysis.RollingStatistics
+    ), "Subsection should be RollingStatistics"
+    assert isinstance(
+        bivariate_section.subsections[4], timeseries_analysis.SeasonalDecomposition
+    ), "Subsection should be SeasonalDecomposition"
+
+
+def test_ft_stft_excluded():
+    ts = TimeseriesAnalysis()
+    for subsec in ts.subsections:
+        assert not isinstance(subsec, timeseries_analysis.FourierTransform)
+        assert not isinstance(subsec, timeseries_analysis.ShortTimeFT)
+
+
+def test_ft_included_stft_excluded():
+    ts = TimeseriesAnalysis(sampling_rate=1)
+    found_ft = False
+    for subsec in ts.subsections:
+        assert not isinstance(subsec, timeseries_analysis.ShortTimeFT)
+        if isinstance(subsec, timeseries_analysis.FourierTransform):
+            found_ft = True
+
+    assert found_ft
+
+
+def test_ft_stft_included():
+    ts = TimeseriesAnalysis(sampling_rate=1, stft_window_size=1)
+    found_ft = False
+    found_stft = False
+    for subsec in ts.subsections:
+        if isinstance(subsec, timeseries_analysis.ShortTimeFT):
+            found_stft = True
+            continue
+        if isinstance(subsec, timeseries_analysis.FourierTransform):
+            found_ft = True
+
+    assert found_ft
+    assert found_stft
+
+
+def test_ft_no_sampling_rate_error():
+    with pytest.raises(ValueError):
+        ts = TimeseriesAnalysis(
+            subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform]
+        )
+    with pytest.raises(ValueError):
+        ts = TimeseriesAnalysis(
+            subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform],
+            stft_window_size=2,
+        )
+    with pytest.raises(ValueError):
+        ts = TimeseriesAnalysis(
+            subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT],
+        )
+    with pytest.raises(ValueError):
+        ts = TimeseriesAnalysis(
+            subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT],
+            sampling_rate=1,
+        )
+
+
+def test_code_export_verbosity_0():
+    ts_section = TimeseriesAnalysis(verbosity=0)
+    # Export code
+    exported_cells = []
+    ts_section.add_cells(exported_cells)
+    # Remove markdown and other cells and get code strings
+    exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
+    # Define expected code
+    expected_code = ["timeseries_analysis(df=df)"]
+    # Test code equivalence
+    assert len(exported_code) == 1
+    assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
+
+def test_code_export_verbosity_0_with_subsections():
+    ts_section = TimeseriesAnalysis(
+        subsections=[
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
+        ],
+        verbosity=0,
+    )
+    # Export code
+    exported_cells = []
+    ts_section.add_cells(exported_cells)
+    # Remove markdown and other cells and get code strings
+    exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
+    # Define expected code
+    expected_code = [
+        "timeseries_analysis(df=df, subsections=["
+        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics, "
+        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests])"
+    ]
+    # Test code equivalence
+    assert len(exported_code) == 1
+    assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
+
+def test_code_export_verbosity_0_with_fft_stft():
+    ts_section = TimeseriesAnalysis(
+        subsections=[
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT,
+        ],
+        verbosity=0,
+        sampling_rate=1,
+        stft_window_size=1,
+    )
+    # Export code
+    exported_cells = []
+    ts_section.add_cells(exported_cells)
+    # Remove markdown and other cells and get code strings
+    exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
+    # Define expected code
+    expected_code = [
+        "timeseries_analysis(df=df, subsections=["
+        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform, "
+        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT], "
+        "sampling_rate=1, stft_window_size=1)"
+    ]
+    # Test code equivalence
+    assert len(exported_code) == 1
+    assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
+
+def test_generated_code_verobsity_1():
+    ts_section = TimeseriesAnalysis(verbosity=1)
+
+    exported_cells = []
+    ts_section.add_cells(exported_cells)
+    exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
+
+    expected_code = [
+        "time_analysis_plot(df=df)",
+        "rolling_statistics(df=df)",
+        "boxplots_over_time(df=df)",
+        "seasonal_decomposition(df=df, model='additive')",
+        "stationarity_tests(df=df)",
+        "plot_acf(df=df)",
+        "plot_pacf(df=df)",
+    ]
+
+    assert len(expected_code) == len(exported_code)
+    for expected_line, exported_line in zip(expected_code, exported_code):
+        assert expected_line == exported_line, "Exported code mismatch"
+
+
+def test_generated_code_verobsity_2():
+    ts_section = TimeseriesAnalysis(verbosity=2, sampling_rate=1, stft_window_size=1)
+
+    pairplot_cells = []
+    ts_section.add_cells(pairplot_cells)
+    exported_code = [cell["source"] for cell in pairplot_cells if cell["cell_type"] == "code"]
+
+    expected_code = [
+        "\n\n".join(
+            (
+                get_code(timeseries_analysis.TimeAnalysisPlot.time_analysis_plot).replace(
+                    "TimeAnalysisPlot.", ""
+                ),
+                get_code(timeseries_analysis.TimeAnalysisPlot._time_analysis_colored_plot),
+                "time_analysis_plot(df=df)",
+            )
+        ),
+        "\n\n".join(
+            (
+                get_code(timeseries_analysis.RollingStatistics.rolling_statistics),
+                "rolling_statistics(df=df)",
+            )
+        ),
+        "\n\n".join(
+            (
+                get_code(timeseries_analysis.BoxplotsOverTime.default_grouping_functions),
+                get_code(timeseries_analysis.BoxplotsOverTime.get_default_grouping_func).replace(
+                    "BoxplotsOverTime.", ""
+                ),
+                get_code(timeseries_analysis.BoxplotsOverTime.boxplots_over_time).replace(
+                    "BoxplotsOverTime.", ""
+                ),
+                "boxplots_over_time(df=df)",
+            )
+        ),
+        "\n\n".join(
+            (
+                get_code(timeseries_analysis.SeasonalDecomposition.seasonal_decomposition),
+                "seasonal_decomposition(df=df, model='additive')",
+            )
+        ),
+        "\n\n".join(
+            (
+                get_code(timeseries_analysis.StationarityTests.default_stationarity_tests),
+                get_code(timeseries_analysis.StationarityTests.stationarity_tests).replace(
+                    "StationarityTests.", ""
+                ),
+                "stationarity_tests(df=df)",
+            )
+        ),
+        get_code(timeseries_analysis.Autocorrelation.plot_acf) + "\n\n" + "plot_acf(df=df)",
+        "\n\n".join(
+            (
+                get_code(timeseries_analysis.Autocorrelation.plot_pacf).replace(
+                    "Autocorrelation.", ""
+                ),
+                "plot_pacf(df=df)",
+            )
+        ),
+        "\n\n".join(
+            (
+                get_code(timeseries_analysis.FourierTransform.fourier_transform),
+                "fourier_transform(df=df, sampling_rate=1)",
+            )
+        ),
+        "\n\n".join(
+            (
+                get_code(timeseries_analysis.ShortTimeFT.short_time_ft),
+                "short_time_ft(df=df, sampling_rate=1, window_size=1)",
+            )
+        ),
+    ]
+
+    assert len(expected_code) == len(exported_code)
+    for expected_line, exported_line in zip(expected_code, exported_code):
+        assert expected_line == exported_line, "Exported code mismatch"
+
+
+def test_verbosity_0_different_subsection_verbosities():
+    ts_section = TimeseriesAnalysis(
+        verbosity=0,
+        subsections=[
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeAnalysisPlot,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT,
+        ],
+        sampling_rate=1,
+        stft_window_size=2,
+        verbosity_rolling_statistics=1,
+        verbosity_short_time_ft=2,
+    )
+
+    ts_cells = []
+    ts_section.add_cells(ts_cells)
+    exported_code = [cell["source"] for cell in ts_cells if cell["cell_type"] == "code"]
+
+    expected_code = [
+        "timeseries_analysis(df=df, "
+        "subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeAnalysisPlot, "
+        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform, "
+        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests, "
+        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime], sampling_rate=1)",
+        "rolling_statistics(df=df)",
+        (
+            get_code(timeseries_analysis.ShortTimeFT.short_time_ft)
+            + "\n\n"
+            + "short_time_ft(df=df, sampling_rate=1, window_size=2)"
+        ),
+    ]
+
+    assert len(exported_code) == len(expected_code)
+    for expected_line, exported_line in zip(expected_code, exported_code):
+        assert expected_line == exported_line, "Exported code mismatch"
+
+
+def test_boxplots_over_time_def():
+    def month_func(x: datetime.datetime) -> str:
+        return str(x.month)
+
+    boxplots_sub = BoxplotsOverTime(grouping_name="Month", grouping_function=month_func)
+    # Export code
+    exported_cells = []
+    boxplots_sub.add_cells(exported_cells)
+    # Remove markdown and other cells and get code strings
+    exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
+
+    expected_code = (
+        get_code(month_func) + "\n\n",
+        "boxplots_over_time(df=df, grouping_function=month_func, grouping_name='Month')",
+    )
+
+    assert len(expected_code) == len(exported_code)
+    for expected_line, exported_line in zip(expected_code, exported_code):
+        assert expected_line == exported_line, "Exported code mismatch"
+
+
+def test_boxplots_over_time_lambda():
+    month_lambda = lambda x: x.month
+
+    boxplots_sub = BoxplotsOverTime(grouping_name="Month", grouping_function=month_lambda)
+
+    # Export code
+    exported_cells = []
+    boxplots_sub.add_cells(exported_cells)
+    # Remove markdown and other cells and get code strings
+    exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
+
+    expected_code = [
+        get_code(month_lambda) + "\n\n",
+        "boxplots_over_time(df=df, grouping_function=month_lambda, grouping_name='Month')",
+    ]
+
+    assert len(expected_code) == len(exported_code)
+    for expected_line, exported_line in zip(expected_code, exported_code):
+        assert expected_line == exported_line, "Exported code mismatch"
+
+
+def test_imports_verbosity_0():
+    ts_section = TimeseriesAnalysis(verbosity=0)
+
+    exported_imports = ts_section.required_imports()
+    expected_imports = [
+        "from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis\n"
+        "timeseries_analysis = TimeseriesAnalysis.timeseries_analysis"
+    ]
+
+    assert isinstance(exported_imports, list)
+    assert len(expected_imports) == len(exported_imports)
+    for expected_import, exported_import in zip(expected_imports, exported_imports):
+        assert expected_import == exported_import, "Exported import mismatch"
+
+
+def test_imports_verbosity_1():
+    ts_section = TimeseriesAnalysis(verbosity=1)
+
+    exported_imports = ts_section.required_imports()
+    expected_imports = list(set().union(*[s.required_imports() for s in ts_section.subsections]))
+
+    assert isinstance(exported_imports, list)
+    assert len(expected_imports) == len(exported_imports)
+    for expected_import, exported_import in zip(expected_imports, exported_imports):
+        assert expected_import == exported_import, "Exported import mismatch"
+
+
+def test_imports_verbosity_2():
+    ts_section = TimeseriesAnalysis(verbosity=2)
+
+    exported_imports = ts_section.required_imports()
+    expected_imports = list(set().union(*[s.required_imports() for s in ts_section.subsections]))
+
+    assert isinstance(exported_imports, list)
+    assert len(expected_imports) == len(exported_imports)
+    for expected_import, exported_import in zip(expected_imports, exported_imports):
+        assert expected_import == exported_import, "Exported import mismatch"
+
+
+def test_imports_verbosity_0_different_subsection_verbosities():
+    ts_section = TimeseriesAnalysis(
+        verbosity=0,
+        subsections=[
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeAnalysisPlot,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT,
+        ],
+        sampling_rate=1,
+        stft_window_size=2,
+        verbosity_rolling_statistics=1,
+        verbosity_short_time_ft=2,
+    )
+
+    exported_imports = ts_section.required_imports()
+
+    expected_imports = {
+        "from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis\n"
+        "timeseries_analysis = TimeseriesAnalysis.timeseries_analysis"
+    }
+    for s in ts_section.subsections:
+        if s.verbosity > 0:
+            expected_imports.update(s.required_imports())
+
+    assert isinstance(exported_imports, list)
+    assert set(exported_imports) == set(expected_imports)
+
+
+def test_show():
+    df = edvart.example_datasets.dataset_global_temp()
+    ts_section = TimeseriesAnalysis()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        with redirect_stdout(None):
+            ts_section.show(df)
