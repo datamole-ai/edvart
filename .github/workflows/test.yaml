@@ -1,0 +1,60 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  POETRY_VERSION: 1.5.1
+  CONVCO_VERSION: v0.4.0
+
+jobs:
+  test-python:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test against all supported Python minor versions
+        # Specified only minor version: the latest patch is used
+        python-version: ['3.11', '3.10', '3.9', '3.8']
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }}
+      - id: cache
+        uses: actions/cache@v3
+        with:
+          path: .venv/
+          key: ${{ runner.os }}-python-${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          poetry config --local virtualenvs.in-project true
+          poetry env use ${{ matrix.python-version }}
+          poetry install -E all
+      - name: Test python
+        run: |
+          poetry run python -m pytest --disable-warnings --cov=edvart tests/
+      - name: Lint
+        run: |
+          poetry run pylint --rcfile=.pylintrc edvart/
+          poetry run black --check --line-length 100 edvart/ tests/
+          poetry run isort --check --line-length 100 --profile black edvart/ tests/
+
+  commit-check:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # actions/checkout checks out HEAD only by default
+      - name: Get convco
+        run: |
+          curl -sSfL https://github.com/convco/convco/releases/download/${{ env.CONVCO_VERSION }}/convco-ubuntu.zip | zcat > /usr/local/bin/convco
+          chmod +x /usr/local/bin/convco
+      - name: Check
+        run: convco check

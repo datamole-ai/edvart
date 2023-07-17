@@ -1,0 +1,77 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - v*
+
+env:
+  POETRY_VERSION: 1.5.1
+
+# Do not allow more than one publish job to run at a time
+concurrency:
+  group: "publish"
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish-python:
+    runs-on: ubuntu-22.04
+    environment: publish
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    - name: Install poetry
+      run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }}
+    - name: Build and publish python stable
+      run: |
+        poetry config http-basic.pypi ${{ secrets.PYPI_USERNAME}} ${{ secrets.PYPI_PASSWORD }}
+        poetry publish --build
+
+  build-docs:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install poetry
+        run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }}
+      - uses: actions/cache@v3
+        with:
+          path: .venv/
+          key: ${{ runner.os }}-python-3.11-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          poetry config --local virtualenvs.in-project true
+          poetry install -E all
+      - name: Build docs
+        run: |
+          poetry run sphinx-apidoc -o docs/source/ edvart
+          poetry run make -C docs html
+      - name: Upload HTML
+        uses: actions/upload-artifact@v3
+        with:
+          name: html
+          path: docs/build/html
+          retention-days: 1
+
+  deploy-pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: docs/build/html
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
