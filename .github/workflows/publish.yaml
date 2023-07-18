@@ -1,12 +1,14 @@
 name: Publish
 
 on:
-  push:
-    tags:
-      - v*
+  workflow_run:
+    workflows: ["Test"]
+    branches: [main]
+    types: [completed]
 
 env:
   POETRY_VERSION: 1.5.1
+  CONVCO_VERSION: v0.4.0
 
 # Do not allow more than one publish job to run at a time
 concurrency:
@@ -14,20 +16,66 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-publish-python:
-    runs-on: ubuntu-22.04
+  publish-python:
+    runs-on: ubuntu-22.04  # convco needs GLIBC_2.32 which is not in 20.04
     environment: publish
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
-    - name: Install poetry
-      run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }}
-    - name: Build and publish python stable
-      run: |
-        poetry config http-basic.pypi ${{ secrets.PYPI_USERNAME}} ${{ secrets.PYPI_PASSWORD }}
-        poetry publish --build
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install poetry
+        run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }}
+      - name: Install convco
+        run: |
+          curl -sSfL "https://github.com/convco/convco/releases/download/${{ env.CONVCO_VERSION }}/convco-ubuntu.zip" | zcat > /usr/local/bin/convco
+          chmod +x /usr/local/bin/convco
+      - name: Set variables
+        run: |
+          base_version_command="
+            convco
+            version
+            --prefix=v
+          "
+          old_version=$($base_version_command)
+          new_version=$($base_version_command --bump)
+          new_tag=v"$new_version"
+          echo "OLD_VERSION=$old_version" >> $GITHUB_ENV
+          echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
+          echo "NEW_MAJOR_VERSION=$(echo $new_version | cut -d'.' -f1)" >> $GITHUB_ENV
+          echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
+          echo "old version: $old_version"
+          echo "new version: $new_version"
+          echo "new tag: $new_tag"
+      - name: Release and publish
+        # Only run if the version has changed.
+        # Only start publishing automatically when the major version is 1 or higher.
+        if: ${{ env.OLD_VERSION != env.NEW_VERSION && env.NEW_MAJOR_VERSION >= 1 }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ########################################
+          # Generate changelogs
+          ########################################
+          base_changelog_command="
+            convco
+            changelog
+            --unreleased=${{ env.NEW_VERSION }}
+          "
+          $base_changelog_command --max-versions=1 > ${{ env.CHANGELOG_FILE }}
+          $base_changelog_command > ${{ env.FULL_CHANGELOG_FILE }}
+          ########################################
+          # Create GitHub Release
+          ########################################
+          gh release create \
+            ${{ env.NEW_TAG }} \
+            --title ${{ env.NEW_TAG }} \
+            --notes-file ${{ env.CHANGELOG_FILE }} \
+            ${{ env.FULL_CHANGELOG_FILE }}
+          ########################################
+          # Publish to PyPI
+          ########################################
+          poetry config http-basic.pypi ${{ secrets.PYPI_USERNAME}} ${{ secrets.PYPI_PASSWORD }}
+          poetry publish --build
 
   build-docs:
     runs-on: ubuntu-22.04

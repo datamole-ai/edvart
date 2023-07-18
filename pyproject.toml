@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "edvart"
-version = "1.0.0"
+version = "0.0.0"  # DO NOT CHANGE - managed by Git tags and CI
 license = "MIT"
 repository = "https://github.com/datamole-ai/edvart"
 description = "Effective data visualization and reporting tool"
