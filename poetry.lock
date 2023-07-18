@@ -3647,4 +3647,4 @@ umap = ["umap-learn"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8, <3.12"
-content-hash = "401569065e1e6bb8f8b878cbdd22515fe9f11d34ba9bdc6549539cffdb10af28"
+content-hash = "80d08d360418b48d3ded41e85eaf82f05f0e27377ea711c1c69cb6996553322a"

@@ -501,7 +501,7 @@ def kendall(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _corr(df: pd.DataFrame, method: Literal["pearson", "kendall", "spearman"]) -> pd.DataFrame:
-    return df.corr(method=method)
+    return df.corr(method=method, numeric_only=True)
 
 
 def pair_plot(
