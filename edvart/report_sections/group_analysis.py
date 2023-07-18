@@ -448,7 +448,10 @@ class GroupAnalysis(Section):
             row_heights=[0.3, 0.7],
             vertical_spacing=0.02,
         )
-        for name, group in df.groupby(groupby):
+
+        for name, group in df.groupby(
+            by=(groupby[0] if isinstance(groupby, list) and len(groupby) == 1 else groupby)
+        ):
             if hasattr(name, "__len__") and not isinstance(name, str):
                 group_name = "_".join([str(i) for i in name])
             else:
