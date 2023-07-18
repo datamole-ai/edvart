@@ -26,6 +26,9 @@ def dataset_meteorite_landings() -> pd.DataFrame:
     Returns a dataset that includes the location, mass, composition, and fall year
     for over 45,000 meteorites that have struck our planet.
 
+    Source of data: NASA Open Data Portal
+    (https://data.nasa.gov/Space-Science/Meteorite-Landings/gh4g-9sfh)
+
     Returns
     -------
     pd.DataFrame
@@ -35,10 +38,16 @@ def dataset_meteorite_landings() -> pd.DataFrame:
 
 def dataset_titanic() -> pd.DataFrame:
     """
-    Returns a dataset that contains data for 887 of the real Titanic passengers.
+    Returns a dataset that contains data for 891 of the real Titanic passengers.
     Each row represents one person. The columns describe different attributes about the person
-    including whether they survived (S), their age (A), their passenger-class (C), their sex (G)
-    and the fare they paid (X).
+    including whether they survived, their age, their passenger-class, their sex
+    and the fare they paid.
+
+    The dataset contains 891 rows and 12 columns.
+
+
+    Source: https://www.kaggle.com/datasets/hesh97/titanicdataset-traincsv
+    Unmodified.
 
     Returns
     -------
@@ -51,6 +60,9 @@ def dataset_global_temp() -> pd.DataFrame:
     """
     Returns a time-series dataset containing monthly deviations from mean global average temperature
     from 1880 until 2016 according to two methodologies: GCAG and GISTEMP.
+
+    Source: https://datahub.io/core/global-temp.
+    Modified: Moved each methodology into its own column.
     """
     return pd.read_csv(
         os.path.join(_DATASETS_DIR, "global_temp.csv"),
@@ -63,6 +75,12 @@ def dataset_pollution() -> pd.DataFrame:
     """
     Returns a time-series dataset containing hourly weather and pollution data from 2010 until 2014
     from Beijing, China. There are 43800 rows and 8 columns.
+
+    Source: https://www.kaggle.com/datasets/djhavera/beijing-pm25-data-data-set
+    Modified:
+    - Merged columns "year", "month", "day", "hour" into a single "date" column.
+    - Removed the first day, for which pollution data is missing.
+    - Renamed columns.
     """
     return pd.read_csv(
         os.path.join(_DATASETS_DIR, "pollution.csv"),
