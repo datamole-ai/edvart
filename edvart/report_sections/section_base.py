@@ -11,11 +11,34 @@ class Section(ABC):
     Parameters
     -----------
     verbosity : int
-        The verbosity of the code generated in the exported notebook,
-        must be one of [0, 1, 2].
+        The verbosity of the code generated in the exported notebook.
+        Must be one of [0, 1, 2].
     columns : List[str], optional
-        List of columns that are considered in the analysis of the section,
-        all columns are used by default
+        List of columns that are considered in the analysis of the section.
+        All columns are used by default.
+
+    Notes
+    -----
+    To create a new section, subclass this class and implement the abstract methods.
+
+    * `__init__` initializes your object and accepts `verbosity` and `columns`
+      (in addition to any other section specific parameters).
+        - `verbosity` is an integer representing the detail level of the exported code.
+          The value can be either `0`, `1`, or `2`.
+            * `0` exports a single function call that generates the entire section
+            * `1` exports a function call for each of the subsection the subsection
+            * `2` exports the full code of the analysis
+        - `columns` is a list of names of columns which will be used in the analysis.
+    * `required_imports` returns a list of lines of code that import the packages
+       required by the analysis which will get added to a cell at the top of the exported notebook.
+       Keep in mind that different verbosity levels usually require a different set of imports.
+    * `add_cells(cells)` adds cells to the list of cells `cells`.
+       This method is used to build the code for the exported notebook.
+        - To create a markdown cell, pass a string to `nbformat.v4.new_markdown_cell()`
+        - To create a code cell pass a string to `nbformat.v4.new_code_cell()`
+        - Finally append the objects returned by the functions mentioned above to `cells`
+        - Keep in mind that the code created should conform to `verbosity`
+    * `show` renders the analysis in place in the calling notebook.
     """
 
     def __init__(self, verbosity: int = 0, columns: Optional[List[str]] = None):
