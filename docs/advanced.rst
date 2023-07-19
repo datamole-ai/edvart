@@ -33,7 +33,7 @@ For example, to export a notebook called `notebook.ipynb` using the `lab` templa
 TimeseriesReport class
 ----------------------
 
-This class is a special version of the `Report` class which is specifically meant to be used for analysis of time series.
+This class is a special version of the :py:class:`~edvart.report.Report` class which is specifically meant to be used for analysis of time series.
 
 The main differences are a different set of default sections including :py:class:`~edvart.report_sections.TimeseriesAnalysis`,
 which cannot be added to the normal `Report` and the assumption that analyzed data is time-indexed.
@@ -57,7 +57,7 @@ Each column is treated as a separate timeseries.
             ['2019Q4', 90000, 12000],
             ['2020Q1', 130000, 12000],
       ],
-      columns=['Quarter', 'Revenue', 'Profit']
+      columns=['Quarter', 'Revenue', 'Profit'],
    )
 
    # Reindex using helper function to have 'Quarter' as index
@@ -137,15 +137,16 @@ Or you can set section verbosity (described later).
 
 .. code-block:: python
 
-    # Configures sections to omit or use specific columns
-    import edvart
-    df = edvart.example_datasets.dataset_titanic()
-    report = edvart.Report(df,
-                         columns_overview=['Name', 'Survived'],
-                         use_default_sections = False)
-    report \
-       .add_overview(omit_columns=['PassengerId'])
-       .add_univariate_analysis(use_columns=['Name','Sex','Age'])
+  # Configures sections to omit or use specific columns
+  import edvart
+
+  df = edvart.example_datasets.dataset_titanic()
+  report = edvart.Report(df, columns_overview=["Name", "Survived"], use_default_sections=False)
+
+  report.add_overview(omit_columns=["PassengerId"]).add_univariate_analysis(
+    use_columns=["Name", "Sex", "Age"]
+  )
+
 
 
 .. _verbosity:
@@ -173,15 +174,15 @@ Examples:
 
     # Set default verbosity for all sections to 1
     import edvart
-    df = edvart.example_datasets.dataset_titanic()
-    edvart.Report(df, verbosity=1).export_notebook('test-export.ipynb')
 
+    df = edvart.example_datasets.dataset_titanic()
+    edvart.Report(df, verbosity=1).export_notebook("test-export.ipynb")
 
 
 .. code-block:: python
 
     # Set default verbosity to 1 but use verbosity 2 for univariate analysis
     import edvart
+
     df = edvart.example_datasets.dataset_titanic()
-    edvart.Report(df, verbosity=1, verbosity_univariate_analysis=2) \
-        .export_notebook('test-export.ipynb')
+    edvart.Report(df, verbosity=1, verbosity_univariate_analysis=2).export_notebook("test-export.ipynb")
