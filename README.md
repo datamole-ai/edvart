@@ -22,7 +22,7 @@ See the notebook `api-example.md` for usage examples.
 
 ## User documentation
 
-TODO: Add link
+The user documentation is available at https://datamole-ai.github.io/edvart/.
 
 ## License
 edvart is licensed under the [MIT license](https://opensource.org/license/mit/). See the LICENSE file for more details.
