@@ -19,6 +19,8 @@ jobs:
   publish-python:
     runs-on: ubuntu-22.04  # convco needs GLIBC_2.32 which is not in 20.04
     environment: publish
+    outputs:
+      new_version: ${{ steps.set-vars.outputs.new_version }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -30,6 +32,7 @@ jobs:
           curl -sSfL "https://github.com/convco/convco/releases/download/${{ env.CONVCO_VERSION }}/convco-ubuntu.zip" | zcat > /usr/local/bin/convco
           chmod +x /usr/local/bin/convco
       - name: Set variables
+        id: set-vars
         run: |
           base_version_command="
             convco
@@ -41,6 +44,7 @@ jobs:
           new_tag=v"$new_version"
           echo "OLD_VERSION=$old_version" >> $GITHUB_ENV
           echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
           echo "NEW_MAJOR_VERSION=$(echo $new_version | cut -d'.' -f1)" >> $GITHUB_ENV
           echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
           echo "old version: $old_version"
@@ -79,6 +83,7 @@ jobs:
 
   build-docs:
     runs-on: ubuntu-22.04
+    needs: publish-python
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -97,6 +102,7 @@ jobs:
           poetry install -E all
       - name: Build docs
         run: |
+          poetry version ${{ needs.publish-python.outputs.new_version }}
           poetry run sphinx-apidoc -o docs/source/ edvart
           poetry run make -C docs html
       - name: Upload HTML
