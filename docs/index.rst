@@ -25,7 +25,7 @@ Table of Contents
 .. include:: installation.rst
 .. include:: getting_started.rst
 
-Other links
+Links
 -----------
 * `Gitlab repository <GitLab URL>`_
 
