@@ -56,5 +56,9 @@ jobs:
         run: |
           curl -sSfL https://github.com/convco/convco/releases/download/${{ env.CONVCO_VERSION }}/convco-ubuntu.zip | zcat > /usr/local/bin/convco
           chmod +x /usr/local/bin/convco
-      - name: Check
+      - name: Check pull request title
+        if: github.event_name == 'pull_request'
+        run: echo "${{ github.event.pull_request.title }}" | convco check --from-stdin
+      - name: Check all commits
+        if: github.ref == 'refs/heads/main'
         run: convco check
