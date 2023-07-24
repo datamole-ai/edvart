@@ -27,6 +27,6 @@ Table of Contents
 
 Links
 -----------
-* `Gitlab repository <GitLab URL>`_
+* `GitHub repository <https://github.com/datamole-ai/edvart>`_
 
 * :ref:`modindex`
