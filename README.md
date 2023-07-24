@@ -1,7 +1,7 @@
 # Edvart
 
 Exploratory Data Analysis (EDA) is the initial task a data scientist or data
-analyst undertakes when they obtains new data. EDA refers to the critical
+analyst undertakes when they obtain new data. EDA refers to the critical
 process of conducting preliminary investigations on data to uncover patterns,
 spot anomalies, test hypotheses, and verify assumptions with the help of
 summary statistics and graphical representations.
