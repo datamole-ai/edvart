@@ -9,6 +9,8 @@ on:
 env:
   POETRY_VERSION: 1.5.1
   CONVCO_VERSION: v0.4.0
+  CHANGELOG_FILE: CHANGELOG.md
+  FULL_CHANGELOG_FILE: FULL_CHANGELOG.md
 
 # Do not allow more than one publish job to run at a time
 concurrency:
