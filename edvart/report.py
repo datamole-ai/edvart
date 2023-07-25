@@ -3,6 +3,7 @@
 # Standard imports
 import base64
 import logging
+import os
 import pickle
 from abc import ABC
 from typing import List, Optional, Tuple, Union
@@ -225,7 +226,14 @@ class ReportBase(ABC):
 
         html_exporter = nbconvert.HTMLExporter(**html_exp_kwargs)
 
+        # Workaround for a warning from `nbconvert` regarding debugging
+        # and frozen modules. We are not debugging, so we can safely ignore it.
+        disable_validation_env_var_name = "PYDEVD_DISABLE_FILE_VALIDATION"
+        env_original = os.environ.copy()
+        os.environ[disable_validation_env_var_name] = "1"
+
         html = html_exporter.from_notebook_node(nb)[0]
+        os.environ = env_original
 
         # Save HTML to file
         with open(html_filepath, "w") as html_file:
