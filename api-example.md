@@ -17,8 +17,6 @@ jupyter:
 %autoreload 2
 
 import edvart
-import pandas as pd
-import os
 
 import plotly.offline as py
 py.init_notebook_mode()
