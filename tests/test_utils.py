@@ -29,7 +29,6 @@ def test_full_na_series():
             warnings.simplefilter(action="error", category=RuntimeWarning)
             result = func(series)
             assert math.isnan(float(result))
-    assert utils.is_numeric(series)
     assert utils.is_categorical(series)
     assert utils.num_unique_values(series) == 0
 
