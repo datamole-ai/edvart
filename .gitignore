@@ -1,3 +1,8 @@
+# Tracking locked dependencies is unnecessary overhead for packages.
+# Moreover, it's potentially misleading as the package should theoratically
+# work with any package combination that is allowed by pyproject.toml.
+poetry.lock
+
 # Byte-compiled / optimized files
 __pycache__/
 .pytest_cache/
