@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from edvart import data_types
@@ -20,6 +21,16 @@ def test_inference():
         data_types.infer_data_type(pd.Series([True, False, False, True, True]))
         == data_types.DataType.BOOLEAN
     ), "Should be boolean type"
+    assert data_types.infer_data_type(
+        pd.Series([None, None, np.nan, float("nan")]) == data_types.DataType.MISSING
+    ), "Should be missing"
+
+
+def test_missing_series():
+    assert data_types.is_missing(pd.Series([None, None, np.nan, float("nan")])), "Should be missing"
+    assert data_types.is_missing(pd.Series([pd.NA])), "Should be missing"
+    assert not data_types.is_missing(pd.Series([1, np.nan, None])), "Should not be missing"
+    assert not data_types.is_missing(pd.Series(["2023-01-01", None])), "Should not be missing"
 
 
 def test_numeric_series():
@@ -33,6 +44,9 @@ def test_numeric_series():
     assert not data_types.is_numeric(
         pd.Series([23, 45, 2, 1, -3, -66, "99", "-1207"])
     ), "Should not be numeric type"
+    assert not data_types.is_numeric(
+        pd.Series([None, None, np.nan, float("nan")])
+    ), "Should not be numeric"
 
 
 def test_categorical_series():
@@ -43,6 +57,10 @@ def test_categorical_series():
     assert not data_types.is_categorical(
         pd.Series([1, 2, 31, 4, 52, 6, 87, 87.7, 9, 1, 3, 4, 1, 10, 123123, 9876, 1.2, 6.8])
     ), "Should not be categorical"
+    assert not data_types.is_categorical(
+        pd.Series([None, None, np.nan, float("nan")])
+    ), "Should not be categorical"
+    assert not data_types.is_categorical(pd.Series([pd.NA])), "Should not be categorical"
 
 
 def test_boolean_series():
@@ -60,6 +78,7 @@ def test_boolean_series():
     assert not data_types.is_boolean(pd.Series(["a", "abc", "2"])), "Should not be boolean"
     assert not data_types.is_boolean(pd.Series(["A", "B", "A", "A", "B"])), "Should not be boolean"
     assert not data_types.is_boolean(pd.Series([-0.2, 1.6567, 3, 4, 5])), "Should not be boolean"
+    assert not data_types.is_boolean(pd.Series([None])), "Should not be boolean"
 
 
 def test_date_series():

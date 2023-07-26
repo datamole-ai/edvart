@@ -69,6 +69,8 @@ def is_numeric(series: pd.Series) -> bool:
     bool
         Boolean indicating whether series contains only numbers.
     """
+    if is_missing(series):
+        return False
     # When an unkown dtype is encountered, `np.issubdtype(series.dtype, np.number)`
     # raises a TypeError. This happens for example if `series` is `pd.Categorical`
     # If the dtype is unknown, we treat it as non-numeric, therefore return False.
@@ -111,7 +113,8 @@ def is_categorical(series: pd.Series, unique_value_count_threshold: int = 10) ->
         Boolean indicating if series is categorical.
     """
     return (
-        not is_boolean(series)
+        not is_missing(series)
+        and not is_boolean(series)
         and not is_date(series)
         and (
             (
@@ -136,7 +139,9 @@ def is_boolean(series: pd.Series) -> bool:
     bool
         Boolean indicating if series is boolean.
     """
-    return pd.api.types.is_bool_dtype(series) or set(series.unique()) <= {1, 0, pd.NA}
+    return not is_missing(series) and (
+        pd.api.types.is_bool_dtype(series) or set(series.unique()) <= {1, 0, pd.NA}
+    )
 
 
 def is_date(series: pd.Series) -> bool:
@@ -154,6 +159,13 @@ def is_date(series: pd.Series) -> bool:
     """
     if isinstance(series.dtype, pd.PeriodDtype):
         return True
-    no_numerics = np.all(~series.astype(str).str.isnumeric())
-    converted_series = pd.to_datetime(series, errors="coerce", infer_datetime_format=True)
-    return converted_series.notna().all() and no_numerics and not is_numeric(series)
+    if is_missing(series) or is_numeric(series):
+        return False
+    contains_numerics = np.any(series.astype(str).str.isnumeric())
+    if contains_numerics:
+        return False
+    try:
+        converted_series = pd.to_datetime(series, errors="coerce", infer_datetime_format=True)
+        return converted_series.notna().all()
+    except ValueError:
+        return False
