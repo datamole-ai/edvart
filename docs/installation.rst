@@ -31,7 +31,7 @@ snippet:
    python = ">=3.8, <3.12"
    edvart = { version = "|VERSION|", extras = ["umap"] }
 
-To install edvart with the optional "umap" dependencyvia pip, run the following command:
+To install edvart with the optional "umap" dependency via pip, run the following command:
 
 .. code-block:: console
 
