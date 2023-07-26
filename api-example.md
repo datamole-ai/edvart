@@ -22,6 +22,10 @@ import plotly.offline as py
 py.init_notebook_mode()
 ```
 
+```markdown
+## Basic report
+```
+
 ```python
 dataset = edvart.example_datasets.dataset_titanic()
 ```
@@ -35,7 +39,8 @@ report = edvart.Report(
     dataset,
     verbosity=0,
     columns_overview=['Name', 'Survived'],
-    columns_univariate_analysis=['Name', 'Age', 'Pclass']
+    columns_univariate_analysis=['Name', 'Age', 'Pclass'],
+    groupby='Survived',
 )
 ```
 
@@ -47,12 +52,16 @@ report.export_notebook('test-export.ipynb')
 report.export_html(
     html_filepath='test-export.html',
     dataset_name='Titanic',
-    dataset_description='Dataset that contains data for 887 of the real Titanic passengers.'
+    dataset_description='Dataset that contains data for 891 of the real Titanic passengers.'
 )
 ```
 
 ```python
 report.show()
+```
+
+```markdown
+## Timeseries report
 ```
 
 ```python
