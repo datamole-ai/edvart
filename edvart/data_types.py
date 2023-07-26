@@ -17,6 +17,7 @@ class DataType(IntEnum):
     BOOLEAN = (3,)
     DATE = (4,)
     UNKNOWN = 5
+    MISSING = 6
 
     def __str__(self):
         return self.name.lower()
@@ -38,7 +39,8 @@ def infer_data_type(series: pd.Series, string_representation: bool = False) -> U
         Inferred custom edvart data type or its string representation.
     """
     ret = None
-
+    if is_missing(series):
+        ret = DataType.MISSING
     if is_boolean(series):
         ret = DataType.BOOLEAN
     elif is_date(series):
@@ -74,6 +76,22 @@ def is_numeric(series: pd.Series) -> bool:
         return np.issubdtype(series.dtype, np.number)
     except TypeError:
         return False
+
+
+def is_missing(series: pd.Series) -> bool:
+    """Function to tell if the series contains only missing values.
+
+    Parameters
+    ----------
+    series : pd.Series
+        Series from which to infer data type.
+
+    Returns
+    -------
+    bool
+        True if all values in the series are missing, False otherwise.
+    """
+    return series.isnull().all()
 
 
 def is_categorical(series: pd.Series, unique_value_count_threshold: int = 10) -> bool:
