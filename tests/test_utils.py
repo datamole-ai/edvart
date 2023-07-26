@@ -1,4 +1,5 @@
 import math
+import os
 import warnings
 
 import numpy as np
@@ -31,3 +32,11 @@ def test_full_na_series():
     assert utils.is_numeric(series)
     assert utils.is_categorical(series)
     assert utils.num_unique_values(series) == 0
+
+
+def test_env_var():
+    test_var_name = "TEST_VAR"
+    test_var_value = "test"
+    with utils.env_var(test_var_name, test_var_value):
+        assert os.environ[test_var_name] == test_var_value
+    assert test_var_value not in os.environ

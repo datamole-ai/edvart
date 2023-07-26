@@ -3,7 +3,6 @@
 # Standard imports
 import base64
 import logging
-import os
 import pickle
 from abc import ABC
 from typing import List, Optional, Tuple, Union
@@ -24,6 +23,7 @@ from edvart.report_sections.multivariate_analysis import MultivariateAnalysis
 from edvart.report_sections.table_of_contents import TableOfContents
 from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis
 from edvart.report_sections.univariate_analysis import UnivariateAnalysis
+from edvart.utils import env_var
 
 
 class ReportBase(ABC):
@@ -228,12 +228,8 @@ class ReportBase(ABC):
 
         # Workaround for a warning from `nbconvert` regarding debugging
         # and frozen modules. We are not debugging, so we can safely ignore it.
-        disable_validation_env_var_name = "PYDEVD_DISABLE_FILE_VALIDATION"
-        env_original = os.environ.copy()
-        os.environ[disable_validation_env_var_name] = "1"
-
-        html = html_exporter.from_notebook_node(nb)[0]
-        os.environ = env_original
+        with env_var("PYDEVD_DISABLE_FILE_VALIDATION", "1"):
+            html = html_exporter.from_notebook_node(nb)[0]
 
         # Save HTML to file
         with open(html_filepath, "w") as html_file:

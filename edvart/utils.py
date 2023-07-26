@@ -1,6 +1,8 @@
 """Utils package."""
 
-from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
+import os
+from contextlib import contextmanager
+from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Tuple, Union
 
 import pandas as pd
 import seaborn as sns
@@ -542,3 +544,23 @@ def contingency_table(df: pd.DataFrame) -> pd.DataFrame:
     """
     table = sm.stats.Table.from_data(df)
     return table.table_orig.astype(int)
+
+
+@contextmanager
+def env_var(name: str, value: str) -> Iterator[None]:
+    """
+    Set an environment variable for the duration of the context.
+
+    Parameters
+    ----------
+    name : str
+        Name of the environment variable.
+    value : str
+        Value of the environment variable.
+    """
+    original_env = os.environ.copy()
+    os.environ[name] = value
+    try:
+        yield
+    finally:
+        os.environ = original_env
