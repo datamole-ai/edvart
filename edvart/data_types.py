@@ -166,6 +166,6 @@ def is_date(series: pd.Series) -> bool:
         return False
     try:
         converted_series = pd.to_datetime(series, errors="coerce", infer_datetime_format=True)
-        return converted_series.notna().all()
     except ValueError:
         return False
+    return converted_series.notna().all()
