@@ -12,10 +12,10 @@ import pandas as pd
 class DataType(IntEnum):
     """Class describe possible data types."""
 
-    NUMERIC = (1,)
-    CATEGORICAL = (2,)
-    BOOLEAN = (3,)
-    DATE = (4,)
+    NUMERIC = 1
+    CATEGORICAL = 2
+    BOOLEAN = 3
+    DATE = 4
     UNKNOWN = 5
 
     def __str__(self):
