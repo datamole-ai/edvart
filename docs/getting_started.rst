@@ -19,8 +19,8 @@ Getting started
     report.export_notebook("titanic_report.ipynb")
 
 You can modify the generated notebook if you want to modify some settings.
-For more advanced usage of edvart please read section
-:ref:`Advanced usage of Data Analysis Report Tool <advanced_usage>`.
+For more advanced usage of edvart, please read the documentation section
+:ref:`Advanced usage <advanced_usage>`.
 
 3. Generate HTML report
 
