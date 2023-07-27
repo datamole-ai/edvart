@@ -182,7 +182,7 @@ class TimeAnalysisPlot(Section):
         if self.columns is not None:
             default_call += f", columns={self.columns}"
         if self.color_col is not None:
-            default_call += f", color_col={self.color_col}"
+            default_call += f", color_col='{self.color_col}'"
         if self.separate_plots:
             default_call += ", separate_plots=True"
         default_call += ")"

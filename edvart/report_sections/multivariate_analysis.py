@@ -227,7 +227,7 @@ class MultivariateAnalysis(ReportSection):
             if self.columns is not None:
                 code += f", columns={self.columns}"
             if self.color_col is not None:
-                code += f", color_col={self.color_col}"
+                code += f", color_col='{self.color_col}'"
             code += ")"
             cells.append(nbfv4.new_code_cell(code))
             for sub in self.subsections:
