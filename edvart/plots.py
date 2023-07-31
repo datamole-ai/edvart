@@ -158,8 +158,10 @@ def scatter_plot_2d(
     if interactive:
         fig.show()
     else:
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        if xlabel is not None:
+            ax.set_xlabel(xlabel)
+        if ylabel is not None:
+            ax.set_ylabel(ylabel)
         if not show_xticks:
             ax.set_xticks([])
         if not show_yticks:
