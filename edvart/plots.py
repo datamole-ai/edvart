@@ -166,4 +166,6 @@ def scatter_plot_2d(
             ax.set_xticks([])
         if not show_yticks:
             ax.set_yticks([])
+        if not show_zerolines:
+            ax.grid(False)
         plt.show()
