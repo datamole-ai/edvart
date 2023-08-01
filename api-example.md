@@ -35,7 +35,7 @@ dataset.head()
 ```
 
 ```python
-report = edvart.Report(
+report = edvart.DefaultReport(
     dataset,
     verbosity=0,
     columns_overview=['Name', 'Survived'],
@@ -69,7 +69,7 @@ dataset_ts = edvart.example_datasets.dataset_global_temp()
 ```
 
 ```python
-report_ts = edvart.TimeseriesReport(
+report_ts = edvart.DefaultTimeseriesReport(
     dataset_ts,
     # Monthly data -> analyze yearly seasonality
     sampling_rate=12,
