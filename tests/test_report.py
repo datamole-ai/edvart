@@ -4,13 +4,53 @@ from contextlib import redirect_stdout
 import numpy as np
 import pandas as pd
 
-from edvart import Report
+from edvart.report import DefaultReport, Report
+
+
+def _get_test_df() -> pd.DataFrame:
+    return pd.DataFrame(
+        data=np.random.random_sample((50, 20)), columns=[f"Col{i}" for i in range(20)]
+    )
+
+
+def test_report():
+    report = Report(dataframe=_get_test_df())
+    assert len(report.sections) == 0, "Report should be empty"
+
+    report.add_overview(verbosity=1)
+    assert len(report.sections) == 1, "Report should have one section"
+
+    report.add_bivariate_analysis(verbosity=2, use_columns=["Col1", "Col2", "Col3"])
+    assert len(report.sections) == 2, "Report should have two sections"
+
+    assert report.sections[0].name == "Overview", "Wrong section name"
+    assert report.sections[0].verbosity == 1, "Wrong section verbosity"
+    assert report.sections[0].columns is None, "Default column selection should be None"
+
+    assert report.sections[1].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
+
+
+def test_default_report():
+    report = DefaultReport(
+        dataframe=_get_test_df(),
+        verbosity_overview=1,
+        verbosity_univariate_analysis=2,
+        columns_bivariate_analysis=["Col1", "Col2", "Col3"],
+    )
+    assert len(report.sections) > 0, "Default report should not be empty"
+
+    assert report.sections[1].verbosity == 1, "Wrong section verbosity"
+    assert report.sections[1].columns is None, "Default column selection should be None"
+
+    assert report.sections[2].verbosity == 2, "Wrong section verbosity"
+    assert report.sections[2].columns is None, "Default column selection should be None"
+
+    assert report.sections[3].verbosity == 0, "Wrong section verbosity"
+    assert report.sections[3].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
 
 
 def test_column_selection():
-    test_df = pd.DataFrame(
-        data=np.random.random_sample((50, 20)), columns=[f"Col{i}" for i in range(20)]
-    )
+    test_df = _get_test_df()
     report = Report(dataframe=test_df)
 
     # Default column selection
@@ -34,9 +74,7 @@ def test_column_selection():
 
 
 def test_show():
-    test_df = pd.DataFrame(
-        data=np.random.random_sample((50, 20)), columns=[f"Col{i}" for i in range(20)]
-    )
+    test_df = _get_test_df()
     report = Report(dataframe=test_df)
 
     with warnings.catch_warnings():
