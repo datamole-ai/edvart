@@ -10,7 +10,10 @@ Report class
 ------------
 
 The most important class of the package :py:class:`~edvart.report.Report`.
-This class allows you to specify :ref:`verbosity <verbosity>` or specify which columns should be used.
+The report consists of sections, which can be added via methods of the `Report` class.
+The report is empty by default.
+The class :py:class:`~edvart.report.DefaultReport` is a subclass of `Report`,
+which contains a default set of sections.
 
 With created instance of `Report` you can:
 
@@ -141,7 +144,7 @@ Or you can set section verbosity (described later).
   import edvart
 
   df = edvart.example_datasets.dataset_titanic()
-  report = edvart.Report(df, columns_overview=["Name", "Survived"], use_default_sections=False)
+  report = edvart.Report(df)
 
   report.add_overview(omit_columns=["PassengerId"]).add_univariate_analysis(
     use_columns=["Name", "Sex", "Age"]
@@ -176,7 +179,7 @@ Examples:
     import edvart
 
     df = edvart.example_datasets.dataset_titanic()
-    edvart.Report(df, verbosity=1).export_notebook("test-export.ipynb")
+    edvart.DefaultReport(df, verbosity=1).export_notebook("test-export.ipynb")
 
 
 .. code-block:: python
@@ -185,4 +188,4 @@ Examples:
     import edvart
 
     df = edvart.example_datasets.dataset_titanic()
-    edvart.Report(df, verbosity=1, verbosity_univariate_analysis=2).export_notebook("test-export.ipynb")
+    edvart.DefaultReport(df, verbosity=1, verbosity_univariate_analysis=2).export_notebook("test-export.ipynb")
