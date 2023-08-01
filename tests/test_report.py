@@ -11,7 +11,7 @@ def test_column_selection():
     test_df = pd.DataFrame(
         data=np.random.random_sample((50, 20)), columns=[f"Col{i}" for i in range(20)]
     )
-    report = Report(dataframe=test_df, use_default_sections=False)
+    report = Report(dataframe=test_df)
 
     # Default column selection
     report.add_overview()
@@ -37,7 +37,7 @@ def test_show():
     test_df = pd.DataFrame(
         data=np.random.random_sample((50, 20)), columns=[f"Col{i}" for i in range(20)]
     )
-    report = Report(dataframe=test_df, use_default_sections=False)
+    report = Report(dataframe=test_df)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)

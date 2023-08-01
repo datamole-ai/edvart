@@ -34,8 +34,6 @@ class ReportBase(ABC):
     ----------
     dataframe : pd.DataFrame
         Data from which to generate the report.
-    use_default_sections : bool (default = True)
-        Whether add the report's default sections to the report.
     verbosity : int (default = 0)
         The default verbosity for the exported code of the entire report, has to be one of
         [0, 1, 2], by default 0.
@@ -49,12 +47,10 @@ class ReportBase(ABC):
     def __init__(
         self,
         dataframe: pd.DataFrame,
-        use_default_sections: bool = True,
         verbosity: int = 0,
     ):
         self._class_logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
         self.df = dataframe
-        self.use_default_sections = use_default_sections
         self.sections = []
         # Check for global verbosity validity
         if verbosity not in [0, 1, 2]:
@@ -653,21 +649,39 @@ class ReportBase(ABC):
 
 
 class Report(ReportBase):
-    """This class instantiates an object that the edvart user should mainly use for report
-    configuration and export.
+    """
+    A report for tabular datasets. Contains no sections by default.
 
-    This class is intended for creating general-purpose reports.
-    For creating a report for time-series data, please see `TimeseriesReport`.
+    See `DefaultReport` for a report with default sections.
+    See methods `add_*` for adding sections to the report.
 
     Parameters
     ----------
     dataframe : pd.DataFrame
         Data from which to generate the report.
-    use_default_sections : bool (default = True)
-        If True, all default sections of the report are added, otherwise you have to add
-        the sections manually using add_<section name>() methods.
-        Default sections for this report are: overview, univariate analysis, bivariate analysis and
-        multivariate analysis.
+    verbosity : int (default = 0)
+        Verbosity of the exported code of the entire report, has to be one of
+        [0, 1, 2], by default 0.
+    """
+
+    def __init__(self, dataframe: pd.DataFrame, verbosity: int = 0):
+        super().__init__(dataframe=dataframe, verbosity=verbosity)
+
+
+class DefaultReport(Report):
+    """A report for tabular data containing default sections.
+
+    The report contains the following sections:
+    - dataset overview
+    - univariate analysis
+    - bivariate analysis
+    - multivariate analysis
+    - group analysis (if `groupby` is specified)
+
+    Parameters
+    ----------
+    dataframe : pd.DataFrame
+        Data from which to generate the report.
     verbosity : int (default = 0)
         The default verbosity for the exported code of the entire report, has to be one of
         [0, 1, 2], by default 0.
@@ -701,7 +715,6 @@ class Report(ReportBase):
     def __init__(
         self,
         dataframe: pd.DataFrame,
-        use_default_sections: bool = True,
         verbosity: int = 0,
         verbosity_overview: Optional[int] = None,
         verbosity_univariate_analysis: Optional[int] = None,
@@ -715,7 +728,7 @@ class Report(ReportBase):
         columns_group_analysis: Optional[List[str]] = None,
         groupby: Union[str, List[str]] = None,
     ):
-        super().__init__(dataframe, use_default_sections, verbosity)
+        super().__init__(dataframe, verbosity)
 
         # If section verbosities are not set, default to the global verbosity
         if verbosity_overview is None:
@@ -726,90 +739,53 @@ class Report(ReportBase):
             verbosity_bivariate_analysis = verbosity
         if verbosity_multivariate_analysis is None:
             verbosity_multivariate_analysis = verbosity
-        # Add default sections if user doesn't build the report manually
-        if use_default_sections:
-            self.add_table_of_contents(include_subsections=True)
-            self.add_overview(verbosity=verbosity_overview, use_columns=columns_overview)
-            self.add_univariate_analysis(
-                verbosity=verbosity_univariate_analysis,
-                use_columns=columns_univariate_analysis,
+
+        # Add default sections
+        self.add_table_of_contents(include_subsections=True)
+        self.add_overview(verbosity=verbosity_overview, use_columns=columns_overview)
+        self.add_univariate_analysis(
+            verbosity=verbosity_univariate_analysis,
+            use_columns=columns_univariate_analysis,
+        )
+        if isinstance(groupby, str):
+            color_col = groupby
+        elif hasattr(groupby, "__len__") and len(groupby) == 1:
+            color_col = groupby[0]
+        else:
+            color_col = None
+        self.add_bivariate_analysis(
+            verbosity=verbosity_bivariate_analysis,
+            use_columns=columns_bivariate_analysis,
+            color_col=color_col,
+        )
+        self.add_multivariate_analysis(
+            verbosity=verbosity_multivariate_analysis,
+            use_columns=columns_multivariate_analysis,
+            color_col=color_col,
+        )
+        if groupby is not None:
+            self.add_group_analysis(
+                groupby=groupby,
+                use_columns=columns_group_analysis,
+                verbosity=verbosity_group_analysis,
             )
-            if isinstance(groupby, str):
-                color_col = groupby
-            elif hasattr(groupby, "__len__") and len(groupby) == 1:
-                color_col = groupby[0]
-            else:
-                color_col = None
-            self.add_bivariate_analysis(
-                verbosity=verbosity_bivariate_analysis,
-                use_columns=columns_bivariate_analysis,
-                color_col=color_col,
-            )
-            self.add_multivariate_analysis(
-                verbosity=verbosity_multivariate_analysis,
-                use_columns=columns_multivariate_analysis,
-                color_col=color_col,
-            )
-            if groupby is not None:
-                self.add_group_analysis(
-                    groupby=groupby,
-                    use_columns=columns_group_analysis,
-                    verbosity=verbosity_group_analysis,
-                )
 
 
 class TimeseriesReport(ReportBase):
-    """This class instantiates an object that the edvart user should mainly use for report
-    configuration and export, specifically for timeseries data.
+    """
+    A report for time-series data. Contains no sections by default.
 
-    Parameters
-    ----------
-    dataframe : pd.DataFrame
-        Data from which to generate the report. Data needs to be indexed by time: pd.DateTimeIndex
-        or pd.PeriodIndex.
-        The data is assumed to be sorted according to the time index in ascending order.
-    use_default_sections : bool, optional
-        If True, all default sections of the report are added, otherwise you have to add
-        the sections manually using add_<section name>() methods.
-        Default sections for this report are overview, univariate analysis and timeseries analysis.
-    verbosity : int (default = 0)
-        The default verbosity for the exported code of the entire report, has to be one of
-        [0, 1, 2], by default 0.
-    verbosity_overview : int, optional
-        Verbosity of the overview section
-    verbosity_univariate_analysis : int, optional
-        Verbosity of the univariate analysis section
-    verbosity_timeseries_analysis : int, optional
-        Verbosity of the timeseries analysis section
-    columns_overview : List[str], optional
-        Subset of columns to use in overview section
-    columns_univariate_analysis : List[str], optional
-        Subset of columns to use in univariate analysis section
-    columns_timeseries_analysis : List[str], optional
-        Subset of columns to use in timeseries analysis section
-    sampling_rate : int, optional
-        Sampling rate for Fourier transform and Short-time Fourier transform subsections. Determines
-        frequency unit for analysis of frequencies, for example with monthly data and sampling rate
-        12, yearly frequncy spectrum is produced.
-        If not set, these two sections will not be included.
-    stft_window_size : int, optional
-        Windows size for short-time Fourier transform subsection. If not set, STFT will be exluded.
+    See `DefaultTimeseriesReport` for a time-series report with default sections.
+    See methods `add_*` for adding sections to the report.
+
+    Raises
+    ------
+    ValueError
+        If the input dataframe is not indexed by time.
     """
 
-    def __init__(
-        self,
-        dataframe: pd.DataFrame,
-        use_default_sections: bool = True,
-        verbosity: int = 0,
-        verbosity_overview: Optional[int] = None,
-        verbosity_univariate_analysis: Optional[int] = None,
-        verbosity_timeseries_analysis: Optional[int] = None,
-        columns_overview: Optional[List[str]] = None,
-        columns_univariate_analysis: Optional[List[str]] = None,
-        columns_timeseries_analysis: Optional[List[str]] = None,
-        sampling_rate: Optional[int] = None,
-        stft_window_size: Optional[int] = None,
-    ):
+    def __init__(self, dataframe: pd.DataFrame, verbosity: int = 0):
+        super().__init__(dataframe, verbosity)
         if not is_date(dataframe.index):
             raise ValueError(
                 "Input dataframe needs to be indexed by time."
@@ -821,27 +797,6 @@ class TimeseriesReport(ReportBase):
             dataframe.index = pd.PeriodIndex(dataframe.index)
         else:
             dataframe.index = pd.DatetimeIndex(dataframe.index)
-        super().__init__(dataframe, use_default_sections, verbosity)
-
-        if verbosity_overview is None:
-            verbosity_overview = verbosity
-        if verbosity_univariate_analysis is None:
-            verbosity_univariate_analysis = verbosity
-        if verbosity_timeseries_analysis is None:
-            verbosity_timeseries_analysis = verbosity
-        if use_default_sections:
-            self.add_table_of_contents(include_subsections=True)
-            self.add_overview(verbosity=verbosity_overview, use_columns=columns_overview)
-            self.add_univariate_analysis(
-                verbosity=verbosity_univariate_analysis,
-                use_columns=columns_univariate_analysis,
-            )
-            self.add_timeseries_analysis(
-                verbosity=verbosity_timeseries_analysis,
-                use_columns=columns_timeseries_analysis,
-                sampling_rate=sampling_rate,
-                stft_window_size=stft_window_size,
-            )
 
     def add_timeseries_analysis(
         self,
@@ -928,3 +883,76 @@ class TimeseriesReport(ReportBase):
         )
 
         return self
+
+
+class DefaultTimeseriesReport(TimeseriesReport):
+    """A default report for time series data.
+
+    The report contains the following sections:
+    - dataset overview
+    - univariate analysis
+    - timeseries analysis
+
+    Parameters
+    ----------
+    dataframe : pd.DataFrame
+        Data from which to generate the report. Data needs to be indexed by time: pd.DateTimeIndex
+        or pd.PeriodIndex.
+        The data is assumed to be sorted according to the time index in ascending order.
+    verbosity : int (default = 0)
+        The default verbosity for the exported code of the entire report, has to be one of
+        [0, 1, 2], by default 0.
+    verbosity_overview : int, optional
+        Verbosity of the overview section
+    verbosity_univariate_analysis : int, optional
+        Verbosity of the univariate analysis section
+    verbosity_timeseries_analysis : int, optional
+        Verbosity of the timeseries analysis section
+    columns_overview : List[str], optional
+        Subset of columns to use in overview section
+    columns_univariate_analysis : List[str], optional
+        Subset of columns to use in univariate analysis section
+    columns_timeseries_analysis : List[str], optional
+        Subset of columns to use in timeseries analysis section
+    sampling_rate : int, optional
+        Sampling rate for Fourier transform and Short-time Fourier transform subsections. Determines
+        frequency unit for analysis of frequencies, for example with monthly data and sampling rate
+        12, yearly frequncy spectrum is produced.
+        If not set, these two sections will not be included.
+    stft_window_size : int, optional
+        Windows size for short-time Fourier transform subsection. If not set, STFT will be exluded.
+    """
+
+    def __init__(
+        self,
+        dataframe: pd.DataFrame,
+        verbosity: int = 0,
+        verbosity_overview: Optional[int] = None,
+        verbosity_univariate_analysis: Optional[int] = None,
+        verbosity_timeseries_analysis: Optional[int] = None,
+        columns_overview: Optional[List[str]] = None,
+        columns_univariate_analysis: Optional[List[str]] = None,
+        columns_timeseries_analysis: Optional[List[str]] = None,
+        sampling_rate: Optional[int] = None,
+        stft_window_size: Optional[int] = None,
+    ):
+        super().__init__(dataframe, verbosity)
+
+        if verbosity_overview is None:
+            verbosity_overview = verbosity
+        if verbosity_univariate_analysis is None:
+            verbosity_univariate_analysis = verbosity
+        if verbosity_timeseries_analysis is None:
+            verbosity_timeseries_analysis = verbosity
+        self.add_table_of_contents(include_subsections=True)
+        self.add_overview(verbosity=verbosity_overview, use_columns=columns_overview)
+        self.add_univariate_analysis(
+            verbosity=verbosity_univariate_analysis,
+            use_columns=columns_univariate_analysis,
+        )
+        self.add_timeseries_analysis(
+            verbosity=verbosity_timeseries_analysis,
+            use_columns=columns_timeseries_analysis,
+            sampling_rate=sampling_rate,
+            stft_window_size=stft_window_size,
+        )
