@@ -117,17 +117,18 @@ or modifying sections settings.
 
 Selection of sections
 ~~~~~~~~~~~~~~~~~~~~~
-
-If you want to use only a subset of sections you have to set
-`use_default_sections` parameter of report to `False` and then you can add your own sections.
+You can add sections using methods `add_*` of the `Report` class.
 
 .. code-block:: python
 
-    # Shows only univariate analysis
+    # Shows only univariate and bivariate analysis
     import edvart
     df = edvart.example_datasets.dataset_titanic()
-    report = edvart.Report(df, use_default_sections=False)
-    report.add_univariate_analysis()
+    report = (
+      edvart.Report(df)
+        .add_univariate_analysis()
+        .add_bivariate_analysis()
+    )
 
 
 Sections configuration
