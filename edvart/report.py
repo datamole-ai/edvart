@@ -99,15 +99,26 @@ class ReportBase(ABC):
 
         return [col for col in use_columns if col not in omit_columns]
 
-    def export_notebook(self, notebook_filepath: str) -> None:
+    def export_notebook(
+            self,
+            notebook_filepath: str,
+            dataset_name: str = "[INSERT DATASET NAME]",
+            dataset_description: str = "[INSERT DATASET DESCRIPTION]"
+    ) -> None:
         """Exports the report as an .ipynb file.
 
         Parameters
         ----------
         notebook_filepath : str
             Filepath of the exported notebook.
+        dataset_name : str (default = "[INSERT DATASET NAME]")
+            Name of dataset to be used in the title of the report.
+        dataset_description : str (default = "[INSERT DATASET DESCRIPTION]")
+            Description of dataset to be used below the title of the report.
         """
-        nb = self._generate_notebook()
+        # Generate a notebook containing dataset name and description
+        nb = self._generate_notebook(dataset_name=dataset_name,
+                                     dataset_description=dataset_description)
 
         # Save notebook to file
         with open(notebook_filepath, "w") as notebook_file:
