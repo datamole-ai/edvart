@@ -7,7 +7,10 @@ import pytest
 import edvart
 from edvart.report_sections import timeseries_analysis
 from edvart.report_sections.code_string_formatting import get_code
-from edvart.report_sections.timeseries_analysis import BoxplotsOverTime, TimeseriesAnalysis
+from edvart.report_sections.timeseries_analysis import (
+    BoxplotsOverTime,
+    TimeseriesAnalysis,
+)
 
 
 def test_default_config_verbosity():

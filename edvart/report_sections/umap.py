@@ -7,7 +7,11 @@ from IPython.display import Markdown, display
 
 from edvart.data_types import is_numeric
 from edvart.plots import scatter_plot_2d
-from edvart.report_sections.code_string_formatting import code_dedent, get_code, total_dedent
+from edvart.report_sections.code_string_formatting import (
+    code_dedent,
+    get_code,
+    total_dedent,
+)
 from edvart.report_sections.section_base import Section
 
 try:

@@ -6,7 +6,11 @@ import pandas as pd
 import plotly.io
 import pytest
 
-from edvart.report_sections.code_string_formatting import code_dedent, get_code, total_dedent
+from edvart.report_sections.code_string_formatting import (
+    code_dedent,
+    get_code,
+    total_dedent,
+)
 from edvart.report_sections.group_analysis import GroupAnalysis
 
 # Workaround to prevent multiple browser tabs opening with figures

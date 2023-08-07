@@ -14,7 +14,12 @@ from IPython.display import HTML, Markdown, display
 # Internal library imports
 from edvart import utils
 from edvart.data_types import DataType, infer_data_type
-from edvart.pandas_formatting import add_html_heading, dict_to_html, format_number, subcells_html
+from edvart.pandas_formatting import (
+    add_html_heading,
+    dict_to_html,
+    format_number,
+    subcells_html,
+)
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.section_base import Section
 
