@@ -1,15 +1,12 @@
 """Plots package."""
 
-# Standard imports
 from typing import Optional, Tuple, Union
 
-# Third-party library imports
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
 
-# Internal library imports
 from edvart import utils
 from edvart.data_types import is_numeric
 

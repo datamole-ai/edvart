@@ -1,6 +1,5 @@
 """Report package."""
 
-# Standard imports
 import base64
 import logging
 import pickle
@@ -13,7 +12,6 @@ import nbformat as nbf
 import nbformat.v4 as nbf4
 import pandas as pd
 
-# Internal library imports
 from edvart.data_types import is_date
 from edvart.report_sections.bivariate_analysis import BivariateAnalysis
 from edvart.report_sections.code_string_formatting import code_dedent

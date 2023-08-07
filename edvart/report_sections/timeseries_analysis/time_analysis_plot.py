@@ -1,16 +1,13 @@
 """Time analysis interactive plot package."""
 
-# Standard imports
 import warnings
 from typing import Any, Dict, List, Optional
 
-# Third-party library imports
 import nbformat.v4 as nbfv4
 import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import Markdown, display
 
-# Internal library imports
 from edvart import utils
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending

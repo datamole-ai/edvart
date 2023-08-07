@@ -1,9 +1,7 @@
 """Pandas formatting package."""
 
-# Standard imports
 from typing import Any, Dict, List, Union
 
-# Third-party library imports
 import pandas as pd
 from IPython.display import display
 from pandas.io.formats.style import Styler

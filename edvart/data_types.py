@@ -1,10 +1,8 @@
 """Module defines data types and helper function for recognizing them."""
 
-# Standard imports
 from enum import IntEnum
 from typing import Union
 
-# Third-party library imports
 import numpy as np
 import pandas as pd
 

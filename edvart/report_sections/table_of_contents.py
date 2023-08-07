@@ -1,12 +1,9 @@
 """Table of contents analysis package."""
-# Standard imports
 from typing import Any, Dict, List
 
-# Third-party library imports
 import nbformat.v4 as nbfv4
 from IPython.display import Markdown, display
 
-# Internal library imports
 from edvart.report_sections.section_base import ReportSection, Section
 
 

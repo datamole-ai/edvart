@@ -1,6 +1,5 @@
 """Bivariate analysis section package."""
 
-# Standard imports
 from enum import IntEnum
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -9,11 +8,8 @@ import nbformat.v4 as nbfv4
 import numpy as np
 import pandas as pd
 import seaborn as sns
-
-# Third-party library imports
 from IPython.display import Markdown, display
 
-# Internal library imports
 from edvart import utils
 from edvart.data_types import is_boolean, is_categorical, is_numeric
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
