@@ -11,10 +11,7 @@ pio.renderers.default = "json"
 from edvart import utils
 from edvart.report_sections import multivariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
-from edvart.report_sections.multivariate_analysis import (
-    UMAP_AVAILABLE,
-    MultivariateAnalysis,
-)
+from edvart.report_sections.multivariate_analysis import UMAP_AVAILABLE, MultivariateAnalysis
 
 
 def get_test_df() -> pd.DataFrame:

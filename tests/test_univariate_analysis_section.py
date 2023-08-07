@@ -4,12 +4,7 @@ from contextlib import redirect_stdout
 import pandas as pd
 import pytest
 
-from edvart.pandas_formatting import (
-    add_html_heading,
-    dict_to_html,
-    format_number,
-    subcells_html,
-)
+from edvart.pandas_formatting import add_html_heading, dict_to_html, format_number, subcells_html
 from edvart.report_sections import univariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 
