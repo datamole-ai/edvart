@@ -1,10 +1,6 @@
 name: Publish
 
-on:
-  workflow_run:
-    workflows: ["Test"]
-    branches: [main]
-    types: [completed]
+on: workflow_dispatch
 
 env:
   POETRY_VERSION: 1.5.1
@@ -20,7 +16,6 @@ concurrency:
 jobs:
   publish-python:
     runs-on: ubuntu-22.04  # convco needs GLIBC_2.32 which is not in 20.04
-    if: false
     environment: publish
     outputs:
       new_version: ${{ steps.set-vars.outputs.new_version }}
