@@ -12,7 +12,7 @@ from edvart import utils
 from edvart.data_types import DataType, infer_data_type
 from edvart.pandas_formatting import add_html_heading, dict_to_html, format_number, subcells_html
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 
 class UnivariateAnalysis(Section):
@@ -22,25 +22,19 @@ class UnivariateAnalysis(Section):
     -----------
     df : pd.DataFrame
         Dataframe to be analyzed
-    verbosity : int
-        The verbosity of the code generated in the exported notebook,
-        must be one of [0, 1, 2].
-
-        0
-            A single function call generates the entire univariate analysis section.
-        1
-            Function calls to parameterizable functions are generated for each column separately
-            in separate cells.
-        2
-            Similar to 1, but in addition, function definitions are generated, column
-            data type inference and default statistics become customizable.
-
+    verbosity : Verbosity
+        The verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns for which to do univariate analysis,
         all columns are used by default
     """
 
-    def __init__(self, df: pd.DataFrame, verbosity: int = 0, columns: Optional[List[str]] = None):
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        verbosity: Verbosity = Verbosity.LOW,
+        columns: Optional[List[str]] = None,
+    ):
         self.df = df
         super().__init__(verbosity, columns)
 
@@ -290,12 +284,12 @@ class UnivariateAnalysis(Section):
         List[str]
             List of import strings to be added at the top of the generated notebook.
         """
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             return [
                 "from edvart.report_sections.univariate_analysis import UnivariateAnalysis\n"
                 "univariate_analysis = UnivariateAnalysis.univariate_analysis"
             ]
-        if self.verbosity == 1:
+        if self.verbosity == Verbosity.MEDIUM:
             return [
                 "from edvart.report_sections.univariate_analysis import UnivariateAnalysis\n"
                 "top_most_frequent = UnivariateAnalysis.top_most_frequent\n"
@@ -304,7 +298,7 @@ class UnivariateAnalysis(Section):
                 "histogram = UnivariateAnalysis.histogram",
                 "from edvart import utils",
             ]
-        # verbosity 2
+        # Verbosity.HIGH
         return [
             "from edvart import utils",
             "from IPython.display import display",
@@ -329,7 +323,7 @@ class UnivariateAnalysis(Section):
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
 
-        if self.verbosity == 2:
+        if self.verbosity == Verbosity.HIGH:
             # Add cell with default stats dictionaries
             default_stats_dicts = nbfv4.new_code_cell(
                 "# Default statistics dictionaries"
@@ -366,7 +360,7 @@ class UnivariateAnalysis(Section):
             )
             cells.append(frame_rendering)
 
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             if self.columns is None:
                 code = "univariate_analysis(df=df)"
             else:
@@ -389,7 +383,7 @@ class UnivariateAnalysis(Section):
                         top_most_frequent(df['{col}'])
                         bar_plot(df['{col}'])"""
                     )
-                elif self.verbosity == 1:
+                elif self.verbosity == Verbosity.MEDIUM:
                     code = code_dedent(
                         f"""
                             numeric_statistics(df['{col}'])

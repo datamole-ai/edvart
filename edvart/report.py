@@ -18,6 +18,7 @@ from edvart.report_sections.code_string_formatting import code_dedent
 from edvart.report_sections.dataset_overview import Overview
 from edvart.report_sections.group_analysis import GroupAnalysis
 from edvart.report_sections.multivariate_analysis import MultivariateAnalysis
+from edvart.report_sections.section_base import Verbosity
 from edvart.report_sections.table_of_contents import TableOfContents
 from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis
 from edvart.report_sections.univariate_analysis import UnivariateAnalysis
@@ -32,28 +33,19 @@ class ReportBase(ABC):
     ----------
     dataframe : pd.DataFrame
         Data from which to generate the report.
-    verbosity : int (default = 0)
-        The default verbosity for the exported code of the entire report, has to be one of
-        [0, 1, 2], by default 0.
-
-    Raises
-    ------
-    ValueError
-        If verbosity is not one of [0, 1, 2].
+    verbosity : Verbosity (default = Verbosity.LOW)
+        The default verbosity for the exported code of the entire report, by default Verbosity.LOW.
     """
 
     def __init__(
         self,
         dataframe: pd.DataFrame,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
     ):
         self._class_logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
         self.df = dataframe
         self.sections = []
-        # Check for global verbosity validity
-        if verbosity not in [0, 1, 2]:
-            raise ValueError(f"Verbosity has to be one of [0, 1, 2], not {verbosity}.")
-        self.verbosity = verbosity
+        self.verbosity = Verbosity(verbosity)
 
     def show(self) -> None:
         """Renders the report in the calling notebook."""
@@ -331,14 +323,14 @@ class ReportBase(ABC):
         use_columns: Optional[List[str]] = None,
         omit_columns: Optional[List[str]] = None,
         subsections: Optional[List[Overview.OverviewSubsection]] = None,
-        verbosity: Optional[int] = None,
-        verbosity_quick_info: Optional[int] = None,
-        verbosity_data_types: Optional[int] = None,
-        verbosity_data_preview: Optional[int] = None,
-        verbosity_missing_values: Optional[int] = None,
-        verbosity_rows_with_missing_value: Optional[int] = None,
-        verbosity_constant_occurrence: Optional[int] = None,
-        verbosity_duplicate_rows: Optional[int] = None,
+        verbosity: Optional[Verbosity] = None,
+        verbosity_quick_info: Optional[Verbosity] = None,
+        verbosity_data_types: Optional[Verbosity] = None,
+        verbosity_data_preview: Optional[Verbosity] = None,
+        verbosity_missing_values: Optional[Verbosity] = None,
+        verbosity_rows_with_missing_value: Optional[Verbosity] = None,
+        verbosity_constant_occurrence: Optional[Verbosity] = None,
+        verbosity_duplicate_rows: Optional[Verbosity] = None,
     ) -> "ReportBase":
         """
         Adds a dataset overview section to the report.
@@ -354,31 +346,22 @@ class ReportBase(ABC):
         subsections : List[Overview.OverviewSubsection], optional
             List of sub-sections to include into the Overview section.
             If None, all subsections are added.
-        verbosity : int, optional
-            Generated code verbosity global to the Overview sections, must be on of [0, 1, 2].
-
-            0
-                A single cell which generates the overview section is exported.
-            1
-                Parameterizable function calls for each subsection of the overview section are
-                exported.
-            2
-                Similar to 1, but in addition function definitions are also exported.
-
+        verbosity : Verbosity, optional
+            Generated code verbosity global to the Overview sections.
             If subsection verbosities are None, then they will be overridden by this parameter.
-        verbosity_quick_info : int, optional
+        verbosity_quick_info : Verbosity, optional
             Quick info sub-section code verbosity.
-        verbosity_data_types : int, optional
+        verbosity_data_types : Verbosity, optional
             Data types sub-section code verbosity.
-        verbosity_data_preview : int, optional
+        verbosity_data_preview : Verbosity, optional
             Data preview sub-section code verbosity.
-        verbosity_missing_values : int, optional
+        verbosity_missing_values : Verbosity, optional
             Missing values sub-section code verbosity.
-        verbosity_rows_with_missing_value : int, optional
+        verbosity_rows_with_missing_value : Verbosity, optional
             Rows with missing value sub-section code verbosity.
-        verbosity_constant_occurrence : int, optional
+        verbosity_constant_occurrence : Verbosity, optional
             Constant values occurrence sub-section code verbosity.
-        verbosity_duplicate_rows : int, optional
+        verbosity_duplicate_rows : Verbosity, optional
             Duplicate rows sub-section code verbosity.
 
         """
@@ -403,7 +386,7 @@ class ReportBase(ABC):
         self,
         use_columns: Optional[List[str]] = None,
         omit_columns: Optional[List[str]] = None,
-        verbosity: Optional[int] = None,
+        verbosity: Optional[Verbosity] = None,
     ) -> "ReportBase":
         """Adds univariate section to the report.
 
@@ -415,19 +398,8 @@ class ReportBase(ABC):
         omit_columns : List[str], optional
             Columns to exclude from analysis.
             If None, use_columns dictates column selection.
-        verbosity : int
-            The verbosity of the code generated in the exported notebook,
-            must be one of [0, 1, 2].
-
-            0
-                A single function call generates the entire univariate analysis section.
-            1
-                Function calls to parameterizable functions are generated for each column separately
-                in separate cells.
-            2
-                Similar to 1, but in addition, function definitions are generated, column
-                data type inference and default statistics become customizable.
-
+        verbosity : Verbosity
+            The verbosity of the code generated in the exported notebook.
         """
         self.sections.append(
             UnivariateAnalysis(
@@ -446,10 +418,10 @@ class ReportBase(ABC):
         columns_y: Optional[List[str]] = None,
         columns_pairs: Optional[List[Tuple[str, str]]] = None,
         subsections: Optional[List[BivariateAnalysis.BivariateAnalysisSubsection]] = None,
-        verbosity: Optional[int] = None,
-        verbosity_correlations: Optional[int] = None,
-        verbosity_pairplot: Optional[int] = None,
-        verbosity_contingency_table: Optional[int] = None,
+        verbosity: Optional[Verbosity] = None,
+        verbosity_correlations: Optional[Verbosity] = None,
+        verbosity_pairplot: Optional[Verbosity] = None,
+        verbosity_contingency_table: Optional[Verbosity] = None,
         color_col: Optional[str] = None,
     ) -> "ReportBase":
         """Adds bivariate analysis section to the report.
@@ -481,24 +453,13 @@ class ReportBase(ABC):
         subsections : List[BivariateAnalysis.BivariateAnalysisSubsection], optional
             List of sub-sections to include into the BivariateAnalysis section.
             If None, all subsections are added.
-        verbosity : int, optional
-            The verbosity of the code generated in the exported notebook,
-            must be one of [0, 1, 2].
-
-            0
-                A single function call generates the entire bivariate analysis section.
-            1
-                Function calls to parameterizable functions are generated for each column separately
-                in separate cells.
-            2
-                Similar to 1, but in addition, function definitions are generated, column
-                data type inference and default statistics become customizable.
-
-        verbosity_correlations : int, optional
+        verbosity : Verbosity, optional
+            The verbosity of the code generated in the exported notebook.
+        verbosity_correlations : Verbosity, optional
             Correlation plots subsection code verbosity.
-        verbosity_pairplot : int, optional
+        verbosity_pairplot : Verbosity, optional
             Pairplot subsection code verbosity.
-        verbosity_contingency_table : int, optional
+        verbosity_contingency_table : Verbosity, optional
             Contingency table code verbosity.
         color_col : str, optional
             Name of column according to use for coloring of the multivariate analysis subsections.
@@ -526,11 +487,11 @@ class ReportBase(ABC):
         use_columns: Optional[List[str]] = None,
         omit_columns: Optional[List[str]] = None,
         subsections: Optional[List[MultivariateAnalysis.MultivariateAnalysisSubsection]] = None,
-        verbosity: Optional[int] = None,
-        verbosity_pca: Optional[int] = None,
-        verbosity_umap: Optional[int] = None,
-        verbosity_parallel_coordinates: Optional[int] = None,
-        verbosity_parallel_categories: Optional[int] = None,
+        verbosity: Optional[Verbosity] = None,
+        verbosity_pca: Optional[Verbosity] = None,
+        verbosity_umap: Optional[Verbosity] = None,
+        verbosity_parallel_coordinates: Optional[Verbosity] = None,
+        verbosity_parallel_categories: Optional[Verbosity] = None,
         color_col: Optional[str] = None,
     ) -> "ReportBase":
         """Add multivariate analysis section to the report.
@@ -546,27 +507,15 @@ class ReportBase(ABC):
         subsections : List[MultivariateAnalysis.MultivariateAnalysisSubsection], optional
             List of sub-sections to include into the BivariateAnalysis section.
             If None, all subsections are added.
-        verbosity : int, optional
-            verbosity : int
-            The verbosity of the code generated in the exported notebook,
-            must be one of [0, 1, 2].
-
-            0
-                A single function call generates the entire univariate analysis section.
-            1
-                Function calls to parameterizable functions are generated for each column separately
-                in separate cells.
-            2
-                Similar to 1, but in addition, function definitions are generated, column
-                data type inference and default statistics become customizable.
-
-        verbosity_pca : int, optional
+        verbosity : Verbosity, optional
+            The verbosity of the code generated in the exported notebook.
+        verbosity_pca : Verbosity, optional
             Principal component analysis subsection code verbosity.
-        verbosity_umap : int, optional
+        verbosity_umap : Verbosity, optional
             UMAP subsection code verbosity.
-        verbosity_parallel_coordinates: int, optional
+        verbosity_parallel_coordinates: Verbosity, optional
             Parallel coordinates subsection code verbosity.
-        verbosity_parallel_categories: int, optional
+        verbosity_parallel_categories: Verbosity, optional
             Parallel categories subsection code verbosity.
         color_col : str, optional
             Name of column to use for coloring of the multivariate analysis subsections.
@@ -593,7 +542,7 @@ class ReportBase(ABC):
         groupby: Union[str, List[str]],
         use_columns: Optional[List[str]] = None,
         omit_columns: Optional[List[str]] = None,
-        verbosity: Optional[int] = None,
+        verbosity: Optional[Verbosity] = None,
         show_within_group_statistics: bool = True,
         show_group_missing_values: bool = True,
         show_group_distribution_plots: bool = True,
@@ -610,19 +559,8 @@ class ReportBase(ABC):
         omit_columns : List[str], optional
             Columns to exclude from analysis.
             If None, use_columns dictates column selection.
-        verbosity : int, optional
-            verbosity : int
-            The verbosity of the code generated in the exported notebook,
-            must be one of [0, 1, 2].
-
-            0
-                A single function call generates the entire univariate analysis section.
-            1
-                Function calls to parameterizable functions are generated for each column separately
-                in separate cells.
-            2
-                Similar to 1, but in addition, function definitions are generated, column
-                data type inference and default statistics become customizable.
+        verbosity : Verbosity, optional
+            The verbosity of the code generated in the exported notebook.
         show_within_group_statistics : bool (default = True)
             Whether to show per-group statistics.
         show_group_missing_values : bool (default = True)
@@ -669,12 +607,15 @@ class Report(ReportBase):
     ----------
     dataframe : pd.DataFrame
         Data from which to generate the report.
-    verbosity : int (default = 0)
-        Verbosity of the exported code of the entire report, has to be one of
-        [0, 1, 2], by default 0.
+    verbosity : Verbosity (default = Verbosity.LOW)
+        Verbosity of the exported code of the entire report.
     """
 
-    def __init__(self, dataframe: pd.DataFrame, verbosity: int = 0):
+    def __init__(
+        self,
+        dataframe: pd.DataFrame,
+        verbosity: Verbosity = Verbosity.LOW,
+    ):
         super().__init__(dataframe=dataframe, verbosity=verbosity)
 
 
@@ -692,16 +633,15 @@ class DefaultReport(Report):
     ----------
     dataframe : pd.DataFrame
         Data from which to generate the report.
-    verbosity : int (default = 0)
-        The default verbosity for the exported code of the entire report, has to be one of
-        [0, 1, 2], by default 0.
-    verbosity_overview : int, optional
+    verbosity : Verbosity (default = Verbosity.LOW)
+        The default verbosity for the exported code of the entire report.
+    verbosity_overview : Verbosity, optional
         Verbosity of the overview section
-    verbosity_univariate_analysis : int, optional
+    verbosity_univariate_analysis : Verbosity, optional
         Verbosity of the univariate analysis section
-    verbosity_bivariate_analysis : int, optiona
+    verbosity_bivariate_analysis : Verbosity, optiona
         Verbosity of the bivariate analysis section.
-    verbosity_multivariate_analysis: int, optional
+    verbosity_multivariate_analysis: Verbosity, optional
         Verbosity of the multivariate analysis section
     columns_overview : List[str], optional
         Subset of columns to use in overview section
@@ -725,12 +665,12 @@ class DefaultReport(Report):
     def __init__(
         self,
         dataframe: pd.DataFrame,
-        verbosity: int = 0,
-        verbosity_overview: Optional[int] = None,
-        verbosity_univariate_analysis: Optional[int] = None,
-        verbosity_bivariate_analysis: Optional[int] = None,
-        verbosity_multivariate_analysis: Optional[int] = None,
-        verbosity_group_analysis: Optional[int] = None,
+        verbosity: Verbosity = Verbosity.LOW,
+        verbosity_overview: Optional[Verbosity] = None,
+        verbosity_univariate_analysis: Optional[Verbosity] = None,
+        verbosity_bivariate_analysis: Optional[Verbosity] = None,
+        verbosity_multivariate_analysis: Optional[Verbosity] = None,
+        verbosity_group_analysis: Optional[Verbosity] = None,
         columns_overview: Optional[List[str]] = None,
         columns_univariate_analysis: Optional[List[str]] = None,
         columns_bivariate_analysis: Optional[List[str]] = None,
@@ -794,7 +734,11 @@ class TimeseriesReport(ReportBase):
         If the input dataframe is not indexed by time.
     """
 
-    def __init__(self, dataframe: pd.DataFrame, verbosity: int = 0):
+    def __init__(
+        self,
+        dataframe: pd.DataFrame,
+        verbosity: Verbosity = Verbosity.LOW,
+    ):
         super().__init__(dataframe, verbosity)
         if not is_date(dataframe.index):
             raise ValueError(
@@ -813,17 +757,17 @@ class TimeseriesReport(ReportBase):
         use_columns: Optional[List[str]] = None,
         omit_columns: Optional[List[str]] = None,
         subsections: Optional[List[TimeseriesAnalysis.TimeseriesAnalysisSubsection]] = None,
-        verbosity: Optional[int] = None,
-        verbosity_time_analysis_plot: Optional[int] = None,
-        verbosity_rolling_statistics: Optional[int] = None,
-        verbosity_boxplots_over_time: Optional[int] = None,
-        verbosity_seasonal_decomposition: Optional[int] = None,
-        verbosity_autocorrelation: Optional[int] = None,
-        verbosity_stationarity_tests: Optional[int] = None,
-        verbosity_fourier_transform: Optional[int] = None,
-        verbosity_short_time_ft: Optional[int] = None,
-        sampling_rate: Optional[int] = None,
-        stft_window_size: Optional[int] = None,
+        verbosity: Optional[Verbosity] = None,
+        verbosity_time_analysis_plot: Optional[Verbosity] = None,
+        verbosity_rolling_statistics: Optional[Verbosity] = None,
+        verbosity_boxplots_over_time: Optional[Verbosity] = None,
+        verbosity_seasonal_decomposition: Optional[Verbosity] = None,
+        verbosity_autocorrelation: Optional[Verbosity] = None,
+        verbosity_stationarity_tests: Optional[Verbosity] = None,
+        verbosity_fourier_transform: Optional[Verbosity] = None,
+        verbosity_short_time_ft: Optional[Verbosity] = None,
+        sampling_rate: Optional[Verbosity] = None,
+        stft_window_size: Optional[Verbosity] = None,
     ) -> "TimeseriesReport":
         """Add timeseries analysis section to the report.
 
@@ -838,10 +782,8 @@ class TimeseriesReport(ReportBase):
         subsections : List[TimeseriesAnalysis.TimeseriesAnalysisSubsection], optional
             List of sub-sections to include into the BivariateAnalysis section.
             If None, all subsections are added.
-        verbosity : int, optional
-            The verbosity of the code generated in the exported notebook,
-            must be one of [0, 1, 2].
-
+        verbosity : Verbosity, optional
+            The verbosity of the code generated in the exported notebook.
             0
                 A single function call generates the entire bivariate analysis section.
             1
@@ -851,26 +793,26 @@ class TimeseriesReport(ReportBase):
                 Similar to 1, but in addition, function definitions are generated, column
                 data type inference and default statistics become customizable.
 
-        verbosity_time_analysis_plot : int, optional
+        verbosity_time_analysis_plot : Verbosity, optional
             Time analysis interactive plot subsection code verbosity.
-        verbosity_rolling_statistics : int, optional
+        verbosity_rolling_statistics : Verbosity, optional
             Rolling statistics interactive plot subsection code verbosity.
-        verbosity_boxplots_over_time : int, optional
+        verbosity_boxplots_over_time : Verbosity, optional
             Boxplots grouped over time intervals plot subsection code verbosity.
-        verbosity_seasonal_decomposition : int, optional
+        verbosity_seasonal_decomposition : Verbosity, optional
             Decomposition into trend, seasonal and residual components code verbosity.
-        verbosity_autocorrelation : int, optional
+        verbosity_autocorrelation : Verbosity, optional
             Autocorrelation and partial autocorrelation vs. lag code verbosity.
-        verbosity_stationarity_tests : int, optional
+        verbosity_stationarity_tests : Verbosity, optional
             Stationarity tests code verbosity.
-        verbosity_fourier_transform: int, optional
+        verbosity_fourier_transform: Verbosity, optional
             Fourier transform and short-time Fourier transform code verbosity.
-        verbosity_short_time_ft: int, optional
+        verbosity_short_time_ft: Verbosity, optional
             Short-time Fourier transform transform spectrogram code verbosity.
-        sampling_rate: int, optional
+        sampling_rate: Verbosity, optional
             Sampling rate for Fourier transform and Short-time Fourier transform subsections.
             Needs to be set in order for these two subs to be included.
-        stft_window_size : int, optional
+        stft_window_size : Verbosity, optional
             Window size for Short-time Fourier transform. Needs to be set in order for the STFT
             subsection to be included.
         """
@@ -909,14 +851,13 @@ class DefaultTimeseriesReport(TimeseriesReport):
         Data from which to generate the report. Data needs to be indexed by time: pd.DateTimeIndex
         or pd.PeriodIndex.
         The data is assumed to be sorted according to the time index in ascending order.
-    verbosity : int (default = 0)
-        The default verbosity for the exported code of the entire report, has to be one of
-        [0, 1, 2], by default 0.
-    verbosity_overview : int, optional
+    verbosity : Verbosity (default = Verbosity.LOW)
+        The default verbosity for the exported code of the entire report.
+    verbosity_overview : Verbosity, optional
         Verbosity of the overview section
-    verbosity_univariate_analysis : int, optional
+    verbosity_univariate_analysis : Verbosity, optional
         Verbosity of the univariate analysis section
-    verbosity_timeseries_analysis : int, optional
+    verbosity_timeseries_analysis : Verbosity, optional
         Verbosity of the timeseries analysis section
     columns_overview : List[str], optional
         Subset of columns to use in overview section
@@ -936,15 +877,15 @@ class DefaultTimeseriesReport(TimeseriesReport):
     def __init__(
         self,
         dataframe: pd.DataFrame,
-        verbosity: int = 0,
-        verbosity_overview: Optional[int] = None,
-        verbosity_univariate_analysis: Optional[int] = None,
-        verbosity_timeseries_analysis: Optional[int] = None,
+        verbosity: Verbosity = Verbosity.LOW,
+        verbosity_overview: Optional[Verbosity] = None,
+        verbosity_univariate_analysis: Optional[Verbosity] = None,
+        verbosity_timeseries_analysis: Optional[Verbosity] = None,
         columns_overview: Optional[List[str]] = None,
         columns_univariate_analysis: Optional[List[str]] = None,
         columns_timeseries_analysis: Optional[List[str]] = None,
-        sampling_rate: Optional[int] = None,
-        stft_window_size: Optional[int] = None,
+        sampling_rate: Optional[Verbosity] = None,
+        stft_window_size: Optional[Verbosity] = None,
     ):
         super().__init__(dataframe, verbosity)
 

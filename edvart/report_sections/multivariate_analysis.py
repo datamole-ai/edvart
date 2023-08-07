@@ -15,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 from edvart.data_types import is_numeric
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import ReportSection, Section
+from edvart.report_sections.section_base import ReportSection, Section, Verbosity
 from edvart.utils import discrete_colorscale, is_categorical
 
 try:
@@ -38,27 +38,19 @@ class MultivariateAnalysis(ReportSection):
     subsections : List[MultivariateAnalysisSubsection], optional
         List of subsections to include.
         All subsection in MultivariateAnalysisSubsection are included by default.
-    verbosity : int
-        Generated code verbosity global to the Multivariate sections, must be one of [0, 1, 2].
-
-        0
-            A single cell which generates the multivariate section is exported.
-        1
-            Parameterizable function calls for each subsection are exported.
-        2
-            Similar to 1, but in addition function definitions are also exported.
-
+    verbosity : Verbosity
+        Generated code verbosity global to the Multivariate sections.
         If subsection verbosities are None, then they will be overridden by this parameter.
     columns : List[str], optional
         Columns on which to do multivariate analysis.
         All columns of df will be used by default.
-    verbosity_pca : int, optional
+    verbosity_pca : Verbosity, optional
         Principal component analysis subsection code verbosity.
-    verbosity_umap : int, optional
+    verbosity_umap : Verbosity, optional
         UMAP subsection code verbosity.
-    verbosity_parallel_coordinates : int, optional
+    verbosity_parallel_coordinates : Verbosity, optional
         Parallel coordinates subsection code verbosity.
-    verbosity_parallel_categories : int, optional
+    verbosity_parallel_categories : Verbosity, optional
         Parallel categories subsection code verbosity.
     color_col : str, optional
         Name of the column according to which to color points in the sections.
@@ -82,12 +74,12 @@ class MultivariateAnalysis(ReportSection):
         self,
         df: pd.DataFrame,
         subsections: Optional[List[MultivariateAnalysisSubsection]] = None,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
-        verbosity_pca: Optional[int] = None,
-        verbosity_umap: Optional[int] = None,
-        verbosity_parallel_coordinates: Optional[int] = None,
-        verbosity_parallel_categories: Optional[int] = None,
+        verbosity_pca: Optional[Verbosity] = None,
+        verbosity_umap: Optional[Verbosity] = None,
+        verbosity_parallel_coordinates: Optional[Verbosity] = None,
+        verbosity_parallel_categories: Optional[Verbosity] = None,
         color_col: Optional[str] = None,
     ):
         verbosity_pca = verbosity_pca if verbosity_pca is not None else verbosity
@@ -173,7 +165,11 @@ class MultivariateAnalysis(ReportSection):
             df = df[columns]
 
         multivariate_analysis = MultivariateAnalysis(
-            df=df, subsections=subsections, verbosity=0, columns=columns, color_col=color_col
+            df=df,
+            subsections=subsections,
+            verbosity=Verbosity.LOW,
+            columns=columns,
+            color_col=color_col,
         )
 
         for sub in multivariate_analysis.subsections:
@@ -188,13 +184,13 @@ class MultivariateAnalysis(ReportSection):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np']
         """
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             imports = {
                 "from edvart.report_sections.multivariate_analysis import MultivariateAnalysis\n"
                 "multivariate_analysis = MultivariateAnalysis.multivariate_analysis"
             }
             for subsec in self.subsections:
-                if subsec.verbosity > 0:
+                if subsec.verbosity > Verbosity.LOW:
                     imports.update(subsec.required_imports())
 
             return list(imports)
@@ -212,7 +208,7 @@ class MultivariateAnalysis(ReportSection):
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             code = "multivariate_analysis(df=df"
             if self.subsections_0 is not None:
                 arg_subsections_names = [
@@ -227,7 +223,7 @@ class MultivariateAnalysis(ReportSection):
             code += ")"
             cells.append(nbfv4.new_code_cell(code))
             for sub in self.subsections:
-                if sub.verbosity > 0:
+                if sub.verbosity > Verbosity.LOW:
                     sub.add_cells(cells)
         else:
             super().add_cells(cells)
@@ -251,7 +247,7 @@ class PCA(Section):
     ----------
     df : pd.DataFrame
         Data on which to perform PCA.
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns on which to perform PCA. Only numeric columns can be used.
@@ -269,7 +265,7 @@ class PCA(Section):
     def __init__(
         self,
         df: pd.DataFrame,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         color_col: Optional[str] = None,
         standardize: bool = True,
@@ -416,7 +412,7 @@ class PCA(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -466,7 +462,7 @@ class PCA(Section):
         first_vs_second_call += ")"
         explained_variance_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             cells.append(nbfv4.new_code_cell(first_vs_second_call))
             cells.append(explained_variance_header)
             cells.append(nbfv4.new_code_cell(explained_variance_call))
@@ -508,7 +504,7 @@ class ParallelCoordinates(Section):
     ----------
     df : pd.DataFrame
         Data for which to generate the parallel coordinates plot.
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns for which to generate parallel coordinates. All columns which are either numeric or
@@ -524,7 +520,7 @@ class ParallelCoordinates(Section):
     def __init__(
         self,
         df: pd.DataFrame,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         nunique_max: int = 20,
         color_col: Optional[str] = None,
@@ -646,7 +642,7 @@ class ParallelCoordinates(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -680,7 +676,7 @@ class ParallelCoordinates(Section):
             default_call += f", color_col='{self.color_col}'"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = (
@@ -715,7 +711,7 @@ class ParallelCategories(Section):
     ----------
     df : pd.DataFrame
         Data for which to generate the parallel coordinates plot.
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns for which to generate parallel coordinates.
@@ -731,7 +727,7 @@ class ParallelCategories(Section):
     def __init__(
         self,
         df: pd.DataFrame,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         nunique_max: int = 20,
         color_col: Optional[str] = None,
@@ -834,7 +830,7 @@ class ParallelCategories(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -868,7 +864,7 @@ class ParallelCategories(Section):
             default_call += f", color_col='{self.color_col}'"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = (

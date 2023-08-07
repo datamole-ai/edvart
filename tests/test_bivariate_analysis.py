@@ -7,6 +7,7 @@ import pytest
 from edvart.report_sections import bivariate_analysis
 from edvart.report_sections.bivariate_analysis import BivariateAnalysis
 from edvart.report_sections.code_string_formatting import get_code
+from edvart.report_sections.section_base import Verbosity
 
 
 def get_test_df() -> pd.DataFrame:
@@ -17,9 +18,9 @@ def get_test_df() -> pd.DataFrame:
 
 def test_default_config_verbosity():
     bivariate_section = bivariate_analysis.BivariateAnalysis()
-    assert bivariate_section.verbosity == 0, "Verbosity should be 0"
+    assert bivariate_section.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
     for s in bivariate_section.subsections:
-        assert s.verbosity == 0, "Verbosity should be 0"
+        assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
 
 def test_high_verobisities():
@@ -35,32 +36,47 @@ def test_high_verobisities():
 
 def test_global_verbosity_overriding():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
-        verbosity=0, verbosity_pairplot=1, verbosity_correlations=2, verbosity_contingency_table=1
+        verbosity=Verbosity.LOW,
+        verbosity_pairplot=Verbosity.MEDIUM,
+        verbosity_correlations=Verbosity.HIGH,
+        verbosity_contingency_table=Verbosity.MEDIUM,
     )
 
-    assert bivariate_section.verbosity == 0
+    assert bivariate_section.verbosity == Verbosity.LOW
     for subsec in bivariate_section.subsections:
         if isinstance(subsec, bivariate_analysis.PairPlot):
-            assert subsec.verbosity == 1, "Verbosity of pairplot should be 1"
+            assert (
+                subsec.verbosity == Verbosity.MEDIUM
+            ), "Verbosity of pairplot should be Verbosity.MEDIUM"
         elif isinstance(subsec, bivariate_analysis.CorrelationPlot):
-            assert subsec.verbosity == 2, "Verbosity of correlation plot should be 2"
+            assert (
+                subsec.verbosity == Verbosity.HIGH
+            ), "Verbosity of correlation plot should be Verbosity.HIGH"
         elif isinstance(subsec, bivariate_analysis.ContingencyTable):
-            assert subsec.verbosity == 1, "Verbosity of contingency table should be 1"
+            assert (
+                subsec.verbosity == Verbosity.MEDIUM
+            ), "Verbosity of contingency table should be Verbosity.MEDIUM"
         else:
             pytest.fail("Unexpected subsection type.")
 
 
 def test_verbosity_propagation():
-    bivariate_section = bivariate_analysis.BivariateAnalysis(verbosity=2)
-    assert bivariate_section.verbosity == 2, "Bivariate analysis global verbosity should be 2."
+    bivariate_section = bivariate_analysis.BivariateAnalysis(verbosity=Verbosity.HIGH)
+    assert (
+        bivariate_section.verbosity == Verbosity.HIGH
+    ), "Bivariate analysis global verbosity should be Verbosity.HIGH."
 
     for subsec in bivariate_section.subsections:
         if isinstance(subsec, bivariate_analysis.PairPlot):
-            assert subsec.verbosity == 2, "PairPlot verbosity should be 2"
+            assert subsec.verbosity == Verbosity.HIGH, "PairPlot verbosity should be Verbosity.HIGH"
         elif isinstance(subsec, bivariate_analysis.ContingencyTable):
-            assert subsec.verbosity == 2, "ContingencyTable verbosity should be 2."
+            assert (
+                subsec.verbosity == Verbosity.HIGH
+            ), "ContingencyTable verbosity should be Verbosity.HIGH."
         elif isinstance(subsec, bivariate_analysis.CorrelationPlot):
-            assert subsec.verbosity == 2, "Correlation plot verbosity should be 2."
+            assert (
+                subsec.verbosity == Verbosity.HIGH
+            ), "Correlation plot verbosity should be Verbosity.HIGH."
         else:
             pytest.fail("Unexpected subsection type")
 
@@ -103,8 +119,8 @@ def test_section_adding():
     ), "Subsection should be ContingencyTable"
 
 
-def test_code_export_verbosity_0():
-    bivariate_section = bivariate_analysis.BivariateAnalysis(verbosity=0)
+def test_code_export_verbosity_low():
+    bivariate_section = bivariate_analysis.BivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
     bivariate_section.add_cells(exported_cells)
@@ -117,13 +133,13 @@ def test_code_export_verbosity_0():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_0_with_subsections():
+def test_code_export_verbosity_low_with_subsections():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         subsections=[
             bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
             bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
         ],
-        verbosity=0,
+        verbosity=Verbosity.LOW,
     )
     # Export code
     exported_cells = []
@@ -141,7 +157,7 @@ def test_code_export_verbosity_0_with_subsections():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_generated_code_verbosity_0_columns():
+def test_generated_code_verbosity_low_columns():
     columns = [f"col{i}" for i in range(5)]
     columns_x = [f"col_x{i}" for i in range(6)]
     columns_y = [f"col_y{i}" for i in range(4)]
@@ -151,7 +167,7 @@ def test_generated_code_verbosity_0_columns():
         columns_x=columns_x,
         columns_y=columns_y,
         columns_pairs=columns_pairs,
-        verbosity=0,
+        verbosity=Verbosity.LOW,
         color_col="col3",
     )
     # Export code
@@ -169,9 +185,9 @@ def test_generated_code_verbosity_0_columns():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_generated_code_verobsity_1():
+def test_generated_code_verobsity_medium():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
-        verbosity=1,
+        verbosity=Verbosity.MEDIUM,
         subsections=[
             bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
             bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
@@ -194,11 +210,11 @@ def test_generated_code_verobsity_1():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_generated_code_verbosity_1_columns_x_y():
+def test_generated_code_verbosity_medium_columns_x_y():
     columns_x = ["a", "b"]
     columns_y = ["c", "d"]
     bivariate_section = bivariate_analysis.BivariateAnalysis(
-        verbosity=1,
+        verbosity=Verbosity.MEDIUM,
         columns_x=columns_x,
         columns_y=columns_y,
         subsections=[
@@ -224,12 +240,12 @@ def test_generated_code_verbosity_1_columns_x_y():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_generated_code_verbosity_1_columns_pairs():
+def test_generated_code_verbosity_medium_columns_pairs():
     columns_pairs = [("a", "b"), ("c", "d")]
     columns_x_correct = ["a", "c"]
     columns_y_correct = ["b", "d"]
     bivariate_section = bivariate_analysis.BivariateAnalysis(
-        verbosity=1,
+        verbosity=Verbosity.MEDIUM,
         columns_pairs=columns_pairs,
         subsections=[
             bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
@@ -253,9 +269,9 @@ def test_generated_code_verbosity_1_columns_pairs():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_generated_code_verbosity_2():
+def test_generated_code_verbosity_high():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
-        verbosity=2,
+        verbosity=Verbosity.HIGH,
         subsections=[
             bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
             bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
@@ -298,17 +314,17 @@ def test_generated_code_verbosity_2():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_verbosity_0_different_subsection_verbosities():
+def test_verbosity_low_different_subsection_verbosities():
     bivariate_section = BivariateAnalysis(
-        verbosity=0,
+        verbosity=Verbosity.LOW,
         subsections=[
             BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
             BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
             BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
             BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
         ],
-        verbosity_pairplot=2,
-        verbosity_correlations=1,
+        verbosity_pairplot=Verbosity.HIGH,
+        verbosity_correlations=Verbosity.MEDIUM,
     )
 
     bivariate_cells = []
@@ -328,8 +344,8 @@ def test_verbosity_0_different_subsection_verbosities():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_imports_verbosity_0():
-    bivariate_section = BivariateAnalysis(verbosity=0)
+def test_imports_verbosity_low():
+    bivariate_section = BivariateAnalysis(verbosity=Verbosity.LOW)
 
     exported_imports = bivariate_section.required_imports()
     expected_imports = [
@@ -343,8 +359,8 @@ def test_imports_verbosity_0():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_1():
-    bivariate_section = BivariateAnalysis(verbosity=1)
+def test_imports_verbosity_medium():
+    bivariate_section = BivariateAnalysis(verbosity=Verbosity.MEDIUM)
 
     exported_imports = bivariate_section.required_imports()
     expected_imports = list(
@@ -357,8 +373,8 @@ def test_imports_verbosity_1():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_2():
-    bivariate_section = BivariateAnalysis(verbosity=2)
+def test_imports_verbosity_high():
+    bivariate_section = BivariateAnalysis(verbosity=Verbosity.HIGH)
 
     exported_imports = bivariate_section.required_imports()
     expected_imports = list(
@@ -371,17 +387,17 @@ def test_imports_verbosity_2():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_0_different_subsection_verbosities():
+def test_imports_verbosity_low_different_subsection_verbosities():
     bivariate_section = BivariateAnalysis(
-        verbosity=0,
+        verbosity=Verbosity.LOW,
         subsections=[
             BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
             BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
             BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
             BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
         ],
-        verbosity_pairplot=2,
-        verbosity_correlations=1,
+        verbosity_pairplot=Verbosity.HIGH,
+        verbosity_correlations=Verbosity.MEDIUM,
     )
 
     exported_imports = bivariate_section.required_imports()
@@ -391,7 +407,7 @@ def test_imports_verbosity_0_different_subsection_verbosities():
         "bivariate_analysis = BivariateAnalysis.bivariate_analysis"
     }
     for s in bivariate_section.subsections:
-        if s.verbosity > 0:
+        if s.verbosity > Verbosity.LOW:
             expected_imports.update(s.required_imports())
 
     assert isinstance(exported_imports, list)

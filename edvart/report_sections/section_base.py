@@ -1,8 +1,27 @@
 import uuid
 from abc import ABC, abstractmethod
+from enum import IntEnum
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+
+
+class Verbosity(IntEnum):
+    """
+    Verbosity of the exported code.
+        0
+            A single function call generates the entire bivariate analysis section.
+        1
+            Function calls to parameterizable functions are generated for each column separately
+            in separate cells.
+        2
+            Similar to 1, but in addition, function definitions are generated, column
+            data type inference and default statistics become customizable.
+    """
+
+    LOW: int = 0
+    MEDIUM: int = 1
+    HIGH: int = 2
 
 
 class Section(ABC):
@@ -10,9 +29,8 @@ class Section(ABC):
 
     Parameters
     -----------
-    verbosity : int
+    verbosity : Verbosity
         The verbosity of the code generated in the exported notebook.
-        Must be one of [0, 1, 2].
     columns : List[str], optional
         List of columns that are considered in the analysis of the section.
         All columns are used by default.
@@ -23,11 +41,7 @@ class Section(ABC):
 
     * `__init__` initializes your object and accepts `verbosity` and `columns`
       (in addition to any other section specific parameters).
-        - `verbosity` is an integer representing the detail level of the exported code.
-          The value can be either `0`, `1`, or `2`.
-            * `0` exports a single function call that generates the entire section
-            * `1` exports a function call for each of the subsection the subsection
-            * `2` exports the full code of the analysis
+        - `verbosity` is an enum representing the detail level of the exported code.
         - `columns` is a list of names of columns which will be used in the analysis.
     * `required_imports` returns a list of lines of code that import the packages
        required by the analysis which will get added to a cell at the top of the exported notebook.
@@ -41,10 +55,8 @@ class Section(ABC):
     * `show` renders the analysis in place in the calling notebook.
     """
 
-    def __init__(self, verbosity: int = 0, columns: Optional[List[str]] = None):
-        if verbosity not in [0, 1, 2]:
-            raise ValueError(f"Verbosity must be one of [0, 1, 2], not {verbosity}")
-        self.verbosity = verbosity
+    def __init__(self, verbosity: Verbosity = Verbosity.LOW, columns: Optional[List[str]] = None):
+        self.verbosity = Verbosity(verbosity)
         self.columns = columns
         self._section_id: str = str(uuid.uuid4())
 
@@ -138,9 +150,8 @@ class ReportSection(Section):
     ----------
     subsections : List[Section]
         List of subsections that should be contained in this top level section
-    verbosity : int
-        The verbosity of the code generated in the exported notebook,
-        must be one of [0, 1, 2].
+    verbosity : Verbosity
+        The verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns that are considered in the analysis of the section,
         all columns are used by default
@@ -149,7 +160,7 @@ class ReportSection(Section):
     def __init__(
         self,
         subsections: List[Section],
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
     ):
         super().__init__(verbosity, columns)

@@ -13,7 +13,7 @@ from IPython.display import Markdown, display
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 
 class BoxplotsOverTime(Section):
@@ -24,7 +24,7 @@ class BoxplotsOverTime(Section):
 
     Parameters
     ----------
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the generated code in the exported notebook.
     columns : List[str], optional
         List of columns to analyze. Only numeric column can be analyzed.
@@ -46,7 +46,7 @@ class BoxplotsOverTime(Section):
 
     def __init__(
         self,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         grouping_function: Callable[[Any], str] = None,
         grouping_name: Optional[str] = None,
@@ -196,7 +196,7 @@ class BoxplotsOverTime(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ["import pandas as pd", "import numpy as np"].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -248,7 +248,7 @@ class BoxplotsOverTime(Section):
             default_call += f", grouping_name='{self.grouping_name}'"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             if self.grouping_function is None:

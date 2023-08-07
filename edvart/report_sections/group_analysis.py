@@ -16,7 +16,7 @@ from plotly.subplots import make_subplots
 from edvart import utils
 from edvart.data_types import DataType, infer_data_type
 from edvart.report_sections.code_string_formatting import code_dedent, get_code, total_dedent
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 
 class GroupAnalysis(Section):
@@ -28,16 +28,8 @@ class GroupAnalysis(Section):
         Data for which to perform analysis.
     groupby : Union[str, List[str]]
         Name of column or list of columns names to group by.
-    verbosity : int (default = 0)
-        Generated code verbosity global to the Group analysis sections, must be on of [0, 1, 2].
-
-        0
-            A single cell which generates the group analysis section is exported.
-        1
-            Parameterizable function calls for each subsection are exported.
-        2
-            Similar to 1, but in addition function definitions are also exported.
-
+    verbosity : Verbosity (default = Verbosity.LOW)
+        Generated code verbosity global to the Group analysis sections.
         If subsection verbosities are None, then they will be overridden by this parameter.
     columns : List[str], optional
         Columns on which to do group analysis. All columns are used by default.
@@ -58,7 +50,7 @@ class GroupAnalysis(Section):
         self,
         df: pd.DataFrame,
         groupby: Union[str, List[str]],
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         show_within_group_statistics: bool = True,
         show_group_missing_values: bool = True,
@@ -553,12 +545,12 @@ class GroupAnalysis(Section):
             e.g. ["import pandas as pd", "import numpy as np"]
         """
         ga = "GroupAnalysis"  # pylint:disable=invalid-name
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             return [
                 f"from edvart.report_sections.group_analysis import {ga}\n"
                 f"group_analysis = {ga}.group_analysis"
             ]
-        if self.verbosity == 1:
+        if self.verbosity == Verbosity.MEDIUM:
             return [
                 total_dedent(
                     f"""
@@ -574,7 +566,7 @@ class GroupAnalysis(Section):
                     """
                 )
             ]
-        # verbosity 2
+        # verbosity HIGH
         return [
             "import colorlover as cl",
             "import matplotlib.pyplot as plt",
@@ -621,7 +613,7 @@ class GroupAnalysis(Section):
         cells.append(nbfv4.new_code_cell(code))
 
     def _add_cells_numeric_col(self, cells: List[Dict[str, Any]], column_name: str):
-        """Add code cells for a numeric column at verbosity 1 or 2.
+        """Add code cells for a numeric column at verbosity MEDIUM or HIGH.
 
         Parameters
         ----------
@@ -632,7 +624,7 @@ class GroupAnalysis(Section):
         """
         code = ""
         if self.show_statistics:
-            if self.verbosity == 1:
+            if self.verbosity == Verbosity.MEDIUM:
                 code += (
                     f"within_group_stats(df=df, groupby={self.groupby}, column='{column_name}')\n"
                 )
@@ -672,7 +664,7 @@ class GroupAnalysis(Section):
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
 
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             if self.columns is None:
                 code = f"group_analysis(df=df, groupby={self.groupby})"
             else:
@@ -681,7 +673,7 @@ class GroupAnalysis(Section):
             cells.append(code_cell)
             return
 
-        if self.verbosity == 2:
+        if self.verbosity == Verbosity.HIGH:
             self._add_function_defs(cells)
 
         if self.show_missing_vals:

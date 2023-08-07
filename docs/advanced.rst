@@ -163,11 +163,11 @@ The verbosity helps us to generate a code with a specific level of detail.
 
 edvart supports three levels of verbosity:
 
-- verbosity 0
+- LOW
    - High level functions for whole sections are generated. User can modify the markdown description.
-- verbosity 1
+- MEDIUM
    - edvart functions are generated. User can modify parameters of these functions.
-- verbosity 2
+- HIGH
    - Raw code is generated. User can do very advanced modification such as changing visualisations style.
 
 The verbosity can be set to whole report or to each section separately.
@@ -176,17 +176,18 @@ Examples:
 
 .. code-block:: python
 
-    # Set default verbosity for all sections to 1
+    # Set default verbosity for all sections to Verbosity.MEDIUM
     import edvart
+    from edvart import Verbosity
 
     df = edvart.example_datasets.dataset_titanic()
-    edvart.DefaultReport(df, verbosity=1).export_notebook("test-export.ipynb")
+    edvart.DefaultReport(df, verbosity=Verbosity.MEDIUM).export_notebook("test-export.ipynb")
 
 
 .. code-block:: python
 
-    # Set default verbosity to 1 but use verbosity 2 for univariate analysis
+    # Set default verbosity to Verbosity.MEDIUM but use verbosity Verbosity.HIGH for univariate analysis
     import edvart
 
     df = edvart.example_datasets.dataset_titanic()
-    edvart.DefaultReport(df, verbosity=1, verbosity_univariate_analysis=2).export_notebook("test-export.ipynb")
+    edvart.DefaultReport(df, verbosity=Verbosity.MEDIUM, verbosity_univariate_analysis=Verbosity.HIGH).export_notebook("test-export.ipynb")

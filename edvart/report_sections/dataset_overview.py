@@ -16,7 +16,7 @@ from edvart.data_types import (
 )
 from edvart.pandas_formatting import hide_index, render_dictionary, series_to_frame
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import ReportSection, Section
+from edvart.report_sections.section_base import ReportSection, Section, Verbosity
 
 
 class Overview(ReportSection):
@@ -29,32 +29,24 @@ class Overview(ReportSection):
     subsections : List[OverviewSubsection], optional
         List of subsections to inlcude into the Overview section.
         All subsections in OverviewSubsection are used by default.
-    verbosity : int
-        Generated code verbosity global to the Overview sections, must be one of [0, 1, 2].
-
-        0
-            A single cell which generates the overview section is exported.
-        1
-            Parameterizable function calls for each subsection of the overview section are exported.
-        2
-            Similar to 1, but in addition function definitions are also exported.
-
+    verbosity : Verbosity
+        Generated code verbosity global to the Overview sections
         If subsection verbosities are None, then they will be overridden by this parameter.
     columns : List[str], optional
         Columns on which to do overview analysis. All columns are used by default.
-    verbosity_quick_info : int, optional
+    verbosity_quick_info : Verbosity, optional
         Quick info subsection code verbosity.
-    verbosity_data_types : int, optional
+    verbosity_data_types : Verbosity, optional
         Data types subsection code verbosity.
-    verbosity_data_preview : int, optional
+    verbosity_data_preview : Verbosity, optional
         Data preview subsection code verbosity.
-    verbosity_missing_values : int, optional
+    verbosity_missing_values : Verbosity, optional
         Missing values subsection code verbosity.
-    verbosity_rows_with_missing_value : int, optional
+    verbosity_rows_with_missing_value : Verbosity, optional
         Rows with missing value subsection code verbosity.
-    verbosity_constant_occurence : int, optional
+    verbosity_constant_occurence : Verbosity, optional
         Constant values subsection code verbosity.
-    verbosity_duplicate_rows : int, optional
+    verbosity_duplicate_rows : Verbosity, optional
         Duplicate rows subsection code verbosity.
     """
 
@@ -78,15 +70,15 @@ class Overview(ReportSection):
     def __init__(
         self,
         subsections: Optional[List[OverviewSubsection]] = None,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
-        verbosity_quick_info: Optional[int] = None,
-        verbosity_data_types: Optional[int] = None,
-        verbosity_data_preview: Optional[int] = None,
-        verbosity_missing_values: Optional[int] = None,
-        verbosity_rows_with_missing_value: Optional[int] = None,
-        verbosity_constant_occurence: Optional[int] = None,
-        verbosity_duplicate_rows: Optional[int] = None,
+        verbosity_quick_info: Optional[Verbosity] = None,
+        verbosity_data_types: Optional[Verbosity] = None,
+        verbosity_data_preview: Optional[Verbosity] = None,
+        verbosity_missing_values: Optional[Verbosity] = None,
+        verbosity_rows_with_missing_value: Optional[Verbosity] = None,
+        verbosity_constant_occurence: Optional[Verbosity] = None,
+        verbosity_duplicate_rows: Optional[Verbosity] = None,
     ):
         # Propagate global verbosity to subsection verbosities
         verbosity_quick_info = (
@@ -180,7 +172,7 @@ class Overview(ReportSection):
         """
         if columns is not None:
             df = df[columns]
-        overview = Overview(subsections=subsections, verbosity=0, columns=columns)
+        overview = Overview(subsections=subsections, verbosity=Verbosity.LOW, columns=columns)
         for sub in overview.subsections:
             sub.show(df)
 
@@ -193,13 +185,13 @@ class Overview(ReportSection):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np']
         """
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             imports = {
                 "from edvart.report_sections.dataset_overview import Overview\n"
                 "overview_analysis = Overview.overview_analysis"
             }
             for subsec in self.subsections:
-                if subsec.verbosity > 0:
+                if subsec.verbosity > Verbosity.LOW:
                     imports.update(subsec.required_imports())
 
             return list(imports)
@@ -218,7 +210,7 @@ class Overview(ReportSection):
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
 
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             code = "overview_analysis(df=df"
             if self.subsections_0 is not None:
                 arg_subsections_names = [
@@ -230,7 +222,7 @@ class Overview(ReportSection):
             code += ")"
             cells.append(nbfv4.new_code_cell(code))
             for subsec in self.subsections:
-                if subsec.verbosity > 0:
+                if subsec.verbosity > Verbosity.LOW:
                     subsec.add_cells(cells)
         else:
             super().add_cells(cells)
@@ -252,7 +244,7 @@ class QuickInfo(Section):
 
     Parameters
     ----------
-    verbosity : int
+    verbosity : Verbosity
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns to consider in quick info.
@@ -313,7 +305,7 @@ class QuickInfo(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -340,9 +332,9 @@ class QuickInfo(Section):
         else:
             default_call = f"quick_info(df=df, columns={self.columns})"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
-        elif self.verbosity == 2:
+        elif self.verbosity == Verbosity.HIGH:
             code = (
                 get_code(render_dictionary)
                 + 2 * "\n"
@@ -370,7 +362,7 @@ class DataTypes(Section):
 
     Parameters
     ----------
-    verbosity : int
+    verbosity : Verbosity
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns for which to infer data type.
@@ -418,7 +410,7 @@ class DataTypes(Section):
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
         base_imports = ["from edvart.pandas_formatting import hide_index"]
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return base_imports + [
                 total_dedent(
                     """
@@ -449,9 +441,9 @@ class DataTypes(Section):
         else:
             default_call = f"data_types(df=df, columns={self.columns})"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
-        elif self.verbosity == 2:
+        elif self.verbosity == Verbosity.HIGH:
             code = (
                 get_code(series_to_frame)
                 + 2 * "\n"
@@ -491,7 +483,7 @@ class DataPreview(Section):
 
     Parameters
     ----------
-    verbosity : int
+    verbosity : Verbosity
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns to preview.
@@ -546,7 +538,7 @@ class DataPreview(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -576,9 +568,9 @@ class DataPreview(Section):
         else:
             default_call = f"data_preview(df=df, columns={self.columns})"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
-        elif self.verbosity == 2:
+        elif self.verbosity == Verbosity.HIGH:
             code = get_code(DataPreview.data_preview) + 2 * "\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
@@ -600,7 +592,7 @@ class MissingValues(Section):
 
     Parameters
     ----------
-    verbosity : int
+    verbosity : Verbosity
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns for which to count missing values. If None, all columns are used.
@@ -700,7 +692,7 @@ class MissingValues(Section):
             e.g. ['import pandas as pd', 'import numpy as np']
         """
         base_imports = ["from edvart.pandas_formatting import hide_index"]
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return base_imports + [
                 total_dedent(
                     """
@@ -730,9 +722,9 @@ class MissingValues(Section):
         else:
             default_call = f"missing_values(df=df, columns={self.columns})"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
-        elif self.verbosity == 2:
+        elif self.verbosity == Verbosity.HIGH:
             code = (
                 get_code(series_to_frame)
                 + 2 * "\n"
@@ -760,7 +752,7 @@ class ConstantOccurence(Section):
 
     Parameters
     ----------
-    verbosity : int
+    verbosity : Verbosity
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns to count constant occurence in. If None, all columns are used.
@@ -830,7 +822,7 @@ class ConstantOccurence(Section):
             e.g. ['import pandas as pd', 'import numpy as np']
         """
         base_imports = ["from edvart.pandas_formatting import hide_index"]
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return base_imports + [
                 total_dedent(
                     """
@@ -857,9 +849,9 @@ class ConstantOccurence(Section):
         else:
             default_call = f"constant_occurence(df=df, columns={self.columns})"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
-        elif self.verbosity == 2:
+        elif self.verbosity == Verbosity.HIGH:
             code = (
                 get_code(series_to_frame)
                 + 2 * "\n"
@@ -887,7 +879,7 @@ class RowsWithMissingValue(Section):
 
     Parameters
     ----------
-    verbosity : int
+    verbosity : Verbosity
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns to consider when counting. If None, all columns are used.
@@ -939,7 +931,7 @@ class RowsWithMissingValue(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np']
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -966,9 +958,9 @@ class RowsWithMissingValue(Section):
         else:
             default_call = f"missing_value_row_count(df=df, columns={self.columns})"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
-        elif self.verbosity == 2:
+        elif self.verbosity == Verbosity.HIGH:
             code = (
                 get_code(render_dictionary)
                 + 2 * "\n"
@@ -996,7 +988,7 @@ class DuplicateRows(Section):
 
     Parameters
     ----------
-    verbosity : int
+    verbosity : Verbosity
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns to consider when counting. If None, all columns are used.
@@ -1048,7 +1040,7 @@ class DuplicateRows(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np']
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -1075,9 +1067,9 @@ class DuplicateRows(Section):
         else:
             default_call = f"duplicate_row_count(df=df, columns={self.columns})"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
-        elif self.verbosity == 2:
+        elif self.verbosity == Verbosity.HIGH:
             code = (
                 get_code(render_dictionary)
                 + 2 * "\n"

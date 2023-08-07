@@ -8,6 +8,7 @@ import pytest
 
 from edvart.report_sections.code_string_formatting import code_dedent, get_code, total_dedent
 from edvart.report_sections.group_analysis import GroupAnalysis
+from edvart.report_sections.section_base import Verbosity
 
 # Workaround to prevent multiple browser tabs opening with figures
 plotly.io.renderers.default = "json"
@@ -25,7 +26,7 @@ def get_test_df():
 
 def test_default_config_verbosity():
     group_section = GroupAnalysis(df=pd.DataFrame(), groupby=[])
-    assert group_section.verbosity == 0, "Verbosity should be 0"
+    assert group_section.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
 
 def test_invalid_verbosities():
@@ -74,9 +75,9 @@ def test_static_methods():
         GroupAnalysis.overlaid_histograms(df, groupby=["B"], column="B")
 
 
-def test_code_export_verbosity_0():
+def test_code_export_verbosity_low():
     df = get_test_df()
-    group_section = GroupAnalysis(df=df, groupby="B", verbosity=0)
+    group_section = GroupAnalysis(df=df, groupby="B", verbosity=Verbosity.LOW)
 
     # Export code
     exported_cells = []
@@ -90,9 +91,9 @@ def test_code_export_verbosity_0():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_1():
+def test_code_export_verbosity_medium():
     df = get_test_df()
-    group_section = GroupAnalysis(df=df, groupby="A", verbosity=1)
+    group_section = GroupAnalysis(df=df, groupby="A", verbosity=Verbosity.MEDIUM)
 
     # Export code
     exported_cells = []
@@ -116,9 +117,9 @@ def test_code_export_verbosity_1():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_code_export_verbosity_2():
+def test_code_export_verbosity_high():
     df = get_test_df()
-    group_section = GroupAnalysis(df=df, groupby="A", verbosity=2)
+    group_section = GroupAnalysis(df=df, groupby="A", verbosity=Verbosity.HIGH)
 
     # Export code
     exported_cells = []

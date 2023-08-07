@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from edvart.report import DefaultReport, Report
+from edvart.report_sections.section_base import Verbosity
 
 
 def _get_test_df() -> pd.DataFrame:
@@ -17,14 +18,14 @@ def test_report():
     report = Report(dataframe=_get_test_df())
     assert len(report.sections) == 0, "Report should be empty"
 
-    report.add_overview(verbosity=1)
+    report.add_overview(verbosity=Verbosity.MEDIUM)
     assert len(report.sections) == 1, "Report should have one section"
 
-    report.add_bivariate_analysis(verbosity=2, use_columns=["Col1", "Col2", "Col3"])
+    report.add_bivariate_analysis(verbosity=Verbosity.HIGH, use_columns=["Col1", "Col2", "Col3"])
     assert len(report.sections) == 2, "Report should have two sections"
 
     assert report.sections[0].name == "Overview", "Wrong section name"
-    assert report.sections[0].verbosity == 1, "Wrong section verbosity"
+    assert report.sections[0].verbosity == Verbosity.MEDIUM, "Wrong section verbosity"
     assert report.sections[0].columns is None, "Default column selection should be None"
 
     assert report.sections[1].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
@@ -33,19 +34,19 @@ def test_report():
 def test_default_report():
     report = DefaultReport(
         dataframe=_get_test_df(),
-        verbosity_overview=1,
-        verbosity_univariate_analysis=2,
+        verbosity_overview=Verbosity.MEDIUM,
+        verbosity_univariate_analysis=Verbosity.HIGH,
         columns_bivariate_analysis=["Col1", "Col2", "Col3"],
     )
     assert len(report.sections) > 0, "Default report should not be empty"
 
-    assert report.sections[1].verbosity == 1, "Wrong section verbosity"
+    assert report.sections[1].verbosity == Verbosity.MEDIUM, "Wrong section verbosity"
     assert report.sections[1].columns is None, "Default column selection should be None"
 
-    assert report.sections[2].verbosity == 2, "Wrong section verbosity"
+    assert report.sections[2].verbosity == Verbosity.HIGH, "Wrong section verbosity"
     assert report.sections[2].columns is None, "Default column selection should be None"
 
-    assert report.sections[3].verbosity == 0, "Wrong section verbosity"
+    assert report.sections[3].verbosity == Verbosity.LOW, "Wrong section verbosity"
     assert report.sections[3].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
 
 

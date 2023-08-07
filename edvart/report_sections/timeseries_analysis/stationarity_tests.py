@@ -13,7 +13,7 @@ from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.pandas_formatting import format_number
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 
 class StationarityTests(Section):
@@ -21,7 +21,7 @@ class StationarityTests(Section):
 
     Parameters
     ----------
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the generated code in the exported notebook.
     columns : List[str], optional
         List of columns to analyze. Only numeric column can be analyzed.
@@ -128,7 +128,7 @@ class StationarityTests(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ["import pandas as pd", "import numpy as np"].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -162,7 +162,7 @@ class StationarityTests(Section):
             default_call += f", columns={self.columns}"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = (

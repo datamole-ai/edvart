@@ -16,6 +16,7 @@ from edvart.pandas_formatting import render_dictionary, series_to_frame
 from edvart.report_sections import dataset_overview
 from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.dataset_overview import Overview
+from edvart.report_sections.section_base import Verbosity
 
 
 def get_test_df() -> pd.DataFrame:
@@ -26,52 +27,52 @@ def get_test_df() -> pd.DataFrame:
 
 def test_default_verbosity():
     overview_section = Overview()
-    assert overview_section.verbosity == 0, "Verbosity should be 0"
+    assert overview_section.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
     for s in overview_section.subsections:
-        assert s.verbosity == 0, "Verbosity should be 0"
+        assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
 
 def test_global_section_verbosity():
-    overview_section = Overview(verbosity=1)
-    assert overview_section.verbosity == 1, "Verbosity should be 1"
+    overview_section = Overview(verbosity=Verbosity.MEDIUM)
+    assert overview_section.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
     for s in overview_section.subsections:
-        assert s.verbosity == 1, "Verbosity should be 1"
+        assert s.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
 
 
 def test_subsection_verbosity_overriding():
-    overview_section = Overview(verbosity=0, verbosity_quick_info=1)
-    assert overview_section.verbosity == 0, "Verbosity should be 0"
+    overview_section = Overview(verbosity=Verbosity.LOW, verbosity_quick_info=Verbosity.MEDIUM)
+    assert overview_section.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
     for s in overview_section.subsections:
         if isinstance(s, dataset_overview.QuickInfo):
-            assert s.verbosity == 1, "Verbosity should be 1"
+            assert s.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
         else:
-            assert s.verbosity == 0, "Verbosity should be 0"
+            assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
     overview_section = Overview(
-        verbosity=0,
-        verbosity_quick_info=1,
-        verbosity_constant_occurence=0,
-        verbosity_data_preview=1,
-        verbosity_data_types=2,
-        verbosity_rows_with_missing_value=1,
-        verbosity_duplicate_rows=1,
+        verbosity=Verbosity.LOW,
+        verbosity_quick_info=Verbosity.MEDIUM,
+        verbosity_constant_occurence=Verbosity.LOW,
+        verbosity_data_preview=Verbosity.MEDIUM,
+        verbosity_data_types=Verbosity.HIGH,
+        verbosity_rows_with_missing_value=Verbosity.MEDIUM,
+        verbosity_duplicate_rows=Verbosity.MEDIUM,
     )
-    assert overview_section.verbosity == 0, "Verbosity should be 0"
+    assert overview_section.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
     for s in overview_section.subsections:
         if isinstance(s, dataset_overview.QuickInfo):
-            assert s.verbosity == 1, "Verbosity should be 1"
+            assert s.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
         elif isinstance(s, dataset_overview.ConstantOccurence):
-            assert s.verbosity == 0, "Verbosity should be 0"
+            assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
         elif isinstance(s, dataset_overview.DataPreview):
-            assert s.verbosity == 1, "Verbosity should be 1"
+            assert s.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
         elif isinstance(s, dataset_overview.MissingValues):
-            assert s.verbosity == 0, "Verbosity should be 0"
+            assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
         elif isinstance(s, dataset_overview.DataTypes):
-            assert s.verbosity == 2, "Verbosity should be 2"
+            assert s.verbosity == Verbosity.HIGH, "Verbosity should be 2"
         elif isinstance(s, dataset_overview.RowsWithMissingValue):
-            assert s.verbosity == 1, "Verbosity should be 1"
+            assert s.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
         elif isinstance(s, dataset_overview.DuplicateRows):
-            assert s.verbosity == 1, "Verbosity should be 1"
+            assert s.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
         else:
             pytest.fail("Invalid overview subsection type")
 
@@ -121,8 +122,8 @@ def test_section_adding():
     ), "Subsection should be DuplicateRows"
 
 
-def test_code_export_verbosity_0():
-    overview_section = Overview(verbosity=0)
+def test_code_export_verbosity_low():
+    overview_section = Overview(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
     overview_section.add_cells(exported_cells)
@@ -134,13 +135,13 @@ def test_code_export_verbosity_0():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_0_with_subsections():
+def test_code_export_verbosity_low_with_subsections():
     overview_section = Overview(
         subsections=[
             Overview.OverviewSubsection.QuickInfo,
             Overview.OverviewSubsection.MissingValues,
         ],
-        verbosity=0,
+        verbosity=Verbosity.LOW,
     )
     # Export code
     exported_cells = []
@@ -156,7 +157,7 @@ def test_code_export_verbosity_0_with_subsections():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_1():
+def test_code_export_verbosity_medium():
     # Construct overview section
     overview_section = Overview(
         subsections=[
@@ -168,7 +169,7 @@ def test_code_export_verbosity_1():
             Overview.OverviewSubsection.ConstantOccurence,
             Overview.OverviewSubsection.DuplicateRows,
         ],
-        verbosity=1,
+        verbosity=Verbosity.MEDIUM,
     )
     # Export code
     exported_cells = []
@@ -190,7 +191,7 @@ def test_code_export_verbosity_1():
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
 
 
-def test_code_export_verbosity_2():
+def test_code_export_verbosity_high():
     # Construct overview section
     overview_section = Overview(
         subsections=[
@@ -202,7 +203,7 @@ def test_code_export_verbosity_2():
             Overview.OverviewSubsection.ConstantOccurence,
             Overview.OverviewSubsection.DuplicateRows,
         ],
-        verbosity=2,
+        verbosity=Verbosity.HIGH,
     )
     # Export code
     exported_cells = []
@@ -266,11 +267,11 @@ def test_code_export_verbosity_2():
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
 
 
-def test_verbosity_0_different_subsection_verbosities():
+def test_verbosity_low_different_subsection_verbosities():
     overview_section = Overview(
-        verbosity=0,
-        verbosity_quick_info=1,
-        verbosity_duplicate_rows=2,
+        verbosity=Verbosity.LOW,
+        verbosity_quick_info=Verbosity.MEDIUM,
+        verbosity_duplicate_rows=Verbosity.HIGH,
     )
 
     overview_cells = []
@@ -299,8 +300,8 @@ def test_verbosity_0_different_subsection_verbosities():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_imports_verbosity_0():
-    overview_section = Overview(verbosity=0)
+def test_imports_verbosity_low():
+    overview_section = Overview(verbosity=Verbosity.LOW)
 
     exported_imports = overview_section.required_imports()
     expected_imports = [
@@ -314,8 +315,8 @@ def test_imports_verbosity_0():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_1():
-    multivariate_section = Overview(verbosity=1)
+def test_imports_verbosity_medium():
+    multivariate_section = Overview(verbosity=Verbosity.MEDIUM)
 
     exported_imports = multivariate_section.required_imports()
     expected_imports = list(
@@ -328,8 +329,8 @@ def test_imports_verbosity_1():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_2():
-    multivariate_section = Overview(verbosity=2)
+def test_imports_verbosity_high():
+    multivariate_section = Overview(verbosity=Verbosity.HIGH)
 
     exported_imports = multivariate_section.required_imports()
     expected_imports = list(
@@ -342,11 +343,11 @@ def test_imports_verbosity_2():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_0_different_subsection_verbosities():
+def test_imports_verbosity_low_different_subsection_verbosities():
     overview_section = Overview(
-        verbosity=0,
-        verbosity_quick_info=1,
-        verbosity_duplicate_rows=2,
+        verbosity=Verbosity.LOW,
+        verbosity_quick_info=Verbosity.MEDIUM,
+        verbosity_duplicate_rows=Verbosity.HIGH,
     )
 
     exported_imports = overview_section.required_imports()
@@ -356,7 +357,7 @@ def test_imports_verbosity_0_different_subsection_verbosities():
         "overview_analysis = Overview.overview_analysis"
     }
     for s in overview_section.subsections:
-        if s.verbosity > 0:
+        if s.verbosity > Verbosity.LOW:
             expected_imports.update(s.required_imports())
 
     assert isinstance(exported_imports, list)
