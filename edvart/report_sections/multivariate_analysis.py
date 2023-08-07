@@ -1,6 +1,5 @@
 """Multivariate analysis package."""
 
-# Standard imports
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -10,12 +9,9 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import sklearn.decomposition
-
-# Third-party library imports
 from IPython.display import Markdown, display
 from sklearn.preprocessing import StandardScaler
 
-# Internal library imports
 from edvart.data_types import is_numeric
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import get_code, total_dedent

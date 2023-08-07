@@ -1,17 +1,14 @@
 """Seasonal decomposition package."""
 
-# Standard imports
 import warnings
 from typing import Any, Dict, List, Optional, Tuple
 
-# Third-party library imports
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
 import pandas as pd
 import statsmodels.api as sm
 from IPython.display import Markdown, display
 
-# Internal library imports
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent

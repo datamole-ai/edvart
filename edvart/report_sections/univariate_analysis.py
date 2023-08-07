@@ -1,5 +1,4 @@
 """Univariate analysis package."""
-# Standard imports
 import warnings
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -7,11 +6,8 @@ import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
 import pandas as pd
 import seaborn as sns
-
-# Third-party library imports
 from IPython.display import HTML, Markdown, display
 
-# Internal library imports
 from edvart import utils
 from edvart.data_types import DataType, infer_data_type
 from edvart.pandas_formatting import add_html_heading, dict_to_html, format_number, subcells_html

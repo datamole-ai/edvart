@@ -1,17 +1,14 @@
 """Stationarity tests package."""
 
-# Standard imports
 import warnings
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional
 
-# Third-party library imports
 import nbformat.v4 as nbfv4
 import pandas as pd
 import statsmodels.api as sm
 from IPython.display import Markdown, display
 
-# Internal library imports
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.pandas_formatting import format_number

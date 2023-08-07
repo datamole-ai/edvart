@@ -1,15 +1,12 @@
 """Time series analysis package."""
 
-# Standard imports
 from enum import IntEnum
 from typing import Any, Dict, List, Optional
 
-# Third-party library imports
 import nbformat.v4 as nbfv4
 import pandas as pd
 from IPython.display import Markdown, display
 
-# Internal library imports
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.section_base import ReportSection
 from edvart.report_sections.timeseries_analysis import (

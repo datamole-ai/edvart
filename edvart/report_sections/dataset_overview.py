@@ -1,11 +1,8 @@
-# Standard imports
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
-
-# Third-party library imports
 import pandas as pd
 from IPython.display import Markdown, display
 
@@ -17,8 +14,6 @@ from edvart.data_types import (
     is_date,
     is_numeric,
 )
-
-# Internal library imports
 from edvart.pandas_formatting import hide_index, render_dictionary, series_to_frame
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
 from edvart.report_sections.section_base import ReportSection, Section

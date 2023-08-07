@@ -1,9 +1,7 @@
 """Short-time Fourier transform package."""
 
-# Standard imports
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-# Third-party library imports
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
 import numpy as np
@@ -11,7 +9,6 @@ import pandas as pd
 from IPython.display import Markdown, display
 from scipy import signal
 
-# Internal library imports
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent

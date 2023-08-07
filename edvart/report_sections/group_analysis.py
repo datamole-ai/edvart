@@ -1,6 +1,5 @@
 """Group analysis module."""
 
-# Standard imports
 import warnings
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -9,8 +8,6 @@ import nbformat.v4 as nbfv4
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-
-# Third-party library imports
 from IPython.display import Markdown, display
 from matplotlib import cm
 from matplotlib.colors import Normalize, to_hex
