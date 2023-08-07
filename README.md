@@ -20,7 +20,7 @@ pip install edvart
 
 ## Usage
 
-See the notebook `api-example.md` for usage examples.
+See the notebook [api-example.ipynb](api-example.ipynb) for usage examples.
 
 ## User documentation
 
