@@ -86,7 +86,7 @@ poetry run black --check --line-length 100 edvart/ tests/
 * `isort` is used for sorting imports.
 The following command can be used to properly sort imports:
 ```bash
-poetry run isort --profile black edvart/ tests/
+poetry run isort --line-length 100 --profile black edvart/ tests/
 ```
 The following command can be used to check if the imports are properly sorted:
 ```bash
