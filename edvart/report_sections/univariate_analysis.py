@@ -262,10 +262,6 @@ class UnivariateAnalysis(Section):
             df = df[columns]
 
         for col in df.columns:
-            if df[col].isnull().all():
-                display(Markdown(f"## *{col} - NULL*"))
-                display(Markdown("The column contains only null values."))
-                continue
             data_type_name = infer_data_type(df[col], string_representation=True)
             data_type = infer_data_type(df[col])
             display(Markdown(f"## *{col} - {data_type_name}*"))
@@ -274,6 +270,8 @@ class UnivariateAnalysis(Section):
                 UnivariateAnalysis.bar_plot(df[col])
             elif data_type == DataType.UNIQUE:
                 display(Markdown("Each value in the column is unique."))
+            elif data_type == DataType.MISSING:
+                display(Markdown("The column contains only missing values."))
             else:
                 UnivariateAnalysis.numeric_statistics(df[col])
                 UnivariateAnalysis.histogram(df[col])
@@ -371,10 +369,6 @@ class UnivariateAnalysis(Section):
             cells.append(code_cell)
         else:
             for col in self.df.columns:
-                if self.df[col].isnull().all():
-                    display(Markdown(f"## *{col} - NULL*"))
-                    display(Markdown("The column contains only null values."))
-                    continue
                 data_type_name = infer_data_type(self.df[col], string_representation=True)
                 data_type = infer_data_type(self.df[col])
                 column_header = nbfv4.new_markdown_cell(f"## *{col} - {data_type_name}*")
@@ -389,6 +383,8 @@ class UnivariateAnalysis(Section):
                     )
                 elif data_type == DataType.UNIQUE:
                     cell = nbfv4.new_markdown_cell("Each value in the column is unique.")
+                elif data_type == DataType.MISSING:
+                    cell = nbfv4.new_markdown_cell("The column contains only missing values.")
                 else:
                     if self.verbosity == Verbosity.MEDIUM:
                         cell = nbfv4.new_code_cell(
@@ -425,10 +421,6 @@ class UnivariateAnalysis(Section):
 
         display(Markdown(self.get_title(section_level=1)))
         for col in df.columns:
-            if df[col].isnull().all():
-                display(Markdown(f"## *{col} - NULL*"))
-                display(Markdown("The column contains only null values."))
-                continue
             data_type_name = infer_data_type(df[col], string_representation=True)
             data_type = infer_data_type(df[col])
             display(Markdown(f"## *{col} - {data_type_name}*"))
@@ -437,6 +429,8 @@ class UnivariateAnalysis(Section):
                 UnivariateAnalysis.bar_plot(df[col])
             elif data_type == DataType.UNIQUE:
                 display(Markdown("Each value in the column is unique."))
+            elif data_type == DataType.MISSING:
+                display(Markdown("The column contains only missing values."))
             else:
                 UnivariateAnalysis.numeric_statistics(df[col])
                 UnivariateAnalysis.histogram(df[col])
