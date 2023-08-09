@@ -16,6 +16,7 @@ class DataType(IntEnum):
     DATE = 4
     UNKNOWN = 5
     MISSING = 6
+    UNIQUE = 7
 
     def __str__(self):
         return self.name.lower()
@@ -43,6 +44,8 @@ def infer_data_type(series: pd.Series, string_representation: bool = False) -> U
         ret = DataType.BOOLEAN
     elif is_date(series):
         ret = DataType.DATE
+    elif is_unique(series):
+        ret = DataType.UNIQUE
     elif is_categorical(series):
         ret = DataType.CATEGORICAL
     elif is_numeric(series):
@@ -51,6 +54,22 @@ def infer_data_type(series: pd.Series, string_representation: bool = False) -> U
         ret = DataType.UNKNOWN
 
     return str(ret) if string_representation else ret
+
+
+def is_unique(series: pd.Series) -> bool:
+    """Heuristic to tell if a series is categorical with only unique values.
+
+    Parameters
+    ----------
+    series : pd.Series
+        Series from which to infer data type.
+
+    Returns
+    -------
+    bool
+        Boolean indicating whether series contains only unique values.
+    """
+    return is_categorical(series) and series.nunique() == len(series)
 
 
 def is_numeric(series: pd.Series) -> bool:
