@@ -9,13 +9,13 @@ import pandas as pd
 class Verbosity(IntEnum):
     """
     Verbosity of the exported code.
-        0
-            A single function call generates the entire bivariate analysis section.
-        1
+        LOW
+            A single function call generates the entire section.
+        MEDIUM
             Function calls to parameterizable functions are generated for each column separately
             in separate cells.
-        2
-            Similar to 1, but in addition, function definitions are generated, column
+        HIGH
+            Similar to MEDIUM, but in addition, function definitions are generated, column
             data type inference and default statistics become customizable.
     """
 
