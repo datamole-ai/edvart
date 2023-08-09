@@ -29,8 +29,6 @@ You can also use `poetry run` to run commands in the virtual environment without
 ### Implement a new type of analysis
 Start by implementing a prototype of the analysis in the `prototype.md` notebook.
 
-For instructions on converting between markdown notebook format and Jupyter notebook format, see [README](README.md#markdown-notebooks).
-
 You can test your implementation by loading the example datasets using `edvart.example_datasets.dataset_*` and running your analysis on the dataset.
 
 ### Implement an API for the analysis
