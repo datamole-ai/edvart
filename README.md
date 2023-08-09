@@ -20,7 +20,7 @@ pip install edvart
 
 ## Usage
 
-See the notebook `api-example.md` for usage examples.
+See the notebook [api-example.ipynb](api-example.ipynb) for usage examples.
 
 ## User documentation
 
@@ -35,21 +35,3 @@ details.
 ## How to Contribute
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Markdown Notebooks
-
-Jupyter notebooks are stored in markdown format in the repository. To convert a
-Markdown notebook to a Jupyter notebook, use
-[jupytext](https://github.com/mwouts/jupytext). `jupytext` is included in the
-development dependencies of this project. For example convert `api-example.md`
-to `ipynb` Jupyter notebook format:
-
-```bash
-jupytext --to ipynb api-example.md
-```
-
-To convert an `ipynb` notebook to markdown:
-
-```bash
-jupytext --to md api-example.ipynb
-```
