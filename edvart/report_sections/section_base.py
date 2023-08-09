@@ -19,9 +19,9 @@ class Verbosity(IntEnum):
             data type inference and default statistics become customizable.
     """
 
-    LOW: int = 0
-    MEDIUM: int = 1
-    HIGH: int = 2
+    LOW = 0
+    MEDIUM = 1
+    HIGH = 2
 
 
 class Section(ABC):
