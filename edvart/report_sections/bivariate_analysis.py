@@ -92,13 +92,9 @@ class BivariateAnalysis(ReportSection):
         verbosity_contingency_table: Optional[Verbosity] = None,
         color_col: Optional[str] = None,
     ):
-        verbosity_correlations = (
-            verbosity_correlations if verbosity_correlations is not None else verbosity
-        )
-        verbosity_pairplot = verbosity_pairplot if verbosity_pairplot is not None else verbosity
-        verbosity_contingency_table = (
-            verbosity_contingency_table if verbosity_contingency_table is not None else verbosity
-        )
+        verbosity_correlations = verbosity_correlations or verbosity
+        verbosity_pairplot = verbosity_pairplot or verbosity
+        verbosity_contingency_table = verbosity_contingency_table or verbosity
 
         subsec = BivariateAnalysis.BivariateAnalysisSubsection
 

@@ -99,32 +99,18 @@ class TimeseriesAnalysis(ReportSection):
         self.sampling_rate = sampling_rate
         self.stft_window_size = stft_window_size
 
-        verbosity_time_analysis_plot = (
-            verbosity_time_analysis_plot if verbosity_time_analysis_plot is not None else verbosity
-        )
-        verbosity_rolling_statistics = (
-            verbosity_rolling_statistics if verbosity_rolling_statistics is not None else verbosity
-        )
-        verbosity_boxplots_over_time = (
-            verbosity_boxplots_over_time if verbosity_boxplots_over_time is not None else verbosity
-        )
+        verbosity_time_analysis_plot = verbosity_time_analysis_plot or verbosity
+        verbosity_rolling_statistics = verbosity_rolling_statistics or verbosity
+        verbosity_boxplots_over_time = verbosity_boxplots_over_time or verbosity
         verbosity_seasonal_decomposition = (
             verbosity_seasonal_decomposition
             if verbosity_seasonal_decomposition is not None
             else verbosity
         )
-        verbosity_stationarity_tests = (
-            verbosity_stationarity_tests if verbosity_stationarity_tests is not None else verbosity
-        )
-        verbosity_autocorrelation = (
-            verbosity_autocorrelation if verbosity_autocorrelation is not None else verbosity
-        )
-        verbosity_fourier_transform = (
-            verbosity_fourier_transform if verbosity_fourier_transform is not None else verbosity
-        )
-        verbosity_short_time_ft = (
-            verbosity_short_time_ft if verbosity_short_time_ft is not None else verbosity
-        )
+        verbosity_stationarity_tests = verbosity_stationarity_tests or verbosity
+        verbosity_autocorrelation = verbosity_autocorrelation or verbosity
+        verbosity_fourier_transform = verbosity_fourier_transform or verbosity
+        verbosity_short_time_ft = verbosity_short_time_ft or verbosity
 
         subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
 

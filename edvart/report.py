@@ -369,7 +369,7 @@ class ReportBase(ABC):
         self.sections.append(
             Overview(
                 subsections=subsections,
-                verbosity=verbosity if verbosity is not None else self.verbosity,
+                verbosity=verbosity or self.verbosity,
                 columns=self._select_columns(use_columns, omit_columns),
                 verbosity_quick_info=verbosity_quick_info,
                 verbosity_data_types=verbosity_data_types,
@@ -404,7 +404,7 @@ class ReportBase(ABC):
         self.sections.append(
             UnivariateAnalysis(
                 df=self.df,
-                verbosity=verbosity if verbosity is not None else self.verbosity,
+                verbosity=verbosity or self.verbosity,
                 columns=self._select_columns(use_columns, omit_columns),
             )
         )
@@ -468,7 +468,7 @@ class ReportBase(ABC):
         self.sections.append(
             BivariateAnalysis(
                 subsections=subsections,
-                verbosity=verbosity if verbosity is not None else self.verbosity,
+                verbosity=verbosity or self.verbosity,
                 columns=self._select_columns(use_columns, omit_columns),
                 columns_x=columns_x,
                 columns_y=columns_y,
@@ -525,7 +525,7 @@ class ReportBase(ABC):
             MultivariateAnalysis(
                 subsections=subsections,
                 df=self.df,
-                verbosity=verbosity if verbosity is not None else self.verbosity,
+                verbosity=verbosity or self.verbosity,
                 columns=self._select_columns(use_columns, omit_columns),
                 verbosity_pca=verbosity_pca,
                 verbosity_umap=verbosity_umap,
@@ -572,7 +572,7 @@ class ReportBase(ABC):
             GroupAnalysis(
                 df=self.df,
                 groupby=groupby,
-                verbosity=verbosity if verbosity is not None else self.verbosity,
+                verbosity=verbosity or self.verbosity,
                 columns=self._select_columns(use_columns, omit_columns),
                 show_within_group_statistics=show_within_group_statistics,
                 show_group_missing_values=show_group_missing_values,
@@ -819,7 +819,7 @@ class TimeseriesReport(ReportBase):
         self.sections.append(
             TimeseriesAnalysis(
                 subsections=subsections,
-                verbosity=verbosity if verbosity is not None else self.verbosity,
+                verbosity=verbosity or self.verbosity,
                 columns=self._select_columns(use_columns, omit_columns),
                 verbosity_time_analysis_plot=verbosity_time_analysis_plot,
                 verbosity_rolling_statistics=verbosity_rolling_statistics,
