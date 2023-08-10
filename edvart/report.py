@@ -18,7 +18,7 @@ from edvart.report_sections.code_string_formatting import code_dedent
 from edvart.report_sections.dataset_overview import Overview
 from edvart.report_sections.group_analysis import GroupAnalysis
 from edvart.report_sections.multivariate_analysis import MultivariateAnalysis
-from edvart.report_sections.section_base import Verbosity
+from edvart.report_sections.section_base import Section, Verbosity
 from edvart.report_sections.table_of_contents import TableOfContents
 from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis
 from edvart.report_sections.univariate_analysis import UnivariateAnalysis
@@ -44,7 +44,7 @@ class ReportBase(ABC):
     ):
         self._class_logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
         self.df = dataframe
-        self.sections = []
+        self.sections: list[Section] = []
         self.verbosity = Verbosity(verbosity)
 
     def show(self) -> None:
