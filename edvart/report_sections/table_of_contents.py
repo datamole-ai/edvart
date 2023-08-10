@@ -89,8 +89,7 @@ class TableOfContents(Section):
         # Add links to all main sections (not including subsections) besides the first (table of
         # content) section
         for section in sections:
-            if not isinstance(section, TableOfContents):
-                lines.append(TableOfContents._get_section_link(section, 1))
+            lines.append(TableOfContents._get_section_link(section, 1))
         cells.append(nbfv4.new_markdown_cell("\n".join(lines)))
 
     # pylint: disable=arguments-renamed
@@ -108,6 +107,5 @@ class TableOfContents(Section):
         # Add links to all sections including their subsections besides the first (table of content)
         # section
         for section in sections:
-            if not isinstance(section, TableOfContents):
-                self._add_section_lines(section, 1, lines, self._include_subsections)
+            self._add_section_lines(section, 1, lines, self._include_subsections)
         display(Markdown("\n".join(lines)))
