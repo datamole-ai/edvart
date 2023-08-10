@@ -29,6 +29,7 @@ def scatter_plot_2d(
     show_xticks: bool = False,
     show_yticks: bool = False,
     show_zerolines: bool = False,
+    equal_scale_axes: bool = False,
 ) -> None:
     """Display a 2D scatter plot of x and y, with optional coloring of points by values in a column.
 
@@ -60,6 +61,8 @@ def scatter_plot_2d(
         Whether to display ticks on the y axis.
     show_zerolines : bool (default = False)
         Whether to display zero lines.
+    equal_scale_axes : bool (default = False)
+        Whether to make the x and y axes have the same scale.
     """
     if isinstance(x, str):
         x = df[x]
@@ -78,6 +81,7 @@ def scatter_plot_2d(
         show_xticks=show_xticks,
         show_yticks=show_yticks,
         show_zerolines=show_zerolines,
+        equal_scale_axes=equal_scale_axes,
     )
 
 
@@ -93,6 +97,7 @@ def _scatter_plot_2d_noninteractive(
     show_xticks: bool = False,
     show_yticks: bool = False,
     show_zerolines: bool = False,
+    equal_scale_axes: bool = False,
 ) -> None:
     _fig, ax = plt.subplots(figsize=figsize)
     if color_col is not None:
@@ -123,6 +128,8 @@ def _scatter_plot_2d_noninteractive(
         ax.set_yticks([])
     if not show_zerolines:
         ax.grid(False)
+    if equal_scale_axes:
+        ax.set_aspect("equal", "datalim")
     plt.show()
 
 
@@ -138,6 +145,7 @@ def _scatter_plot_2d_interactive(
     show_xticks: bool = False,
     show_yticks: bool = False,
     show_zerolines: bool = False,
+    equal_scale_axes: bool = False,
 ) -> None:
     layout = go.Layout(
         width=figsize[0] * _INCHES_TO_PIXELS,
@@ -150,6 +158,9 @@ def _scatter_plot_2d_interactive(
         ),
         legend=go.layout.Legend(title=f"<b>{color_col}</b>"),
     )
+    if equal_scale_axes:
+        layout.yaxis.scaleanchor = "x"
+        layout.yaxis.scaleratio = 1
     fig = go.Figure(layout=layout)
     if color_col is not None:
         is_color_categorical = utils.is_categorical(df[color_col]) or not is_numeric(df[color_col])

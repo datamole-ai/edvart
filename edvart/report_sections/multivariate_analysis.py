@@ -350,6 +350,7 @@ class PCA(Section):
             show_xticks=True,
             show_yticks=True,
             show_zerolines=True,
+            equal_scale_axes=True,
         )
 
         print(f"Explained variance ratio: {pca.explained_variance_ratio_[:2].sum() * 100 :.2f}%")
