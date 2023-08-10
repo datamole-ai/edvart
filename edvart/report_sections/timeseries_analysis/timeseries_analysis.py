@@ -8,7 +8,7 @@ import pandas as pd
 from IPython.display import Markdown, display
 
 from edvart.decorators import check_index_time_ascending
-from edvart.report_sections.section_base import ReportSection
+from edvart.report_sections.section_base import ReportSection, Verbosity
 from edvart.report_sections.timeseries_analysis import (
     Autocorrelation,
     BoxplotsOverTime,
@@ -33,35 +33,27 @@ class TimeseriesAnalysis(ReportSection):
         All subsection in TimeseriesAnalysisSubsection are included by default, except for
         FourierTransform, which is only included if `sampling_rate` is set and ShortTimeFT, which
         is only included if `sampling_rate` and `stft_window_size` are both set.
-    verbosity : int
-        Generated code verbosity global to the Overview sections, must be one of [0, 1, 2].
-
-        0
-            A single cell which generates the timeseries analysis section is exported.
-        1
-            Parameterizable function calls for each subsection are exported.
-        2
-            Similar to 1, but in addition function definitions are also exported.
-
+    verbosity : Verbosity
+        Generated code verbosity global to the Overview sections.
         If subsection verbosities are None, then they will be overridden by this parameter.
     columns : List[str], optional
         Columns to include in timeseries analysis. Each column is treated as a separate time series.
         All columns are used by default.
-    verbosity_time_analysis_plot : int, optional
+    verbosity_time_analysis_plot : Verbosity, optional
         Time analysis interactive plot subsection code verbosity.
-    verbosity_rolling_statistics: int, optional
+    verbosity_rolling_statistics: Verbosity, optional
         Rolling statistics interactive plot subsection code verbosity.
-    verbosity_boxplots_over_time: int, optional
+    verbosity_boxplots_over_time: Verbosity, optional
         Boxplots grouped over time intervals subsection code verbosity.
-    verbosity_seasonal_decomposition: int, optional
+    verbosity_seasonal_decomposition: Verbosity, optional
         Seasonal decomposition subsection code verbosity.
-    verbosity_stationarity_tests: int, optional
+    verbosity_stationarity_tests: Verbosity, optional
         Stationarity tests subsection code verbosity.
-    verbosity_autocorrelation: int, optional
+    verbosity_autocorrelation: Verbosity, optional
         Autocorrelation and partial autocorrelation plot subsection code verbosity.
-    verbosity_fourier_transform: int, optional
+    verbosity_fourier_transform: Verbosity, optional
         Discrete Fourier transform plot subsection code verbosity.
-    verbosity_short_time_ft: int, optional
+    verbosity_short_time_ft: Verbosity, optional
         Short-time discrete Fourier transform plot subsection code verbosity.
     sampling_rate: int, optional
         Sampling rate of the time-series, i.e., how many samples form one period. For example,
@@ -91,16 +83,16 @@ class TimeseriesAnalysis(ReportSection):
     def __init__(
         self,
         subsections: Optional[List[TimeseriesAnalysisSubsection]] = None,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
-        verbosity_time_analysis_plot: Optional[int] = None,
-        verbosity_rolling_statistics: Optional[int] = None,
-        verbosity_boxplots_over_time: Optional[int] = None,
-        verbosity_seasonal_decomposition: Optional[int] = None,
-        verbosity_stationarity_tests: Optional[int] = None,
-        verbosity_autocorrelation: Optional[int] = None,
-        verbosity_fourier_transform: Optional[int] = None,
-        verbosity_short_time_ft: Optional[int] = None,
+        verbosity_time_analysis_plot: Optional[Verbosity] = None,
+        verbosity_rolling_statistics: Optional[Verbosity] = None,
+        verbosity_boxplots_over_time: Optional[Verbosity] = None,
+        verbosity_seasonal_decomposition: Optional[Verbosity] = None,
+        verbosity_stationarity_tests: Optional[Verbosity] = None,
+        verbosity_autocorrelation: Optional[Verbosity] = None,
+        verbosity_fourier_transform: Optional[Verbosity] = None,
+        verbosity_short_time_ft: Optional[Verbosity] = None,
         sampling_rate: Optional[int] = None,
         stft_window_size: Optional[int] = None,
     ):
@@ -173,8 +165,8 @@ class TimeseriesAnalysis(ReportSection):
         else:
             subsections_all = subsections
 
-        # Store subsections with 0 verbosity
-        self.subsections_0 = [sub for sub in subsections_all if verbosities[sub] == 0]
+        # Store subsections with Verbosity.LOW
+        self.subsections_0 = [sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW]
 
         if len(self.subsections_0) == len(subsections_all) and subsections is None:
             self.subsections_0 = None
@@ -240,7 +232,7 @@ class TimeseriesAnalysis(ReportSection):
 
         timeseries_analysis = TimeseriesAnalysis(
             subsections=subsections,
-            verbosity=0,
+            verbosity=Verbosity.LOW,
             columns=columns,
             sampling_rate=sampling_rate,
             stft_window_size=stft_window_size,
@@ -262,7 +254,7 @@ class TimeseriesAnalysis(ReportSection):
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
 
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
             code = "timeseries_analysis(df=df"
 
@@ -290,7 +282,7 @@ class TimeseriesAnalysis(ReportSection):
             cells.append(nbfv4.new_code_cell(code))
 
             for sub in self.subsections:
-                if sub.verbosity > 0:
+                if sub.verbosity > Verbosity.LOW:
                     sub.add_cells(cells)
         else:
             super().add_cells(cells)
@@ -304,13 +296,13 @@ class TimeseriesAnalysis(ReportSection):
             List of import strings to be added at the top of the generated notebook,
             e.g. ["import pandas as pd", "import numpy as np"]
         """
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             imports = {
                 "from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis\n"
                 "timeseries_analysis = TimeseriesAnalysis.timeseries_analysis"
             }
             for sub in self.subsections:
-                if sub.verbosity > 0:
+                if sub.verbosity > Verbosity.LOW:
                     imports.update(sub.required_imports())
 
             return list(imports)

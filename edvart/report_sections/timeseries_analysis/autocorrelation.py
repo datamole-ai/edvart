@@ -12,7 +12,7 @@ from statsmodels.graphics import tsaplots
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 
 class Autocorrelation(Section):
@@ -20,7 +20,7 @@ class Autocorrelation(Section):
 
     Parameters
     ----------
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the generated code in the exported notebook.
     columns : List[str], optional
         List of columns to analyze. Only numeric column can be analyzed.
@@ -154,7 +154,7 @@ class Autocorrelation(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ["import pandas as pd", "import numpy as np"].
         """
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             return [
                 total_dedent(
                     """
@@ -163,7 +163,7 @@ class Autocorrelation(Section):
                     """
                 )
             ]
-        if self.verbosity == 1:
+        if self.verbosity == Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -173,7 +173,7 @@ class Autocorrelation(Section):
                     """
                 )
             ]
-        # verbosity 2
+        # Verbosity.HIGH
         return [
             "import functools",
             "import matplotlib.pyplot as plt",
@@ -192,7 +192,7 @@ class Autocorrelation(Section):
         cells : List[Dict[str, Any]]
             List of generated notebook cells which are represented as dictionaries.
         """
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
             default_call = "autocorrelation(df=df"
             if self.columns is not None:
@@ -214,7 +214,7 @@ class Autocorrelation(Section):
             default_call_pacf += f", columns={self.columns}"
         default_call_pacf += ")"
 
-        if self.verbosity == 1:
+        if self.verbosity == Verbosity.MEDIUM:
             code_acf = default_call_acf
             code_pacf = default_call_pacf
         else:

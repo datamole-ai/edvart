@@ -13,7 +13,7 @@ from IPython.display import Markdown, display
 from edvart import utils
 from edvart.data_types import is_boolean, is_categorical, is_numeric
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import ReportSection, Section
+from edvart.report_sections.section_base import ReportSection, Section, Verbosity
 
 
 class BivariateAnalysis(ReportSection):
@@ -26,16 +26,8 @@ class BivariateAnalysis(ReportSection):
     subsections : List[BivariateAnalysisSubsection], optional
         List of subsections to include.
         All subsection in BivariateAnalysisSubsection are included by default.
-    verbosity : int (default = 0)
-        Generated code verbosity global to the Bivariate analysis sections, must be on of [0, 1, 2].
-
-        0
-            A single cell which generates the bivariate analysis section is exported.
-        1
-            Parameterizable function calls for each subsection are exported.
-        2
-            Similar to 1, but in addition function definitions are also exported.
-
+    verbosity : Verbosity (default = Verbosity.LOW)
+        Generated code verbosity global to the Bivariate analysis sections.
         If subsection verbosities are None, then they will be overridden by this parameter.
     columns : List[str], optional
         Columns on which to do bivariate analysis.
@@ -60,11 +52,11 @@ class BivariateAnalysis(ReportSection):
         `columns`, `columns_x`, `columns_y` is specified. In that case, the first elements of each
         pair are treated as `columns_x` and the second elements as `columns_y` in pairplots and
         correlations.
-    verbosity_correlations : int, optional
+    verbosity_correlations : Verbosity, optional
         Correlation plots subsection code verbosity.
-    verbosity_pairplot: int, optional
+    verbosity_pairplot: Verbosity, optional
         Pairplot subsection code verbosity.
-    verbosity_contingency_table: int, optional
+    verbosity_contingency_table: Verbosity, optional
         Contingency table subsection code verbosity.
     color_col : str, optional
         Name of column according to use for coloring of the bivariate analysis subsections.
@@ -90,14 +82,14 @@ class BivariateAnalysis(ReportSection):
     def __init__(
         self,
         subsections: Optional[List[BivariateAnalysisSubsection]] = None,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         columns_x: Optional[List[str]] = None,
         columns_y: Optional[List[str]] = None,
         columns_pairs: Optional[List[Tuple[str, str]]] = None,
-        verbosity_correlations: Optional[int] = None,
-        verbosity_pairplot: Optional[int] = None,
-        verbosity_contingency_table: Optional[int] = None,
+        verbosity_correlations: Optional[Verbosity] = None,
+        verbosity_pairplot: Optional[Verbosity] = None,
+        verbosity_contingency_table: Optional[Verbosity] = None,
         color_col: Optional[str] = None,
     ):
         verbosity_correlations = (
@@ -214,7 +206,7 @@ class BivariateAnalysis(ReportSection):
         """
         bivariate_analysis = BivariateAnalysis(
             subsections=subsections,
-            verbosity=0,
+            verbosity=Verbosity.LOW,
             columns=columns,
             columns_x=columns_x,
             columns_y=columns_y,
@@ -237,7 +229,7 @@ class BivariateAnalysis(ReportSection):
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
-        if self.verbosity == 0:
+        if self.verbosity == Verbosity.LOW:
             code = "bivariate_analysis(df=df"
             if self.subsections_0 is not None:
                 arg_subsections_names = [
@@ -258,7 +250,7 @@ class BivariateAnalysis(ReportSection):
             code += ")"
             cells.append(nbfv4.new_code_cell(code))
             for sub in self.subsections:
-                if sub.verbosity > 0:
+                if sub.verbosity > Verbosity.LOW:
                     sub.add_cells(cells)
         else:
             super().add_cells(cells)
@@ -272,7 +264,7 @@ class BivariateAnalysis(ReportSection):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np']
         """
-        if self.verbosity != 0:
+        if self.verbosity != Verbosity.LOW:
             return super().required_imports()
 
         imports = {
@@ -280,7 +272,7 @@ class BivariateAnalysis(ReportSection):
             "bivariate_analysis = BivariateAnalysis.bivariate_analysis"
         }
         for subsec in self.subsections:
-            if subsec.verbosity > 0:
+            if subsec.verbosity > Verbosity.LOW:
                 imports.update(subsec.required_imports())
 
         return list(imports)
@@ -302,7 +294,7 @@ class CorrelationPlot(Section):
 
     Parameters
     ----------
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns on which to plot pair-wise correlation plot.
@@ -326,7 +318,7 @@ class CorrelationPlot(Section):
 
     def __init__(
         self,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         columns_x: Optional[List[str]] = None,
         columns_y: Optional[List[str]] = None,
@@ -507,7 +499,7 @@ class CorrelationPlot(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -546,7 +538,7 @@ class CorrelationPlot(Section):
 
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = (
@@ -582,7 +574,7 @@ class PairPlot(Section):
 
     Parameters
     ----------
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns on which to plot the pairplot.
@@ -608,7 +600,7 @@ class PairPlot(Section):
 
     def __init__(
         self,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         columns_x: Optional[List[str]] = None,
         columns_y: Optional[List[str]] = None,
@@ -689,7 +681,7 @@ class PairPlot(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -725,7 +717,7 @@ class PairPlot(Section):
             default_call += f", color_col='{self.color_col}'"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = get_code(PairPlot.plot_pairplot) + "\n\n" + default_call
@@ -755,7 +747,7 @@ class ContingencyTable(Section):
 
     Parameters
     ----------
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns on which to show contingency tables.
@@ -782,7 +774,7 @@ class ContingencyTable(Section):
 
     def __init__(
         self,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         columns_x: Optional[List[str]] = None,
         columns_y: Optional[List[str]] = None,
@@ -946,7 +938,7 @@ class ContingencyTable(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -983,7 +975,7 @@ class ContingencyTable(Section):
             default_call += f", columns={self.columns}"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = (

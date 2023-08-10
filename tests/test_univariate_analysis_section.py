@@ -7,6 +7,7 @@ import pytest
 from edvart.pandas_formatting import add_html_heading, dict_to_html, format_number, subcells_html
 from edvart.report_sections import univariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
+from edvart.report_sections.section_base import Verbosity
 
 
 def test_invalid_verbosity():
@@ -21,10 +22,10 @@ def test_invalid_verbosity():
         univariate_analysis.UnivariateAnalysis(df=test_df, verbosity="1")
 
 
-def test_code_export_verbosity_0():
+def test_code_export_verbosity_low():
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
     # Construct univariate analysis section
-    univariate_section = univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=0)
+    univariate_section = univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
     univariate_section.add_cells(exported_cells)
@@ -36,10 +37,12 @@ def test_code_export_verbosity_0():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_1():
+def test_code_export_verbosity_medium():
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
     # Construct univariate analysis section
-    univariate_section = univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=1)
+    univariate_section = univariate_analysis.UnivariateAnalysis(
+        df=test_df, verbosity=Verbosity.MEDIUM
+    )
     # Export code
     exported_cells = []
     univariate_section.add_cells(exported_cells)
@@ -55,10 +58,12 @@ def test_code_export_verbosity_1():
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
 
 
-def test_code_export_verbosity_2():
+def test_code_export_verbosity_high():
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
     # Construct univariate analysis section
-    univariate_section = univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=2)
+    univariate_section = univariate_analysis.UnivariateAnalysis(
+        df=test_df, verbosity=Verbosity.HIGH
+    )
     # Export code
     exported_cells = []
     univariate_section.add_cells(exported_cells)

@@ -12,7 +12,7 @@ from edvart import utils
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 
 class TimeAnalysisPlot(Section):
@@ -20,7 +20,7 @@ class TimeAnalysisPlot(Section):
 
     Parameters
     ----------
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         List of columns to analyze. Only numeric column can be analyzed.
@@ -36,7 +36,7 @@ class TimeAnalysisPlot(Section):
 
     def __init__(
         self,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         separate_plots: bool = False,
         color_col: Optional[str] = None,
@@ -144,7 +144,7 @@ class TimeAnalysisPlot(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ["import pandas as pd", "import numpy as np"].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -184,7 +184,7 @@ class TimeAnalysisPlot(Section):
             default_call += ", separate_plots=True"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = (

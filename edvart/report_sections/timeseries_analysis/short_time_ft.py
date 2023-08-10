@@ -12,7 +12,7 @@ from scipy import signal
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 
 class ShortTimeFT(Section):
@@ -25,7 +25,7 @@ class ShortTimeFT(Section):
         frequencies in multiples of (1 / sampling rate) will be analyzed.
     window_size : int
         Size of window to perform DFT on to obtain Short-time Fourier transform.
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the generated code in the exported notebook.
     columns : List[str], optional
         List of columns to analyze. Only numeric column can be analyzed.
@@ -36,7 +36,7 @@ class ShortTimeFT(Section):
         self,
         sampling_rate: int,
         window_size: int,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
     ):
         if sampling_rate <= 0:
@@ -155,7 +155,7 @@ class ShortTimeFT(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ["import pandas as pd", "import numpy as np"].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -191,7 +191,7 @@ class ShortTimeFT(Section):
             default_call += f", columns={self.columns}"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = get_code(ShortTimeFT.short_time_ft) + "\n\n" + default_call

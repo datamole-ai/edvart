@@ -11,7 +11,7 @@ from IPython.display import Markdown, display
 from edvart.data_types import is_numeric  # noqa:I100
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 
 class FourierTransform(Section):
@@ -22,7 +22,7 @@ class FourierTransform(Section):
     sampling_rate : int
         The time series will be considered as samples from a lower-frequency at this rate, i.e.
         frequencies in multiples of (1 / sampling rate) will be analyzed.
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the generated code in the exported notebook.
     columns : List[str], optional
         List of columns to analyze. Only numeric column can be analyzed.
@@ -32,7 +32,7 @@ class FourierTransform(Section):
     def __init__(
         self,
         sampling_rate: int,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
     ):
         if sampling_rate <= 0:
@@ -121,7 +121,7 @@ class FourierTransform(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ["import pandas as pd", "import numpy as np"].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -153,7 +153,7 @@ class FourierTransform(Section):
             default_call += f", columns={self.columns}"
         default_call += ")"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = get_code(FourierTransform.fourier_transform) + "\n\n" + default_call

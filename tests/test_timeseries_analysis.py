@@ -7,14 +7,15 @@ import pytest
 import edvart
 from edvart.report_sections import timeseries_analysis
 from edvart.report_sections.code_string_formatting import get_code
+from edvart.report_sections.section_base import Verbosity
 from edvart.report_sections.timeseries_analysis import BoxplotsOverTime, TimeseriesAnalysis
 
 
 def test_default_config_verbosity():
     timeseries_section = TimeseriesAnalysis()
-    assert timeseries_section.verbosity == 0, "Verbosity should be 0"
+    assert timeseries_section.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
     for s in timeseries_section.subsections:
-        assert s.verbosity == 0, "Verbosity should be 0"
+        assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
 
 def test_high_verobisities():
@@ -30,33 +31,47 @@ def test_high_verobisities():
 
 def test_global_verbosity_overriding():
     timeseries_section = TimeseriesAnalysis(
-        verbosity=0,
-        verbosity_autocorrelation=2,
-        verbosity_stationarity_tests=1,
-        verbosity_rolling_statistics=2,
-        verbosity_time_analysis_plot=1,
+        verbosity=Verbosity.LOW,
+        verbosity_autocorrelation=Verbosity.HIGH,
+        verbosity_stationarity_tests=Verbosity.MEDIUM,
+        verbosity_rolling_statistics=Verbosity.HIGH,
+        verbosity_time_analysis_plot=Verbosity.MEDIUM,
     )
 
-    assert timeseries_section.verbosity == 0
+    assert timeseries_section.verbosity == Verbosity.LOW
     for subsec in timeseries_section.subsections:
         if isinstance(subsec, timeseries_analysis.Autocorrelation):
-            assert subsec.verbosity == 2, "Verbosity of autocorrelation should be 2"
+            assert (
+                subsec.verbosity == Verbosity.HIGH
+            ), "Verbosity of autocorrelation should be Verbosity.HIGH"
         elif isinstance(subsec, timeseries_analysis.StationarityTests):
-            assert subsec.verbosity == 1, "Verbosity of stationarity tests should be 1"
+            assert (
+                subsec.verbosity == Verbosity.MEDIUM
+            ), "Verbosity of stationarity tests should be Verbosity.MEDIUM"
         elif isinstance(subsec, timeseries_analysis.RollingStatistics):
-            assert subsec.verbosity == 2, "Verbosity of rolling stats should be 2"
+            assert (
+                subsec.verbosity == Verbosity.HIGH
+            ), "Verbosity of rolling stats should be Verbosity.HIGH"
         elif isinstance(subsec, timeseries_analysis.TimeAnalysisPlot):
-            assert subsec.verbosity == 1, "Verbosity of timeanalysis plot should be 1"
+            assert (
+                subsec.verbosity == Verbosity.MEDIUM
+            ), "Verbosity of timeanalysis plot should be 1"
         else:
-            assert subsec.verbosity == 0, "Verbosity of other sections should be 0"
+            assert (
+                subsec.verbosity == Verbosity.LOW
+            ), "Verbosity of other sections should be Verbosity.LOW"
 
 
 def test_verbosity_propagation():
-    timeseries_section = TimeseriesAnalysis(verbosity=2)
-    assert timeseries_section.verbosity == 2, "Timeseries analysis global verbosity should be 2."
+    timeseries_section = TimeseriesAnalysis(verbosity=Verbosity.HIGH)
+    assert (
+        timeseries_section.verbosity == Verbosity.HIGH
+    ), "Timeseries analysis global verbosity should be Verbosity.HIGH."
 
     for subsec in timeseries_section.subsections:
-        assert subsec.verbosity == 2, f"{type(subsec)} verbosity should be 2."
+        assert (
+            subsec.verbosity == Verbosity.HIGH
+        ), f"{type(subsec)} verbosity should be Verbosity.HIGH."
 
 
 def test_negative_verbosities():
@@ -151,8 +166,8 @@ def test_ft_no_sampling_rate_error():
         )
 
 
-def test_code_export_verbosity_0():
-    ts_section = TimeseriesAnalysis(verbosity=0)
+def test_code_export_verbosity_low():
+    ts_section = TimeseriesAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
     ts_section.add_cells(exported_cells)
@@ -165,13 +180,13 @@ def test_code_export_verbosity_0():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_0_with_subsections():
+def test_code_export_verbosity_low_with_subsections():
     ts_section = TimeseriesAnalysis(
         subsections=[
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
         ],
-        verbosity=0,
+        verbosity=Verbosity.LOW,
     )
     # Export code
     exported_cells = []
@@ -189,13 +204,13 @@ def test_code_export_verbosity_0_with_subsections():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_0_with_fft_stft():
+def test_code_export_verbosity_low_with_fft_stft():
     ts_section = TimeseriesAnalysis(
         subsections=[
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT,
         ],
-        verbosity=0,
+        verbosity=Verbosity.LOW,
         sampling_rate=1,
         stft_window_size=1,
     )
@@ -216,8 +231,8 @@ def test_code_export_verbosity_0_with_fft_stft():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_generated_code_verobsity_1():
-    ts_section = TimeseriesAnalysis(verbosity=1)
+def test_generated_code_verobsity_medium():
+    ts_section = TimeseriesAnalysis(verbosity=Verbosity.MEDIUM)
 
     exported_cells = []
     ts_section.add_cells(exported_cells)
@@ -238,8 +253,8 @@ def test_generated_code_verobsity_1():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_generated_code_verobsity_2():
-    ts_section = TimeseriesAnalysis(verbosity=2, sampling_rate=1, stft_window_size=1)
+def test_generated_code_verobsity_high():
+    ts_section = TimeseriesAnalysis(verbosity=Verbosity.HIGH, sampling_rate=1, stft_window_size=1)
 
     pairplot_cells = []
     ts_section.add_cells(pairplot_cells)
@@ -316,9 +331,9 @@ def test_generated_code_verobsity_2():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_verbosity_0_different_subsection_verbosities():
+def test_verbosity_low_different_subsection_verbosities():
     ts_section = TimeseriesAnalysis(
-        verbosity=0,
+        verbosity=Verbosity.LOW,
         subsections=[
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeAnalysisPlot,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
@@ -329,8 +344,8 @@ def test_verbosity_0_different_subsection_verbosities():
         ],
         sampling_rate=1,
         stft_window_size=2,
-        verbosity_rolling_statistics=1,
-        verbosity_short_time_ft=2,
+        verbosity_rolling_statistics=Verbosity.MEDIUM,
+        verbosity_short_time_ft=Verbosity.HIGH,
     )
 
     ts_cells = []
@@ -398,8 +413,8 @@ def test_boxplots_over_time_lambda():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_imports_verbosity_0():
-    ts_section = TimeseriesAnalysis(verbosity=0)
+def test_imports_verbosity_low():
+    ts_section = TimeseriesAnalysis(verbosity=Verbosity.LOW)
 
     exported_imports = ts_section.required_imports()
     expected_imports = [
@@ -413,8 +428,8 @@ def test_imports_verbosity_0():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_1():
-    ts_section = TimeseriesAnalysis(verbosity=1)
+def test_imports_verbosity_medium():
+    ts_section = TimeseriesAnalysis(verbosity=Verbosity.MEDIUM)
 
     exported_imports = ts_section.required_imports()
     expected_imports = list(set().union(*[s.required_imports() for s in ts_section.subsections]))
@@ -425,8 +440,8 @@ def test_imports_verbosity_1():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_2():
-    ts_section = TimeseriesAnalysis(verbosity=2)
+def test_imports_verbosity_high():
+    ts_section = TimeseriesAnalysis(verbosity=Verbosity.HIGH)
 
     exported_imports = ts_section.required_imports()
     expected_imports = list(set().union(*[s.required_imports() for s in ts_section.subsections]))
@@ -437,9 +452,9 @@ def test_imports_verbosity_2():
         assert expected_import == exported_import, "Exported import mismatch"
 
 
-def test_imports_verbosity_0_different_subsection_verbosities():
+def test_imports_verbosity_low_different_subsection_verbosities():
     ts_section = TimeseriesAnalysis(
-        verbosity=0,
+        verbosity=Verbosity.LOW,
         subsections=[
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeAnalysisPlot,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
@@ -450,8 +465,8 @@ def test_imports_verbosity_0_different_subsection_verbosities():
         ],
         sampling_rate=1,
         stft_window_size=2,
-        verbosity_rolling_statistics=1,
-        verbosity_short_time_ft=2,
+        verbosity_rolling_statistics=Verbosity.MEDIUM,
+        verbosity_short_time_ft=Verbosity.HIGH,
     )
 
     exported_imports = ts_section.required_imports()
@@ -461,7 +476,7 @@ def test_imports_verbosity_0_different_subsection_verbosities():
         "timeseries_analysis = TimeseriesAnalysis.timeseries_analysis"
     }
     for s in ts_section.subsections:
-        if s.verbosity > 0:
+        if s.verbosity > Verbosity.LOW:
             expected_imports.update(s.required_imports())
 
     assert isinstance(exported_imports, list)

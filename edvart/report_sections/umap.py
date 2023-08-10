@@ -8,7 +8,7 @@ from IPython.display import Markdown, display
 from edvart.data_types import is_numeric
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import code_dedent, get_code, total_dedent
-from edvart.report_sections.section_base import Section
+from edvart.report_sections.section_base import Section, Verbosity
 
 try:
     with warnings.catch_warnings():
@@ -27,7 +27,7 @@ class UMAP(Section):
     ----------
     df : pd.DataFrame
         Data to analyze.
-    verbosity : int (default = 0)
+    verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns to use in computing in the UMAP embedding. Only numeric columns can be used.
@@ -55,7 +55,7 @@ class UMAP(Section):
     def __init__(
         self,
         df: pd.DataFrame,
-        verbosity: int = 0,
+        verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         color_col: Optional[str] = None,
         interactive: bool = True,
@@ -181,7 +181,7 @@ class UMAP(Section):
             List of import strings to be added at the top of the generated notebook,
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             return [
                 total_dedent(
                     """
@@ -227,7 +227,7 @@ class UMAP(Section):
             default_call += "    interactive=False,"
         default_call += "\n)"
 
-        if self.verbosity <= 1:
+        if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
             code = get_code(UMAP.plot_umap) + "\n\n" + default_call

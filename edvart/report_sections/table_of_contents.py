@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 import nbformat.v4 as nbfv4
 from IPython.display import Markdown, display
 
-from edvart.report_sections.section_base import ReportSection, Section
+from edvart.report_sections.section_base import ReportSection, Section, Verbosity
 
 
 class TableOfContents(Section):
@@ -20,7 +20,7 @@ class TableOfContents(Section):
 
     def __init__(self, include_subsections: bool):
         self._include_subsections = include_subsections
-        super().__init__(verbosity=0, columns=None)
+        super().__init__(verbosity=Verbosity.LOW, columns=None)
 
     def required_imports(self) -> List[str]:
         return []
