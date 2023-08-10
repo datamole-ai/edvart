@@ -129,7 +129,7 @@ def _scatter_plot_2d_noninteractive(
     if not show_zerolines:
         ax.grid(False)
     if equal_scale_axes:
-        ax.set_aspect("equal")
+        ax.set_aspect("equal", "datalim")
     plt.show()
 
 
