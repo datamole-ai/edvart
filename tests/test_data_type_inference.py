@@ -25,7 +25,7 @@ def test_inference():
         pd.Series([None, None, np.nan, float("nan")]) == data_types.DataType.MISSING
     ), "Should be missing"
     assert (
-        data_types.infer_data_type(pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+        data_types.infer_data_type(pd.Series(list(range(10))))
         == data_types.DataType.UNIQUE
     ), "Should be unique"
     assert (
