@@ -1,14 +1,27 @@
 # Edvart
 
-Exploratory Data Analysis (EDA) is the initial task a data scientist or data
-analyst undertakes when they obtain new data. EDA refers to the critical
-process of conducting preliminary investigations on data to uncover patterns,
-spot anomalies, test hypotheses, and verify assumptions with the help of
-summary statistics and graphical representations.
+Edvart is an open-source Python library designed to simplify and streamline
+your exploratory data analysis (EDA) process.
+Edvart supports different levels of customization:
+from a default report generated in one line of code to a fully-customized
+report down to the level of code generating the visualizations.
 
-The Effective Data Visualization and Reporting Tool (Edvart for short) is a
-tool that generates a report in the form of a Jupyter notebook, containing
-various analyses of the input data.
+## Key features
+* **Default Visualizations**: Generate comprehensive visualizations in a single
+statement from pandas DataFrames.
+Edvart supports:
+    - Data overview,
+    - Univariate analysis,
+    - Bivariate analysis,
+    - Multivariate analysis,
+    - Grouped analysis
+    - Time series analysis.
+* **Customizable Reports**: Produce, iterate, and style detailed reports
+    in Jupyter notebooks and HTML formats.
+* **Flexible API**: From high-level simplicity in a single line of code
+    to detailed control, choose the API level that fits your needs.
+* **Interactive Visualizations**: Many of the visualizations are interactive
+    and can be used to explore the data in detail.
 
 ## Installation
 
@@ -19,6 +32,23 @@ pip install edvart
 ```
 
 ## Usage
+
+### Creating a default report
+
+```python
+import edvart
+
+# Load a dataset to a pandas DataFrame
+dataset = edvart.example_datasets.dataset_titanic()
+# Create a default report
+report = edvart.DefaultReport(dataset)
+# Show the report in the current Jupyter notebook
+report.show()
+# Export the report to an HTML file
+report.export_html("report.html")
+# Export the code generating the report to a Jupyter notebook
+report.export_notebook("report.ipynb")
+```
 
 See the notebook [api-example.ipynb](api-example.ipynb) for usage examples.
 
