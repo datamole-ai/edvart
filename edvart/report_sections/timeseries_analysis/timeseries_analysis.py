@@ -165,11 +165,13 @@ class TimeseriesAnalysis(ReportSection):
         else:
             subsections_all = subsections
 
-        # Store subsections with Verbosity.LOW
-        self.subsections_0 = [sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW]
+        # Store subsections with LOW verbosity
+        self.subsections_low_verbosity = [
+            sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW
+        ]
 
-        if len(self.subsections_0) == len(subsections_all) and subsections is None:
-            self.subsections_0 = None
+        if len(self.subsections_low_verbosity) == len(subsections_all) and subsections is None:
+            self.subsections_low_verbosity = None
 
         if subsections is None:
             subsections_implementations = list(enum_to_implementation.values())
@@ -258,18 +260,19 @@ class TimeseriesAnalysis(ReportSection):
             subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
             code = "timeseries_analysis(df=df"
 
-            if self.subsections_0 is not None:
+            if self.subsections_low_verbosity is not None:
                 arg_subsections_names = [
                     f"TimeseriesAnalysis.TimeseriesAnalysisSubsection.{str(sub)}"
-                    for sub in self.subsections_0
+                    for sub in self.subsections_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
 
             stft_included_or_empty = (
-                self.subsections_0 is None or subsec.ShortTimeFT in self.subsections_0
+                self.subsections_low_verbosity is None
+                or subsec.ShortTimeFT in self.subsections_low_verbosity
             )
             include_sampling_rate = self.sampling_rate is not None and (
-                stft_included_or_empty or subsec.FourierTransform in self.subsections_0
+                stft_included_or_empty or subsec.FourierTransform in self.subsections_low_verbosity
             )
             if include_sampling_rate:
                 code += f", sampling_rate={self.sampling_rate}"
