@@ -150,12 +150,14 @@ class ReportBase(ABC):
 
         # Add imports cell
         imports_set = {
-            "import pandas as pd",
             "import os",
             "from typing import Any, Callable, Dict, List, Optional, Tuple, Union",
-            "import plotly.offline as py",
-            "py.init_notebook_mode()",
+            "",
+            "import pandas as pd",
             "import plotly.io as pio",
+            "import plotly.offline as py",
+            "",
+            "py.init_notebook_mode()",
             "pio.renderers.default = 'plotly_mimetype+notebook'",
         }
         if extra_imports is not None:
