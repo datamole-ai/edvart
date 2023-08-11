@@ -23,7 +23,7 @@ def test_default_config_verbosity():
         assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
 
-def test_high_verobisities():
+def test_high_verbosities():
     with pytest.raises(ValueError):
         bivariate_analysis.BivariateAnalysis(verbosity=3)
     with pytest.raises(ValueError):
