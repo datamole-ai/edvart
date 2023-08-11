@@ -31,7 +31,7 @@ def test_default_config_verbosity():
 
 def test_invalid_verbosities():
     with pytest.raises(ValueError):
-        GroupAnalysis(df=pd.DataFrame(), groupby=[], verbosity=3)
+        GroupAnalysis(df=pd.DataFrame(), groupby=[], verbosity=4)
     with pytest.raises(ValueError):
         GroupAnalysis(df=pd.DataFrame(), groupby=[], verbosity=-1)
 

@@ -39,7 +39,7 @@ def test_default_config_verbosity():
 
 def test_high_verobisities():
     with pytest.raises(ValueError):
-        MultivariateAnalysis(df=get_test_df(), verbosity=3)
+        MultivariateAnalysis(df=get_test_df(), verbosity=4)
     with pytest.raises(ValueError):
         MultivariateAnalysis(df=get_test_df(), verbosity_pca=5)
 

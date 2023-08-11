@@ -90,7 +90,7 @@ def test_high_verbosities():
     with pytest.raises(ValueError):
         Overview(verbosity_data_types=4)
     with pytest.raises(ValueError):
-        Overview(verbosity_quick_info=3)
+        Overview(verbosity_quick_info=4)
     with pytest.raises(ValueError):
         Overview(verbosity_missing_values=5)
 
