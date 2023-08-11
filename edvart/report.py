@@ -6,7 +6,6 @@ import pickle
 from abc import ABC
 from typing import List, Optional, Tuple, Union
 
-# External library imports
 import nbconvert
 import nbformat as nbf
 import nbformat.v4 as nbf4
