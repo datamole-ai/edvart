@@ -86,8 +86,6 @@ class TableOfContents(Section):
         cells.append(section_header)
 
         lines: List[str] = []
-        # Add links to all main sections (not including subsections) besides the first (table of
-        # content) section
         for section in sections:
             lines.append(TableOfContents._get_section_link(section, 1))
         cells.append(nbfv4.new_markdown_cell("\n".join(lines)))
@@ -104,8 +102,6 @@ class TableOfContents(Section):
         display(Markdown(self.get_title(section_level=1)))
 
         lines = []
-        # Add links to all sections including their subsections besides the first (table of content)
-        # section
         for section in sections:
             self._add_section_lines(section, 1, lines, self._include_subsections)
         display(Markdown("\n".join(lines)))
