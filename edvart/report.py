@@ -45,14 +45,14 @@ class ReportBase(ABC):
         self.df = dataframe
         self.sections: list[Section] = []
         self.verbosity = Verbosity(verbosity)
+        self._table_of_contents = None
 
     def show(self) -> None:
         """Renders the report in the calling notebook."""
+        if self._table_of_contents is not None:
+            self._table_of_contents.show(self.sections)
         for section in self.sections:
-            if isinstance(section, TableOfContents):
-                section.show(self.sections)
-            else:
-                section.show(self.df)
+            section.show(self.df)
 
     def _select_columns(
         self,
@@ -172,11 +172,10 @@ class ReportBase(ABC):
         nb["cells"].append(nbf4.new_code_cell(load_df))
 
         # Generate code for each report section
+        if self._table_of_contents is not None:
+            self._table_of_contents.add_cells(self.sections, nb["cells"])
         for section in self.sections:
-            if isinstance(section, TableOfContents):
-                section.add_cells(self.sections, nb["cells"])
-            else:
-                section.add_cells(nb["cells"])
+            section.add_cells(nb["cells"])
 
         return nb
 
@@ -591,7 +590,7 @@ class ReportBase(ABC):
             contents. However, they won't be included in an exported notebook created by report's
             export_notebook function.
         """
-        self.sections.append(TableOfContents(include_subsections))
+        self._table_of_contents = TableOfContents(include_subsections)
         return self
 
 
