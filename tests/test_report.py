@@ -40,14 +40,14 @@ def test_default_report():
     )
     assert len(report.sections) > 0, "Default report should not be empty"
 
-    assert report.sections[1].verbosity == Verbosity.MEDIUM, "Wrong section verbosity"
+    assert report.sections[0].verbosity == Verbosity.MEDIUM, "Wrong section verbosity"
+    assert report.sections[0].columns is None, "Default column selection should be None"
+
+    assert report.sections[1].verbosity == Verbosity.HIGH, "Wrong section verbosity"
     assert report.sections[1].columns is None, "Default column selection should be None"
 
-    assert report.sections[2].verbosity == Verbosity.HIGH, "Wrong section verbosity"
-    assert report.sections[2].columns is None, "Default column selection should be None"
-
-    assert report.sections[3].verbosity == Verbosity.LOW, "Wrong section verbosity"
-    assert report.sections[3].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
+    assert report.sections[2].verbosity == Verbosity.LOW, "Wrong section verbosity"
+    assert report.sections[2].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
 
 
 def test_column_selection():

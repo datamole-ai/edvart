@@ -37,9 +37,9 @@ def test_default_config_verbosity():
         assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
 
-def test_high_verobisities():
+def test_high_verbosities():
     with pytest.raises(ValueError):
-        MultivariateAnalysis(df=get_test_df(), verbosity=3)
+        MultivariateAnalysis(df=get_test_df(), verbosity=4)
     with pytest.raises(ValueError):
         MultivariateAnalysis(df=get_test_df(), verbosity_pca=5)
 

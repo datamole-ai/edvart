@@ -111,11 +111,13 @@ class BivariateAnalysis(ReportSection):
         else:
             subsections_all = subsections
 
-        # Store subsections with 0 verbosity
-        self.subsections_0 = [sub for sub in subsections_all if verbosities[sub] == 0]
+        # Store subsections with LOW verbosity
+        self.subsections_low_verbosity = [
+            sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW
+        ]
 
-        if len(self.subsections_0) == len(subsections_all) and subsections is None:
-            self.subsections_0 = None
+        if len(self.subsections_low_verbosity) == len(subsections_all) and subsections is None:
+            self.subsections_low_verbosity = None
 
         if (columns_x is None) != (columns_y is None):
             raise ValueError("Either both or neither of columns_x, columns_y must be specified.")
@@ -227,10 +229,10 @@ class BivariateAnalysis(ReportSection):
         cells.append(section_header)
         if self.verbosity == Verbosity.LOW:
             code = "bivariate_analysis(df=df"
-            if self.subsections_0 is not None:
+            if self.subsections_low_verbosity is not None:
                 arg_subsections_names = [
                     f"BivariateAnalysis.BivariateAnalysisSubsection.{str(sub)}"
-                    for sub in self.subsections_0
+                    for sub in self.subsections_low_verbosity
                 ]
 
                 code += f", subsections={arg_subsections_names}".replace("'", "")

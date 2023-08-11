@@ -15,7 +15,7 @@ def test_invalid_verbosity():
     with pytest.raises(ValueError):
         univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=-1)
     with pytest.raises(ValueError):
-        univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=3)
+        univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=4)
     with pytest.raises(ValueError):
         univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=100)
     with pytest.raises(ValueError):

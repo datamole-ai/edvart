@@ -18,11 +18,11 @@ def test_default_config_verbosity():
         assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
 
-def test_high_verobisities():
+def test_high_verbosities():
     with pytest.raises(ValueError):
-        TimeseriesAnalysis(verbosity=3)
+        TimeseriesAnalysis(verbosity=4)
     with pytest.raises(ValueError):
-        TimeseriesAnalysis(verbosity_time_analysis_plot=3)
+        TimeseriesAnalysis(verbosity_time_analysis_plot=4)
     with pytest.raises(ValueError):
         TimeseriesAnalysis(verbosity_stationarity_tests=5)
     with pytest.raises(ValueError):

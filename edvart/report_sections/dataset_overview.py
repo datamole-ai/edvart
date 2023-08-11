@@ -109,11 +109,13 @@ class Overview(ReportSection):
         else:
             subsections_all = subsections
 
-        # Store subsections with 0 verbosity
-        self.subsections_0 = [sub for sub in subsections_all if verbosities[sub] == 0]
+        # Store subsections with LOW verbosity
+        self.subsections_low_verbosity = [
+            sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW
+        ]
 
-        if len(self.subsections_0) == len(subsections_all) and subsections is None:
-            self.subsections_0 = None
+        if len(self.subsections_low_verbosity) == len(subsections_all) and subsections is None:
+            self.subsections_low_verbosity = None
 
         # Construct objects that implement subsections
         enum_to_implementation = {
@@ -200,9 +202,10 @@ class Overview(ReportSection):
 
         if self.verbosity == Verbosity.LOW:
             code = "overview_analysis(df=df"
-            if self.subsections_0 is not None:
+            if self.subsections_low_verbosity is not None:
                 arg_subsections_names = [
-                    f"Overview.OverviewSubsection.{str(sub)}" for sub in self.subsections_0
+                    f"Overview.OverviewSubsection.{str(sub)}"
+                    for sub in self.subsections_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
             if self.columns is not None:
