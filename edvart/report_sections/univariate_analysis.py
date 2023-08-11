@@ -272,6 +272,8 @@ class UnivariateAnalysis(Section):
             if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
                 UnivariateAnalysis.top_most_frequent(df[col])
                 UnivariateAnalysis.bar_plot(df[col])
+            elif data_type == DataType.UNIQUE:
+                display(Markdown("Each value in the column is unique."))
             else:
                 UnivariateAnalysis.numeric_statistics(df[col])
                 UnivariateAnalysis.histogram(df[col])
@@ -378,29 +380,37 @@ class UnivariateAnalysis(Section):
                 column_header = nbfv4.new_markdown_cell(f"## *{col} - {data_type_name}*")
                 cells.append(column_header)
                 if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
-                    code = code_dedent(
-                        f"""
-                        top_most_frequent(df['{col}'])
-                        bar_plot(df['{col}'])"""
+                    cell = nbfv4.new_code_cell(
+                        code_dedent(
+                            f"""
+                            top_most_frequent(df['{col}'])
+                            bar_plot(df['{col}'])"""
+                        )
                     )
-                elif self.verbosity == Verbosity.MEDIUM:
-                    code = code_dedent(
-                        f"""
-                            numeric_statistics(df['{col}'])
-                            histogram(df['{col}'])"""
-                    )
+                elif data_type == DataType.UNIQUE:
+                    cell = nbfv4.new_markdown_cell("Each value in the column is unique.")
                 else:
-                    code = code_dedent(
-                        f"""
-                            numeric_statistics(
-                                df['{col}'],
-                                descriptive_stats=default_descriptive_statistics(),
-                                quantile_stats=default_quantile_statistics()
+                    if self.verbosity == Verbosity.MEDIUM:
+                        cell = nbfv4.new_code_cell(
+                            code_dedent(
+                                f"""
+                                numeric_statistics(df['{col}'])
+                                histogram(df['{col}'])"""
                             )
-                            histogram(df['{col}'])"""
-                    )
-                code_cell = nbfv4.new_code_cell(code)
-                cells.append(code_cell)
+                        )
+                    else:
+                        cell = nbfv4.new_code_cell(
+                            code_dedent(
+                                f"""
+                                numeric_statistics(
+                                    df['{col}'],
+                                    descriptive_stats=default_descriptive_statistics(),
+                                    quantile_stats=default_quantile_statistics()
+                                )
+                                histogram(df['{col}'])"""
+                            )
+                        )
+                cells.append(cell)
 
     def show(self, df: pd.DataFrame) -> None:
         """Generates univariate analysis cell output in the calling notebook.
@@ -425,6 +435,8 @@ class UnivariateAnalysis(Section):
             if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
                 UnivariateAnalysis.top_most_frequent(df[col])
                 UnivariateAnalysis.bar_plot(df[col])
+            elif data_type == DataType.UNIQUE:
+                display(Markdown("Each value in the column is unique."))
             else:
                 UnivariateAnalysis.numeric_statistics(df[col])
                 UnivariateAnalysis.histogram(df[col])
