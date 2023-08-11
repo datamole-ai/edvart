@@ -32,6 +32,10 @@ Edvart is licensed under the [MIT
 license](https://opensource.org/license/mit/). See the LICENSE file for more
 details.
 
+## Contact
+Edvart has a [Gitter room](https://app.gitter.im/#/room/#edvart:gitter.im)
+for development-related and general discussions.
+
 ## How to Contribute
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
