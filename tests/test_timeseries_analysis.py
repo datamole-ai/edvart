@@ -20,9 +20,9 @@ def test_default_config_verbosity():
 
 def test_high_verobisities():
     with pytest.raises(ValueError):
-        TimeseriesAnalysis(verbosity=3)
+        TimeseriesAnalysis(verbosity=4)
     with pytest.raises(ValueError):
-        TimeseriesAnalysis(verbosity_time_analysis_plot=3)
+        TimeseriesAnalysis(verbosity_time_analysis_plot=4)
     with pytest.raises(ValueError):
         TimeseriesAnalysis(verbosity_stationarity_tests=5)
     with pytest.raises(ValueError):
