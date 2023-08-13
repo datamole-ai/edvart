@@ -24,6 +24,18 @@ def test_inference():
     assert data_types.infer_data_type(
         pd.Series([None, None, np.nan, float("nan")]) == data_types.DataType.MISSING
     ), "Should be missing"
+    assert (
+        data_types.infer_data_type(pd.Series(list(range(10)))) == data_types.DataType.UNIQUE
+    ), "Should be unique"
+    assert (
+        data_types.infer_data_type(pd.Series([1] + list(range(100)))) == data_types.DataType.NUMERIC
+    ), "Should be numeric"
+    assert (
+        data_types.infer_data_type(pd.Series()) == data_types.DataType.UNKNOWN
+    ), "Should be unknown"
+    assert data_types.infer_data_type(
+        pd.Series([True, False]) == data_types.DataType.BOOLEAN
+    ), "Should be boolean"
 
 
 def test_missing_series():
