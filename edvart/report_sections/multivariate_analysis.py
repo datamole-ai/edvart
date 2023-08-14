@@ -82,8 +82,8 @@ class MultivariateAnalysis(ReportSection):
         verbosity_parallel_categories: Optional[Verbosity] = None,
         color_col: Optional[str] = None,
     ):
-        verbosity_pca = verbosity_pca if verbosity_pca is not None else verbosity
-        verbosity_umap = verbosity_umap if verbosity_umap is not None else verbosity
+        verbosity_pca = verbosity_pca or verbosity
+        verbosity_umap = verbosity_umap or verbosity
         verbosity_parallel_coordinates = (
             verbosity_parallel_coordinates
             if verbosity_parallel_coordinates is not None

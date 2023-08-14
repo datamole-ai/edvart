@@ -131,7 +131,7 @@ class UnivariateAnalysis(Section):
             sns.boxplot(x=series, ax=ax_box, **boxplot_kwargs)
             sns.histplot(
                 data=series,
-                bins=bins if bins is not None else "auto",
+                bins=bins or "auto",
                 stat="density" if density else "count",
                 ax=ax_hist,
                 kde=False,
@@ -142,7 +142,7 @@ class UnivariateAnalysis(Section):
             plt.figure(figsize=figsize)
             sns.histplot(
                 data=series,
-                bins=bins if bins is not None else "auto",
+                bins=bins or "auto",
                 stat="density" if density else "count",
                 kde=False,
                 **distplot_kwargs,

@@ -81,26 +81,14 @@ class Overview(ReportSection):
         verbosity_duplicate_rows: Optional[Verbosity] = None,
     ):
         # Propagate global verbosity to subsection verbosities
-        verbosity_quick_info = (
-            verbosity_quick_info if verbosity_quick_info is not None else verbosity
-        )
-        verbosity_data_types = (
-            verbosity_data_types if verbosity_data_types is not None else verbosity
-        )
-        verbosity_data_preview = (
-            verbosity_data_preview if verbosity_data_preview is not None else verbosity
-        )
-        verbosity_missing_values = (
-            verbosity_missing_values if verbosity_missing_values is not None else verbosity
-        )
+        verbosity_quick_info = verbosity_quick_info or verbosity
+        verbosity_data_types = verbosity_data_types or verbosity
+        verbosity_data_preview = verbosity_data_preview or verbosity
+        verbosity_missing_values = verbosity_missing_values or verbosity
         if verbosity_rows_with_missing_value is None:
             verbosity_rows_with_missing_value = verbosity
-        verbosity_constant_occurence = (
-            verbosity_constant_occurence if verbosity_constant_occurence is not None else verbosity
-        )
-        verbosity_duplicate_rows = (
-            verbosity_duplicate_rows if verbosity_duplicate_rows is not None else verbosity
-        )
+        verbosity_constant_occurence = verbosity_constant_occurence or verbosity
+        verbosity_duplicate_rows = verbosity_duplicate_rows or verbosity
 
         subsec = Overview.OverviewSubsection
 
