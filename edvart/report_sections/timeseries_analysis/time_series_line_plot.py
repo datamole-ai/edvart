@@ -1,6 +1,5 @@
 """Time series line plot package."""
 
-import warnings
 from typing import Any, Dict, List, Optional
 
 import nbformat.v4 as nbfv4
@@ -117,8 +116,6 @@ class TimeSeriesLinePlot(Section):
         layout = dict(xaxis_rangeslider_visible=True)
         if not utils.is_categorical(df[color_col]):
             raise ValueError(f"Cannot color by non-categorical column `{color_col}`")
-        if df[color_col].nunique() > 20:
-            warnings.warn("Coloring by categorical column with many unique values!")
         df_color_shifted = df[color_col].shift(-1)
         for col in columns:
             data = [
@@ -157,7 +154,6 @@ class TimeSeriesLinePlot(Section):
             ]
         return [
             "from IPython.display import display, Markdown",
-            "import warnings",
             "import plotly",
             "import plotly.graph_objects as go",
             "plotly.offline.init_notebook_mode()",
