@@ -23,10 +23,11 @@ colorlover = "*"
 scikit-learn = ">=0.22.1"
 nbconvert = "^7.0.0"    # Required for exporting to HTML
 umap-learn = { version = "^0.5.0", optional = true}
+numba = { version = "^0.57", optional = true }
 
 [tool.poetry.extras]
-umap = ["umap-learn"]
-all = ["umap-learn"]
+umap = ["umap-learn", "numba"]
+all = ["umap-learn", "numba"]
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "^2.8"
