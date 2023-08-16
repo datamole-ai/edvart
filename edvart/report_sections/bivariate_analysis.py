@@ -667,7 +667,7 @@ class PairPlot(Section):
         if not allow_categorical:
             columns_x = list(filter(include_column, columns_x))
             columns_y = list(filter(include_column, columns_y))
-        utils.pair_plot(df, columns_x, columns_y, color_col=color_col)
+        sns.pairplot(df, x_vars=columns_x, y_vars=columns_y, hue=color_col)
         plt.show()
 
     def required_imports(self) -> List[str]:
@@ -689,9 +689,9 @@ class PairPlot(Section):
                 )
             ]
         return [
-            "from edvart import utils",
             "from edvart.data_types import is_categorical, is_boolean",
             "import matplotlib.pyplot as plt",
+            "import seaborn as sns",
         ]
 
     def add_cells(self, cells: List[Dict[str, Any]]) -> None:

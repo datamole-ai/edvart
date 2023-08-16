@@ -2,10 +2,9 @@
 
 import os
 from contextlib import contextmanager
-from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, Iterator, Literal, Optional, Tuple, Union
 
 import pandas as pd
-import seaborn as sns
 import statsmodels.api as sm
 
 from edvart.data_types import is_numeric
@@ -504,30 +503,6 @@ def kendall(df: pd.DataFrame) -> pd.DataFrame:
 
 def _corr(df: pd.DataFrame, method: Literal["pearson", "kendall", "spearman"]) -> pd.DataFrame:
     return df.corr(method=method, numeric_only=True)
-
-
-def pair_plot(
-    df: pd.DataFrame,
-    columns_x: Optional[List[str]] = None,
-    columns_y: Optional[List[str]] = None,
-    color_col: Optional[str] = None,
-) -> None:
-    """
-    Plot a pairplot.
-
-    Parameters
-    ----------
-    df: pd.DataFrame
-        DataFrame used for pairplot
-    columns_x: List[str], optional
-        List of columns to plot on the x-axis.
-    columns_y : List[str], optional
-        List of columns to plot on the y-axis.
-    color_col : str, optional
-        Name of columns according to which to color points in the pairplot and univariate
-        distribution plots on the diagonals.
-    """
-    sns.pairplot(df, x_vars=columns_x, y_vars=columns_y, hue=color_col)
 
 
 def contingency_table(df: pd.DataFrame) -> pd.DataFrame:
