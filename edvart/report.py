@@ -782,15 +782,6 @@ class TimeseriesReport(ReportBase):
             If None, all subsections are added.
         verbosity : Verbosity, optional
             The verbosity of the code generated in the exported notebook.
-            0
-                A single function call generates the entire bivariate analysis section.
-            1
-                Function calls to parameterizable functions are generated for each column separately
-                in separate cells.
-            2
-                Similar to 1, but in addition, function definitions are generated, column
-                data type inference and default statistics become customizable.
-
         verbosity_time_analysis_plot : Verbosity, optional
             Time analysis interactive plot subsection code verbosity.
         verbosity_rolling_statistics : Verbosity, optional
