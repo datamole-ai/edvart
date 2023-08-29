@@ -291,9 +291,15 @@ class ReportBase(ABC):
         )
 
         # Add code cells to generated notebook
-        nb["cells"].append(nbf4.new_code_cell("import pickle\nimport base64"))
-        nb["cells"].append(nbf4.new_code_cell(unpickle_report))
-        nb["cells"].append(nbf4.new_code_cell("report.show()"))
+        for code_string in (
+            "import base64",
+            "import pickle",
+            unpickle_report,
+            "import plotly.io as pio",
+            "pio.renderers.default = 'notebook'",
+            "report.show()",
+        ):
+            nb["cells"].append(nbf4.new_code_cell(code_string))
 
         self._export_html(
             nb=nb,
