@@ -291,9 +291,15 @@ class ReportBase(ABC):
         )
 
         # Add code cells to generated notebook
-        nb["cells"].append(nbf4.new_code_cell("import pickle\nimport base64"))
-        nb["cells"].append(nbf4.new_code_cell(unpickle_report))
-        nb["cells"].append(nbf4.new_code_cell("report.show()"))
+        for code_string in (
+            "import base64",
+            "import pickle",
+            unpickle_report,
+            "import plotly.io as pio",
+            "pio.renderers.default = 'notebook'",
+            "report.show()",
+        ):
+            nb["cells"].append(nbf4.new_code_cell(code_string))
 
         self._export_html(
             nb=nb,
@@ -782,15 +788,6 @@ class TimeseriesReport(ReportBase):
             If None, all subsections are added.
         verbosity : Verbosity, optional
             The verbosity of the code generated in the exported notebook.
-            0
-                A single function call generates the entire bivariate analysis section.
-            1
-                Function calls to parameterizable functions are generated for each column separately
-                in separate cells.
-            2
-                Similar to 1, but in addition, function definitions are generated, column
-                data type inference and default statistics become customizable.
-
         verbosity_time_series_line_plot : Verbosity, optional
             Time series line plot subsection code verbosity.
         verbosity_rolling_statistics : Verbosity, optional

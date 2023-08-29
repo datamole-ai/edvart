@@ -31,7 +31,7 @@ def test_inference():
         data_types.infer_data_type(pd.Series([1] + list(range(100)))) == data_types.DataType.NUMERIC
     ), "Should be numeric"
     assert (
-        data_types.infer_data_type(pd.Series()) == data_types.DataType.UNKNOWN
+        data_types.infer_data_type(pd.Series(dtype=pd.Float64Dtype)) == data_types.DataType.UNKNOWN
     ), "Should be unknown"
     assert data_types.infer_data_type(
         pd.Series([True, False]) == data_types.DataType.BOOLEAN
