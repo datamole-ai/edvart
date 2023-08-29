@@ -92,8 +92,10 @@ class SeasonalDecomposition(Section):
         if pd.infer_freq(df.index) is None and period is None:
             display(
                 Markdown(
+                    "<div class='alert alert-block alert-warning'>"
                     "Period could not be inferred, please set the `period` parameter"
                     " to a suitable value. Not plotting seasonal decomposition."
+                    "</div>"
                 )
             )
             return
