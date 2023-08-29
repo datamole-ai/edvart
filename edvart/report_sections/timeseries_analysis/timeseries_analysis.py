@@ -17,7 +17,7 @@ from edvart.report_sections.timeseries_analysis import (
     SeasonalDecomposition,
     ShortTimeFT,
     StationarityTests,
-    TimeAnalysisPlot,
+    TimeSeriesLinePlot,
 )
 
 
@@ -39,8 +39,8 @@ class TimeseriesAnalysis(ReportSection):
     columns : List[str], optional
         Columns to include in timeseries analysis. Each column is treated as a separate time series.
         All columns are used by default.
-    verbosity_time_analysis_plot : Verbosity, optional
-        Time analysis interactive plot subsection code verbosity.
+    verbosity_series_line_plot : Verbosity, optional
+        Time series line plot subsection code verbosity.
     verbosity_rolling_statistics: Verbosity, optional
         Rolling statistics interactive plot subsection code verbosity.
     verbosity_boxplots_over_time: Verbosity, optional
@@ -68,7 +68,7 @@ class TimeseriesAnalysis(ReportSection):
     class TimeseriesAnalysisSubsection(IntEnum):
         """Enum of all implemented timeseries analysis subsections."""
 
-        TimeAnalysisPlot = 0
+        TimeSeriesLinePlot = 0
         RollingStatistics = 1
         BoxplotsOverTime = 2
         SeasonalDecomposition = 3
@@ -85,7 +85,7 @@ class TimeseriesAnalysis(ReportSection):
         subsections: Optional[List[TimeseriesAnalysisSubsection]] = None,
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
-        verbosity_time_analysis_plot: Optional[Verbosity] = None,
+        verbosity_time_series_line_plot: Optional[Verbosity] = None,
         verbosity_rolling_statistics: Optional[Verbosity] = None,
         verbosity_boxplots_over_time: Optional[Verbosity] = None,
         verbosity_seasonal_decomposition: Optional[Verbosity] = None,
@@ -99,7 +99,7 @@ class TimeseriesAnalysis(ReportSection):
         self.sampling_rate = sampling_rate
         self.stft_window_size = stft_window_size
 
-        verbosity_time_analysis_plot = verbosity_time_analysis_plot or verbosity
+        verbosity_time_series_line_plot = verbosity_time_series_line_plot or verbosity
         verbosity_rolling_statistics = verbosity_rolling_statistics or verbosity
         verbosity_boxplots_over_time = verbosity_boxplots_over_time or verbosity
         verbosity_seasonal_decomposition = (
@@ -115,7 +115,7 @@ class TimeseriesAnalysis(ReportSection):
         subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
 
         verbosities = {
-            subsec.TimeAnalysisPlot: verbosity_time_analysis_plot,
+            subsec.TimeSeriesLinePlot: verbosity_time_series_line_plot,
             subsec.RollingStatistics: verbosity_rolling_statistics,
             subsec.BoxplotsOverTime: verbosity_boxplots_over_time,
             subsec.SeasonalDecomposition: verbosity_seasonal_decomposition,
@@ -126,7 +126,7 @@ class TimeseriesAnalysis(ReportSection):
         }
 
         enum_to_implementation = {
-            subsec.TimeAnalysisPlot: TimeAnalysisPlot(verbosity_time_analysis_plot, columns),
+            subsec.TimeSeriesLinePlot: TimeSeriesLinePlot(verbosity_time_series_line_plot, columns),
             subsec.RollingStatistics: RollingStatistics(verbosity_rolling_statistics, columns),
             subsec.BoxplotsOverTime: BoxplotsOverTime(verbosity_boxplots_over_time, columns),
             subsec.SeasonalDecomposition: SeasonalDecomposition(

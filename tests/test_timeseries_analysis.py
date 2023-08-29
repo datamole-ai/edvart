@@ -22,7 +22,7 @@ def test_high_verbosities():
     with pytest.raises(ValueError):
         TimeseriesAnalysis(verbosity=4)
     with pytest.raises(ValueError):
-        TimeseriesAnalysis(verbosity_time_analysis_plot=4)
+        TimeseriesAnalysis(verbosity_time_series_line_plot=4)
     with pytest.raises(ValueError):
         TimeseriesAnalysis(verbosity_stationarity_tests=5)
     with pytest.raises(ValueError):
@@ -35,7 +35,7 @@ def test_global_verbosity_overriding():
         verbosity_autocorrelation=Verbosity.HIGH,
         verbosity_stationarity_tests=Verbosity.MEDIUM,
         verbosity_rolling_statistics=Verbosity.HIGH,
-        verbosity_time_analysis_plot=Verbosity.MEDIUM,
+        verbosity_time_series_line_plot=Verbosity.MEDIUM,
     )
 
     assert timeseries_section.verbosity == Verbosity.LOW
@@ -52,10 +52,10 @@ def test_global_verbosity_overriding():
             assert (
                 subsec.verbosity == Verbosity.HIGH
             ), "Verbosity of rolling stats should be Verbosity.HIGH"
-        elif isinstance(subsec, timeseries_analysis.TimeAnalysisPlot):
+        elif isinstance(subsec, timeseries_analysis.TimeSeriesLinePlot):
             assert (
                 subsec.verbosity == Verbosity.MEDIUM
-            ), "Verbosity of timeanalysis plot should be 1"
+            ), "Verbosity of time series line plot should be 1"
         else:
             assert (
                 subsec.verbosity == Verbosity.LOW
@@ -239,7 +239,7 @@ def test_generated_code_verobsity_medium():
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
     expected_code = [
-        "time_analysis_plot(df=df)",
+        "time_series_line_plot(df=df)",
         "rolling_statistics(df=df)",
         "boxplots_over_time(df=df)",
         "seasonal_decomposition(df=df, model='additive')",
@@ -263,11 +263,11 @@ def test_generated_code_verobsity_high():
     expected_code = [
         "\n\n".join(
             (
-                get_code(timeseries_analysis.TimeAnalysisPlot.time_analysis_plot).replace(
-                    "TimeAnalysisPlot.", ""
+                get_code(timeseries_analysis.TimeSeriesLinePlot.time_series_line_plot).replace(
+                    "TimeSeriesLinePlot.", ""
                 ),
-                get_code(timeseries_analysis.TimeAnalysisPlot._time_analysis_colored_plot),
-                "time_analysis_plot(df=df)",
+                get_code(timeseries_analysis.TimeSeriesLinePlot._time_series_line_plot_colored),
+                "time_series_line_plot(df=df)",
             )
         ),
         "\n\n".join(
@@ -335,7 +335,7 @@ def test_verbosity_low_different_subsection_verbosities():
     ts_section = TimeseriesAnalysis(
         verbosity=Verbosity.LOW,
         subsections=[
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeAnalysisPlot,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
@@ -354,7 +354,7 @@ def test_verbosity_low_different_subsection_verbosities():
 
     expected_code = [
         "timeseries_analysis(df=df, "
-        "subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeAnalysisPlot, "
+        "subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime], sampling_rate=1)",
@@ -456,7 +456,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     ts_section = TimeseriesAnalysis(
         verbosity=Verbosity.LOW,
         subsections=[
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeAnalysisPlot,
+            TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
             TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
