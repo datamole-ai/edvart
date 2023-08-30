@@ -8,8 +8,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import Markdown, display
 
-from edvart import utils
-from edvart.data_types import is_numeric
+from edvart.data_types import is_categorical, is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
 from edvart.report_sections.section_base import Section, Verbosity
@@ -115,7 +114,7 @@ class TimeSeriesLinePlot(Section):
                     )
 
         layout = dict(xaxis_rangeslider_visible=True)
-        if not utils.is_categorical(df[color_col]):
+        if not is_categorical(df[color_col]):
             raise ValueError(f"Cannot color by non-categorical column `{color_col}`")
         if df[color_col].nunique() > 20:
             warnings.warn("Coloring by categorical column with many unique values!")
