@@ -380,7 +380,7 @@ class ReportBase(ABC):
                 verbosity_data_preview=verbosity_data_preview,
                 verbosity_missing_values=verbosity_missing_values,
                 verbosity_rows_with_missing_value=verbosity_rows_with_missing_value,
-                verbosity_constant_occurence=verbosity_constant_occurrence,
+                verbosity_constant_occurrence=verbosity_constant_occurrence,
                 verbosity_duplicate_rows=verbosity_duplicate_rows,
             )
         )

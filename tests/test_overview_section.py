@@ -51,7 +51,7 @@ def test_subsection_verbosity_overriding():
     overview_section = Overview(
         verbosity=Verbosity.LOW,
         verbosity_quick_info=Verbosity.MEDIUM,
-        verbosity_constant_occurence=Verbosity.LOW,
+        verbosity_constant_occurrence=Verbosity.LOW,
         verbosity_data_preview=Verbosity.MEDIUM,
         verbosity_data_types=Verbosity.HIGH,
         verbosity_rows_with_missing_value=Verbosity.MEDIUM,
@@ -61,7 +61,7 @@ def test_subsection_verbosity_overriding():
     for s in overview_section.subsections:
         if isinstance(s, dataset_overview.QuickInfo):
             assert s.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
-        elif isinstance(s, dataset_overview.ConstantOccurence):
+        elif isinstance(s, dataset_overview.ConstantOccurrence):
             assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
         elif isinstance(s, dataset_overview.DataPreview):
             assert s.verbosity == Verbosity.MEDIUM, "Verbosity should be Verbosity.MEDIUM"
@@ -166,7 +166,7 @@ def test_code_export_verbosity_medium():
             Overview.OverviewSubsection.DataPreview,
             Overview.OverviewSubsection.MissingValues,
             Overview.OverviewSubsection.RowsWithMissingValue,
-            Overview.OverviewSubsection.ConstantOccurence,
+            Overview.OverviewSubsection.ConstantOccurrence,
             Overview.OverviewSubsection.DuplicateRows,
         ],
         verbosity=Verbosity.MEDIUM,
@@ -183,7 +183,7 @@ def test_code_export_verbosity_medium():
         "data_preview(df=df)",
         "missing_values(df=df)",
         "missing_value_row_count(df=df)",
-        "constant_occurence(df=df)",
+        "constant_occurrence(df=df)",
         "duplicate_row_count(df=df)",
     ]
     # Test code equivalence
@@ -200,7 +200,7 @@ def test_code_export_verbosity_high():
             Overview.OverviewSubsection.DataPreview,
             Overview.OverviewSubsection.MissingValues,
             Overview.OverviewSubsection.RowsWithMissingValue,
-            Overview.OverviewSubsection.ConstantOccurence,
+            Overview.OverviewSubsection.ConstantOccurrence,
             Overview.OverviewSubsection.DuplicateRows,
         ],
         verbosity=Verbosity.HIGH,
@@ -250,8 +250,8 @@ def test_code_export_verbosity_high():
         "\n\n".join(
             (
                 get_code(series_to_frame),
-                get_code(dataset_overview.ConstantOccurence.constant_occurence),
-                "constant_occurence(df=df)",
+                get_code(dataset_overview.ConstantOccurrence.constant_occurrence),
+                "constant_occurrence(df=df)",
             )
         ),
         "\n\n".join(
@@ -284,7 +284,7 @@ def test_verbosity_low_different_subsection_verbosities():
         "Overview.OverviewSubsection.DataPreview, "
         "Overview.OverviewSubsection.MissingValues, "
         "Overview.OverviewSubsection.RowsWithMissingValue, "
-        "Overview.OverviewSubsection.ConstantOccurence])",
+        "Overview.OverviewSubsection.ConstantOccurrence])",
         "quick_info(df=df)",
         (
             get_code(render_dictionary)
