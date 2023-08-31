@@ -378,10 +378,9 @@ class DataTypes(Section):
         if columns is not None:
             df = df[columns]
         dtypes = df.apply(
-            func=infer_data_type,
+            func=lambda x_: str(infer_data_type(x_)),
             axis=0,
             result_type="expand",
-            string_representation=True,
         )
 
         # Convert result to frame for viewing
