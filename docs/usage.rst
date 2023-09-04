@@ -10,6 +10,8 @@ Show a Default Report in a Jupyter Notebook
 .. code-block:: python
 
     import edvart
+
+
     df = edvart.example_datasets.dataset_titanic()
     edvart.DefaultReport(df).show()
 
@@ -19,6 +21,8 @@ Export the Report Code to a Jupyter Notebook
 .. code-block:: python
 
     import edvart
+
+
     df = edvart.example_datasets.dataset_titanic()
     report = edvart.DefaultReport(df)
     report.export_notebook(
@@ -37,6 +41,8 @@ Export a Report to HTML
 .. code-block:: python
 
     import edvart
+
+
     df = edvart.example_datasets.dataset_titanic()
     report = edvart.DefaultReport(df)
     report.export_html(
@@ -85,7 +91,7 @@ You can add sections using methods ``add_*`` (e.g. :py:meth:`edvart.report.Repor
 
     df = edvart.example_datasets.dataset_titanic()
     report = (
-      edvart.Report(df)
+        edvart.Report(df)
         .add_univariate_analysis()
         .add_bivariate_analysis()
     )
@@ -100,17 +106,15 @@ For example you can define which columns should be used or omitted.
 
 .. code-block:: python
 
-  import edvart
+    import edvart
 
 
-  df = edvart.example_datasets.dataset_titanic()
-  report = (
-    edvart.Report(df)
-    .add_overview(omit_columns=["PassengerId"])
-    .add_univariate_analysis(
-        use_columns=["Name", "Sex", "Age"]
+    df = edvart.example_datasets.dataset_titanic()
+    report = (
+        edvart.Report(df)
+        .add_overview(omit_columns=["PassengerId"])
+        .add_univariate_analysis(use_columns=["Name", "Sex", "Age"])
     )
-  )
 
 
 Subsections
@@ -127,10 +131,12 @@ Some sections are made of subsections. For those, you can can configure which su
     df = edvart.example_datasets.dataset_titanic()
     report = edvart.Report(df)
 
-    report.add_overview(subsections=[
-        Overview.OverviewSubsection.QuickInfo,
-        Overview.OverviewSubsection.DataPreview,
-    ])
+    report.add_overview(
+        subsections=[
+            Overview.OverviewSubsection.QuickInfo,
+            Overview.OverviewSubsection.DataPreview,
+        ]
+    )
 
 
 .. _verbosity:
