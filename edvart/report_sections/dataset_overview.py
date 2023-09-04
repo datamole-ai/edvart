@@ -778,29 +778,33 @@ class ConstantOccurrence(Section):
         constant_count = (df == constant).sum()
         constant_percentage = 100 * constant_count / len(df)
 
+        constant_formatted = f"<i>{constant!r}</i>"
+        constant_count_name = f"{constant_formatted} Count"
+        constant_perc_name = f"{constant_formatted} %"
+
         # Convert series to frames
         constant_count_frame = series_to_frame(
             series=constant_count,
             index_name="Column Name",
-            column_name=f'"{constant}" Count',
+            column_name=constant_count_name,
         )
 
         constant_percentage_frame = series_to_frame(
             series=constant_percentage,
             index_name="Column Name",
-            column_name=f'"{constant}" %',
+            column_name=constant_perc_name,
         )
 
         # Merge absolute and relative counts
         constant_stats_frame = constant_count_frame.merge(
             constant_percentage_frame, on="Column Name"
-        ).sort_values(f'"{constant}" %', ascending=False)
+        ).sort_values(constant_perc_name, ascending=False)
 
         # Display table
         display(
             hide_index(constant_stats_frame)
-            .bar(color="#FFA07A", subset=[f'"{constant}" %'], vmax=100)
-            .format({f'"{constant}" %': "{:.03f}"})
+            .bar(color="#FFA07A", subset=[constant_perc_name], vmax=100)
+            .format({constant_perc_name: "{:.03f}"})
         )
 
     def required_imports(self) -> List[str]:
