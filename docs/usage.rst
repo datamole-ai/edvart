@@ -198,11 +198,11 @@ Examples
 
 Exporting Notebooks to HTML
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-An EDVART report :py:class:`~edvart.report.Report` can be directly exported
+A :py:class:`~edvart.report.Report` can be directly exported
 to HTML via the :py:meth:`~edvart.report.ReportBase.export_html` method.
 
-To export a notebook to other formats including HTML, you may use a tool called
-`jupyter nbconvert` (https://nbconvert.readthedocs.io/en/latest/).
+Jupyter notebooks can be exported to other formats including HTML, using a tool
+called `jupyter nbconvert` (https://nbconvert.readthedocs.io/en/latest/).
 
 For example, to export a notebook called `notebook.ipynb` using the `lab`
 template, you may use the following command:
