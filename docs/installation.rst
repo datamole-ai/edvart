@@ -8,8 +8,7 @@ It can be installed using ``pip``:
 
    $ pip install edvart
 
-We recommend using `Poetry <https://python-poetry.org/>` for dependency management.
-You can add ``edvart`` into your Poetry environment file defined by ``pyproject.toml``:
+We recommend using `Poetry <https://python-poetry.org/>`_ for dependency management.
 
 .. parsed-literal::
 
