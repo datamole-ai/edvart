@@ -205,7 +205,7 @@ def test_code_export_verbosity_medium_all_cols_valid():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_generated_code_verobsity_1():
+def test_generated_code_verbosity_1():
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
         df=get_test_df(), verbosity=Verbosity.MEDIUM
     )
@@ -243,7 +243,7 @@ def test_generated_code_verobsity_1():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_generated_code_verobsity_2():
+def test_generated_code_verbosity_2():
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
         df=get_test_df(), verbosity=Verbosity.HIGH
     )

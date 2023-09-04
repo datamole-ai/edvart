@@ -10,7 +10,7 @@ on:
 
 env:
   POETRY_VERSION: 1.6.1
-  CONVCO_VERSION: v0.4.1
+  CONVCO_VERSION: v0.4.2
 
 jobs:
   test-python:

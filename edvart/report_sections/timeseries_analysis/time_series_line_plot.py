@@ -157,7 +157,6 @@ class TimeSeriesLinePlot(Section):
             ]
         return [
             "from IPython.display import display, Markdown",
-            "import warnings",
             "import plotly",
             "import plotly.graph_objects as go",
             "plotly.offline.init_notebook_mode()",
