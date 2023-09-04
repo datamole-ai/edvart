@@ -210,13 +210,6 @@ to HTML via the :py:meth:`~edvart.report.ReportBase.export_html` method.
 Jupyter notebooks can be exported to other formats including HTML, using a tool
 called `jupyter nbconvert` (https://nbconvert.readthedocs.io/en/latest/).
 
-For example, to export a notebook called `notebook.ipynb` using the `lab`
-template, you may use the following command:
-
-.. code-block:: bash
-
-   poetry run jupyter nbconvert --to html notebook.ipynb --template lab
-
 
 Reports for Time Series Datasets
 --------------------------------
