@@ -61,6 +61,15 @@ It can be simply installed as a Python package, e.g. via ``pip``:
 
    pip install jupyter-dash
 
+to install `plotly-dash` to a Poetry environment, add the following line
+under ``tool.poetry.dependencies`` in the ``pyproject.toml`` environment definition file:
+
+
+.. code-block:: toml
+
+   jupyter-dash = "^0.4.2"
+
+
 See https://plot.ly/python/getting-started/ for more information.
 
 Visual Studio Code
