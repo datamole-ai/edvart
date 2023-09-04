@@ -29,7 +29,7 @@ Multivariate Analysis
 
 Group Analysis
 ~~~~~~~~~~~~~~
-  - Provides analysis of each column when grouped a column or a set of columns.
+  - Provides analysis of each column when grouped by a column or a set of columns.
     Includes basic information similar to dataset overview and univariate analysis,
     but on a per-group basis.
   - See :py:meth:`edvart.report.ReportBase.add_group_analysis`
