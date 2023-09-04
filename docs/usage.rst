@@ -81,6 +81,8 @@ You can add sections using methods ``add_*`` (e.g. :py:meth:`edvart.report.Repor
 
     # Include univariate and bivariate analysis
     import edvart
+
+
     df = edvart.example_datasets.dataset_titanic()
     report = (
       edvart.Report(df)
@@ -100,12 +102,16 @@ For example you can define which columns should be used or omitted.
 
   import edvart
 
-  df = edvart.example_datasets.dataset_titanic()
-  report = edvart.Report(df)
 
-  report.add_overview(omit_columns=["PassengerId"]).add_univariate_analysis(
-    use_columns=["Name", "Sex", "Age"]
+  df = edvart.example_datasets.dataset_titanic()
+  report = (
+    edvart.Report(df)
+    .add_overview(omit_columns=["PassengerId"])
+    .add_univariate_analysis(
+        use_columns=["Name", "Sex", "Age"]
+    )
   )
+
 
 Subsections
 ***********
@@ -116,6 +122,7 @@ Some sections are made of subsections. For those, you can can configure which su
 
     import edvart
     from edvart.report_sections.dataset_overview import Overview
+
 
     df = edvart.example_datasets.dataset_titanic()
     report = edvart.Report(df)
@@ -168,6 +175,7 @@ Examples
     # Set default verbosity for all sections to Verbosity.MEDIUM
     import edvart
     from edvart import Verbosity
+
 
     df = edvart.example_datasets.dataset_titanic()
     edvart.DefaultReport(df, verbosity=Verbosity.MEDIUM).export_notebook("test-export.ipynb")
