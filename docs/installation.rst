@@ -9,6 +9,8 @@ It can be installed using ``pip``:
    $ pip install edvart
 
 We recommend using `Poetry <https://python-poetry.org/>`_ for dependency management.
+To add ``edvart`` into a Poetry environment, add the following snippet
+to the ``pyproject.toml`` environment definition file:
 
 .. parsed-literal::
 
@@ -22,16 +24,16 @@ We recommend using `Poetry <https://python-poetry.org/>`_ for dependency managem
 Extras
 ------
 
-The ``edvart`` package has an optional dependency ``umap``, which adds a plot called `UMAP <https://umap-learn.readthedocs.io/en/latest/>`_
+Edvart has an optional dependency ``umap``, which adds a plot called `UMAP <https://umap-learn.readthedocs.io/en/latest/>`_
 to :ref:`Multivariate Analysis <multivariate_analysis>`.
 
-To install edvart with the optional ``umap`` dependency via pip, run the following command:
+To install Edvart with the optional ``umap`` dependency via pip, run the following command:
 
 .. code-block:: console
 
    $ pip install "edvart[umap]"
 
-To install edvart with the optional extra using Poetry, replace the snippet
+To install Edvart with the optional extra using Poetry, replace the snippet
 of the ``pyproject.toml`` environment file above with the following snippet:
 
 .. parsed-literal::
@@ -43,7 +45,7 @@ of the ``pyproject.toml`` environment file above with the following snippet:
 Rendering Plotly Interactive Plots
 ----------------------------------
 
-Edvart uses
+Edvart uses `Plotly <https://plotly.com/python/>`_ to render interactive plots.
 
 JupyterLab
 ~~~~~~~~~~
@@ -51,9 +53,9 @@ JupyterLab
 To display interactive plots which use Plotly in JupyterLab, you need to install some JupyterLab
 extensions.
 
-You need to install the ``jupyter-dash`` extension to render Plotly plots in
-JupyterLab. You can simply install it as a Python package to your environment,
-e.g. via ``pip``:
+The extension ``jupyter-dash`` needs to be installed in order for Plotly plots
+to be rendered correctly in JupyterLab.
+It can be simply installed as a Python package, e.g. via ``pip``:
 
 .. code-block:: console
 
