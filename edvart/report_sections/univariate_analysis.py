@@ -1,5 +1,4 @@
 """Univariate analysis package."""
-import warnings
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -174,9 +173,11 @@ class UnivariateAnalysis(Section):
             Additional kwargs passed to pandas.Series.bar.
         """
         if series.nunique() > plotting_threshold:
-            warnings.warn(
-                f"Number of unique values is greater than {plotting_threshold},"
-                " not plotting bar plot."
+            display(
+                Markdown(
+                    f"Number of unique values is greater than {plotting_threshold},"
+                    " not plotting bar plot."
+                )
             )
         else:
             value_counts = series.value_counts()
@@ -308,7 +309,6 @@ class UnivariateAnalysis(Section):
             "import matplotlib.pyplot as plt",
             "%matplotlib inline",
             "import seaborn as sns",
-            "import warnings",
         ]
 
     def add_cells(self, cells: List[Dict[str, Any]]) -> None:
