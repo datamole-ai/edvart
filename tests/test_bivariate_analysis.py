@@ -185,7 +185,7 @@ def test_generated_code_verbosity_low_columns():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_generated_code_verobsity_medium():
+def test_generated_code_verbosity_medium():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         verbosity=Verbosity.MEDIUM,
         subsections=[

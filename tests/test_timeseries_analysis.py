@@ -231,7 +231,7 @@ def test_code_export_verbosity_low_with_fft_stft():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_generated_code_verobsity_medium():
+def test_generated_code_verbosity_medium():
     ts_section = TimeseriesAnalysis(verbosity=Verbosity.MEDIUM)
 
     exported_cells = []
@@ -253,7 +253,7 @@ def test_generated_code_verobsity_medium():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_generated_code_verobsity_high():
+def test_generated_code_verbosity_high():
     ts_section = TimeseriesAnalysis(verbosity=Verbosity.HIGH, sampling_rate=1, stft_window_size=1)
 
     pairplot_cells = []
