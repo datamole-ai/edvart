@@ -4,8 +4,8 @@ Edvart is an open-source Python library designed to simplify and streamline
 your exploratory data analysis (EDA) process.
 
 ## Key features
-* **One-line reports**: Generate a comprehensive set of visualizations
-in a single statement from pandas DataFrames.
+* **One-line Reports**: Generate a comprehensive set of pandas DataFrame
+visualizations using a single Python statement.
 Edvart supports:
     - Data overview,
     - Univariate analysis,
