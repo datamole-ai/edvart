@@ -7,8 +7,8 @@ from a default report generated in one line of code to a fully-customized
 report down to the level of code generating the visualizations.
 
 ## Key features
-* **Default Visualizations**: Generate comprehensive visualizations in a single
-statement from pandas DataFrames.
+* **One-line reports**: Generate a comprehensive set of visualizations
+in a single statement from pandas DataFrames.
 Edvart supports:
     - Data overview,
     - Univariate analysis,
