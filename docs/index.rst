@@ -7,6 +7,21 @@ Edvart supports different levels of customization:
 from a default report generated in one line of code to a fully-customized
 report down to the level of code generating the visualizations.
 
+Key Features
+------------
+* **One-line Reports**: Generate a comprehensive set of pandas DataFrame visualizations using a single Python statement.
+  Edvart supports:
+    * Data overview,
+    * Univariate analysis,
+    * Bivariate analysis,
+    * Multivariate analysis,
+    * Grouped analysis,
+    * Time series analysis.
+
+* **Customizable Reports**: Produce, iterate, and style detailed reports in Jupyter notebooks and HTML formats.
+* **Flexible API**: From high-level simplicity in a single line of code to detailed control, choose the API level that fits your needs.
+* **Interactive Visualizations**: Many of the visualizations are interactive and can be used to explore the data in detail.
+
 
 Table of Contents
 -----------------
