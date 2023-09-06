@@ -44,7 +44,7 @@ class Overview(ReportSection):
         Missing values subsection code verbosity.
     verbosity_rows_with_missing_value : Verbosity, optional
         Rows with missing value subsection code verbosity.
-    verbosity_constant_occurence : Verbosity, optional
+    verbosity_constant_occurrence : Verbosity, optional
         Constant values subsection code verbosity.
     verbosity_duplicate_rows : Verbosity, optional
         Duplicate rows subsection code verbosity.
@@ -61,7 +61,7 @@ class Overview(ReportSection):
         DataPreview = 3
         MissingValues = 4
         RowsWithMissingValue = 5
-        ConstantOccurence = 6
+        ConstantOccurrence = 6
         DuplicateRows = 7
 
         def __str__(self):
@@ -77,7 +77,7 @@ class Overview(ReportSection):
         verbosity_data_preview: Optional[Verbosity] = None,
         verbosity_missing_values: Optional[Verbosity] = None,
         verbosity_rows_with_missing_value: Optional[Verbosity] = None,
-        verbosity_constant_occurence: Optional[Verbosity] = None,
+        verbosity_constant_occurrence: Optional[Verbosity] = None,
         verbosity_duplicate_rows: Optional[Verbosity] = None,
     ):
         # Propagate global verbosity to subsection verbosities
@@ -87,7 +87,7 @@ class Overview(ReportSection):
         verbosity_missing_values = verbosity_missing_values or verbosity
         if verbosity_rows_with_missing_value is None:
             verbosity_rows_with_missing_value = verbosity
-        verbosity_constant_occurence = verbosity_constant_occurence or verbosity
+        verbosity_constant_occurrence = verbosity_constant_occurrence or verbosity
         verbosity_duplicate_rows = verbosity_duplicate_rows or verbosity
 
         subsec = Overview.OverviewSubsection
@@ -99,7 +99,7 @@ class Overview(ReportSection):
             subsec.DataPreview: verbosity_data_preview,
             subsec.MissingValues: verbosity_missing_values,
             subsec.RowsWithMissingValue: verbosity_rows_with_missing_value,
-            subsec.ConstantOccurence: verbosity_constant_occurence,
+            subsec.ConstantOccurrence: verbosity_constant_occurrence,
             subsec.DuplicateRows: verbosity_duplicate_rows,
         }
 
@@ -126,7 +126,7 @@ class Overview(ReportSection):
             subsec.RowsWithMissingValue: RowsWithMissingValue(
                 verbosity_rows_with_missing_value, columns
             ),
-            subsec.ConstantOccurence: ConstantOccurence(verbosity_constant_occurence, columns),
+            subsec.ConstantOccurrence: ConstantOccurrence(verbosity_constant_occurrence, columns),
             subsec.DuplicateRows: DuplicateRows(verbosity_duplicate_rows, columns),
         }
 
@@ -378,10 +378,9 @@ class DataTypes(Section):
         if columns is not None:
             df = df[columns]
         dtypes = df.apply(
-            func=infer_data_type,
+            func=lambda x_: str(infer_data_type(x_)),
             axis=0,
             result_type="expand",
-            string_representation=True,
         )
 
         # Convert result to frame for viewing
@@ -738,38 +737,38 @@ class MissingValues(Section):
         MissingValues.missing_values(df=df, columns=self.columns)
 
 
-class ConstantOccurence(Section):
-    """Generates table with occurence of a constant in each column.
+class ConstantOccurrence(Section):
+    """Generates table with occurrence of a constant in each column.
 
     Parameters
     ----------
     verbosity : Verbosity
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
-        List of columns to count constant occurence in. If None, all columns are used.
+        List of columns to count constant occurrence in. If None, all columns are used.
     """
 
     @property
     def name(self) -> str:
-        return "Constant Occurence"
+        return "Constant Occurrence"
 
     @staticmethod
-    def constant_occurence(
+    def constant_occurrence(
         df: pd.DataFrame, columns: Optional[List[str]] = None, constant: Any = 0
     ) -> None:
-        """Displays a table with occurence of a constant in each column.
+        """Displays a table with occurrence of a constant in each column.
 
-        By default, check for 0 occurence.
+        By default, check for 0 occurrence.
 
         Parameters
         ----------
         df : pd.DataFrame
-            Dataframe for which to calculate constant values occurence.
+            Dataframe for which to calculate constant values occurrence.
         columns : Optional[List[str]], optional
-            Subset of columns for which to calculate constant values occurence.
+            Subset of columns for which to calculate constant values occurrence.
             If None, all columns of df are used.
         constant : Any
-            Constant for which to check occurence in df, by default 0.
+            Constant for which to check occurrence in df, by default 0.
         """
         if columns is not None:
             df = df[columns]
@@ -778,29 +777,33 @@ class ConstantOccurence(Section):
         constant_count = (df == constant).sum()
         constant_percentage = 100 * constant_count / len(df)
 
+        constant_formatted = f"<i>{constant!r}</i>"
+        constant_count_name = f"{constant_formatted} Count"
+        constant_perc_name = f"{constant_formatted} %"
+
         # Convert series to frames
         constant_count_frame = series_to_frame(
             series=constant_count,
             index_name="Column Name",
-            column_name=f'"{constant}" Count',
+            column_name=constant_count_name,
         )
 
         constant_percentage_frame = series_to_frame(
             series=constant_percentage,
             index_name="Column Name",
-            column_name=f'"{constant}" %',
+            column_name=constant_perc_name,
         )
 
         # Merge absolute and relative counts
         constant_stats_frame = constant_count_frame.merge(
             constant_percentage_frame, on="Column Name"
-        ).sort_values(f'"{constant}" %', ascending=False)
+        ).sort_values(constant_perc_name, ascending=False)
 
         # Display table
         display(
             hide_index(constant_stats_frame)
-            .bar(color="#FFA07A", subset=[f'"{constant}" %'], vmax=100)
-            .format({f'"{constant}" %': "{:.03f}"})
+            .bar(color="#FFA07A", subset=[constant_perc_name], vmax=100)
+            .format({constant_perc_name: "{:.03f}"})
         )
 
     def required_imports(self) -> List[str]:
@@ -817,15 +820,15 @@ class ConstantOccurence(Section):
             return base_imports + [
                 total_dedent(
                     """
-                    from edvart.report_sections.dataset_overview import ConstantOccurence
-                    constant_occurence = ConstantOccurence.constant_occurence
+                    from edvart.report_sections.dataset_overview import Constantoccurrence
+                    constant_occurrence = Constantoccurrence.constant_occurrence
                     """
                 )
             ]
         return base_imports + ["from IPython.display import display"]
 
     def add_cells(self, cells: List[Dict[str, Any]]) -> None:
-        """Adds code cells which calculate constant occurence table to the list of cells.
+        """Adds code cells which calculate constant occurrence table to the list of cells.
 
         Parameters
         ----------
@@ -836,9 +839,9 @@ class ConstantOccurence(Section):
         cells.append(section_header)
 
         if self.columns is None:
-            default_call = "constant_occurence(df=df)"
+            default_call = "constant_occurrence(df=df)"
         else:
-            default_call = f"constant_occurence(df=df, columns={self.columns})"
+            default_call = f"constant_occurrence(df=df, columns={self.columns})"
 
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
@@ -846,7 +849,7 @@ class ConstantOccurence(Section):
             code = (
                 get_code(series_to_frame)
                 + 2 * "\n"
-                + get_code(ConstantOccurence.constant_occurence)
+                + get_code(ConstantOccurrence.constant_occurrence)
                 + 2 * "\n"
                 + default_call
             )
@@ -854,7 +857,7 @@ class ConstantOccurence(Section):
         cells.append(nbfv4.new_code_cell(code))
 
     def show(self, df: pd.DataFrame) -> None:
-        """Generates constant occurence table in the calling notebook.
+        """Generates constant occurrence table in the calling notebook.
 
         Parameters
         ----------
@@ -862,7 +865,7 @@ class ConstantOccurence(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        ConstantOccurence.constant_occurence(df=df, columns=self.columns)
+        ConstantOccurrence.constant_occurrence(df=df, columns=self.columns)
 
 
 class RowsWithMissingValue(Section):

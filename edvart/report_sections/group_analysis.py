@@ -1,6 +1,5 @@
 """Group analysis module."""
 
-import warnings
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import colorlover as cl
@@ -341,7 +340,12 @@ class GroupAnalysis(Section):
         """
         num_cat = df[column].nunique()
         if num_cat > group_count_threshold:
-            warnings.warn(f"Too many categories ({num_cat}), not plotting distribution")
+            display(
+                Markdown(
+                    f"Number of unique values ({num_cat}) greater than threshold."
+                    " Not plotting distribution"
+                )
+            )
             return
 
         pivot = df.pivot_table(index=groupby, columns=column, aggfunc="size", fill_value=0)
@@ -577,7 +581,6 @@ class GroupAnalysis(Section):
             "import plotly.graph_objects as go",
             "from edvart.data_types import infer_data_type, DataType",
             "from edvart import utils",
-            "import warnings",
             "from typing import List, Dict, Optional, Callable",
             "from plotly.subplots import make_subplots",
         ]
