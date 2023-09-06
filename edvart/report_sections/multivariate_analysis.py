@@ -12,11 +12,11 @@ import sklearn.decomposition
 from IPython.display import Markdown, display
 from sklearn.preprocessing import StandardScaler
 
-from edvart.data_types import is_numeric
+from edvart.data_types import is_boolean, is_categorical, is_numeric
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
 from edvart.report_sections.section_base import ReportSection, Section, Verbosity
-from edvart.utils import discrete_colorscale, is_categorical
+from edvart.utils import discrete_colorscale
 
 try:
     from edvart.report_sections.umap import UMAP
@@ -533,11 +533,9 @@ class ParallelCoordinates(Section):
             columns = [
                 col
                 for col in df.columns
-                if is_numeric(df[col])
-                or (
-                    is_categorical(df[col], nunique_max=nunique_max)
-                    and df[col].nunique() <= nunique_max
-                )
+                if is_categorical(df[col], unique_value_count_threshold=nunique_max)
+                or is_boolean(df[col])
+                or is_numeric(df[col])
             ]
             # If all columns are numeric we don't want to list them all in the generated call
             # Setting columns to None will result in the columns argument not being included
@@ -740,10 +738,8 @@ class ParallelCategories(Section):
             columns = [
                 col
                 for col in df.columns
-                if (
-                    is_categorical(df[col], nunique_max=nunique_max)
-                    and df[col].nunique() <= nunique_max
-                )
+                if is_categorical(df[col], unique_value_count_threshold=nunique_max)
+                or is_boolean(df[col])
             ]
 
             # If all columns are numeric we don't want to list them all in the generated call

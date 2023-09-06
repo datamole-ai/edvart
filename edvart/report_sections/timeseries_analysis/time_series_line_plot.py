@@ -1,4 +1,4 @@
-"""Time analysis interactive plot package."""
+"""Time series line plot package."""
 
 import warnings
 from typing import Any, Dict, List, Optional
@@ -8,15 +8,14 @@ import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import Markdown, display
 
-from edvart import utils
-from edvart.data_types import is_numeric
+from edvart.data_types import is_categorical, is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
 from edvart.report_sections.section_base import Section, Verbosity
 
 
-class TimeAnalysisPlot(Section):
-    """Generates the time analysis interactive plot section.
+class TimeSeriesLinePlot(Section):
+    """Generates the time series line plot section.
 
     Parameters
     ----------
@@ -47,17 +46,17 @@ class TimeAnalysisPlot(Section):
 
     @property
     def name(self) -> str:
-        return "Time analysis interactive plot"
+        return "Time series line plot"
 
     @staticmethod
     @check_index_time_ascending
-    def time_analysis_plot(
+    def time_series_line_plot(
         df,
         columns: Optional[List[str]] = None,
         separate_plots: bool = False,
         color_col: Optional[str] = None,
     ) -> None:
-        """Display time analysis interactive plot.
+        """Display time series line plot.
 
         Parameters
         ----------
@@ -80,7 +79,9 @@ class TimeAnalysisPlot(Section):
             If the input data is not indexed by time in ascending order.
         """
         if color_col is not None:
-            TimeAnalysisPlot._time_analysis_colored_plot(df, columns=columns, color_col=color_col)
+            TimeSeriesLinePlot._time_series_line_plot_colored(
+                df, columns=columns, color_col=color_col
+            )
             return
         if columns is None:
             columns = [col for col in df.columns if is_numeric(df[col])]
@@ -88,7 +89,7 @@ class TimeAnalysisPlot(Section):
             for col in columns:
                 if not is_numeric(df[col]):
                     raise ValueError(
-                        f"Cannot plot TimeAnalysisPlot plot for non-numeric column {col}"
+                        f"Cannot plot TimeSeriesLinePlot plot for non-numeric column {col}"
                     )
 
         data = [go.Scatter(x=df.index, y=df[col], name=col, mode="lines") for col in columns]
@@ -102,18 +103,18 @@ class TimeAnalysisPlot(Section):
             go.Figure(data=data, layout=layout).show()
 
     @staticmethod
-    def _time_analysis_colored_plot(df, columns=None, color_col=None):
+    def _time_series_line_plot_colored(df, columns=None, color_col=None):
         if columns is None:
             columns = [col for col in df.columns if is_numeric(df[col])]
         else:
             for col in columns:
                 if not is_numeric(df[col]):
                     raise ValueError(
-                        f"Cannot plot TimeAnalysisPlot plot for non-numeric column {col}"
+                        f"Cannot plot TimeSeriesLinePlot plot for non-numeric column {col}"
                     )
 
         layout = dict(xaxis_rangeslider_visible=True)
-        if not utils.is_categorical(df[color_col]):
+        if not is_categorical(df[color_col]):
             raise ValueError(f"Cannot color by non-categorical column `{color_col}`")
         if df[color_col].nunique() > 20:
             warnings.warn("Coloring by categorical column with many unique values!")
@@ -148,14 +149,13 @@ class TimeAnalysisPlot(Section):
             return [
                 total_dedent(
                     """
-                    from edvart.report_sections.timeseries_analysis import TimeAnalysisPlot
-                    time_analysis_plot = TimeAnalysisPlot.time_analysis_plot
+                    from edvart.report_sections.timeseries_analysis import TimeSeriesLinePlot
+                    time_series_line_plot = TimeSeriesLinePlot.time_series_line_plot
                     """
                 )
             ]
         return [
             "from IPython.display import display, Markdown",
-            "import warnings",
             "import plotly",
             "import plotly.graph_objects as go",
             "plotly.offline.init_notebook_mode()",
@@ -175,7 +175,7 @@ class TimeAnalysisPlot(Section):
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
 
-        default_call = "time_analysis_plot(df=df"
+        default_call = "time_series_line_plot(df=df"
         if self.columns is not None:
             default_call += f", columns={self.columns}"
         if self.color_col is not None:
@@ -188,9 +188,11 @@ class TimeAnalysisPlot(Section):
             code = default_call
         else:
             code = (
-                get_code(TimeAnalysisPlot.time_analysis_plot).replace("TimeAnalysisPlot.", "")
+                get_code(TimeSeriesLinePlot.time_series_line_plot).replace(
+                    "TimeSeriesLinePlot.", ""
+                )
                 + "\n\n"
-                + get_code(TimeAnalysisPlot._time_analysis_colored_plot)
+                + get_code(TimeSeriesLinePlot._time_series_line_plot_colored)
                 + "\n\n"
                 + default_call
             )
@@ -198,7 +200,7 @@ class TimeAnalysisPlot(Section):
         cells.append(nbfv4.new_code_cell(code))
 
     def show(self, df: pd.DataFrame) -> None:
-        """Generates time analysis interactive plot(s) in the calling notebook.
+        """Generates time series line plot(s) in the calling notebook.
 
         Parameters
         ----------
@@ -206,7 +208,7 @@ class TimeAnalysisPlot(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        TimeAnalysisPlot.time_analysis_plot(
+        TimeSeriesLinePlot.time_series_line_plot(
             df=df,
             columns=self.columns,
             color_col=self.color_col,

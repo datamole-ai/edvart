@@ -7,30 +7,6 @@ from typing import Any, Dict, Iterable, Iterator, Literal, Optional, Tuple, Unio
 import pandas as pd
 import statsmodels.api as sm
 
-from edvart.data_types import is_numeric
-
-
-def is_categorical(series: pd.Series, nunique_max: int = 20) -> bool:
-    """
-    A heuristic of whether a series is categorical or numerical.
-
-    Parameters
-    ----------
-    series: pd.Series
-        Input series
-    nunique_max: int (default = 20)
-        Maximum number of unique values for a numeric series to be regarded as categorical.
-        No limit on number of unique values if set to a negative number.
-
-    Returns
-    -------
-    bool
-        True if series contains categorical values, otherwise False
-    """
-    return (
-        (nunique_max < 0 or series.nunique() <= nunique_max) or not is_numeric(series)
-    ) and not pd.core.dtypes.common.is_datetime_or_timedelta_dtype(series)
-
 
 def top_frequent_values(series: pd.Series, n_top: int = 10) -> Dict[Any, float]:
     """

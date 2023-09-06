@@ -668,6 +668,7 @@ class PairPlot(Section):
             columns_x = list(filter(include_column, columns_x))
             columns_y = list(filter(include_column, columns_y))
         sns.pairplot(df, x_vars=columns_x, y_vars=columns_y, hue=color_col)
+        plt.tight_layout()
         plt.show()
 
     def required_imports(self) -> List[str]:

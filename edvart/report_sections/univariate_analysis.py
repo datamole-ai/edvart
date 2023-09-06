@@ -1,5 +1,4 @@
 """Univariate analysis package."""
-import warnings
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -174,9 +173,11 @@ class UnivariateAnalysis(Section):
             Additional kwargs passed to pandas.Series.bar.
         """
         if series.nunique() > plotting_threshold:
-            warnings.warn(
-                f"Number of unique values is greater than {plotting_threshold},"
-                " not plotting bar plot."
+            display(
+                Markdown(
+                    f"Number of unique values is greater than {plotting_threshold},"
+                    " not plotting bar plot."
+                )
             )
         else:
             value_counts = series.value_counts()
@@ -266,8 +267,8 @@ class UnivariateAnalysis(Section):
                 display(Markdown(f"## *{col} - NULL*"))
                 display(Markdown("The column contains only null values."))
                 continue
-            data_type_name = infer_data_type(df[col], string_representation=True)
             data_type = infer_data_type(df[col])
+            data_type_name = str(data_type)
             display(Markdown(f"## *{col} - {data_type_name}*"))
             if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
                 UnivariateAnalysis.top_most_frequent(df[col])
@@ -308,7 +309,6 @@ class UnivariateAnalysis(Section):
             "import matplotlib.pyplot as plt",
             "%matplotlib inline",
             "import seaborn as sns",
-            "import warnings",
         ]
 
     def add_cells(self, cells: List[Dict[str, Any]]) -> None:
@@ -375,8 +375,8 @@ class UnivariateAnalysis(Section):
                     display(Markdown(f"## *{col} - NULL*"))
                     display(Markdown("The column contains only null values."))
                     continue
-                data_type_name = infer_data_type(self.df[col], string_representation=True)
                 data_type = infer_data_type(self.df[col])
+                data_type_name = str(data_type)
                 column_header = nbfv4.new_markdown_cell(f"## *{col} - {data_type_name}*")
                 cells.append(column_header)
                 if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
@@ -429,8 +429,8 @@ class UnivariateAnalysis(Section):
                 display(Markdown(f"## *{col} - NULL*"))
                 display(Markdown("The column contains only null values."))
                 continue
-            data_type_name = infer_data_type(df[col], string_representation=True)
             data_type = infer_data_type(df[col])
+            data_type_name = str(data_type)
             display(Markdown(f"## *{col} - {data_type_name}*"))
             if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
                 UnivariateAnalysis.top_most_frequent(df[col])
