@@ -52,6 +52,12 @@ Export a Report to HTML
     )
 
 
+A :py:class:`~edvart.report.Report` can be directly exported
+to HTML via the :py:meth:`~edvart.report.ReportBase.export_html` method.
+
+Jupyter notebooks can be exported to other formats including HTML, using a tool
+called `jupyter nbconvert` (https://nbconvert.readthedocs.io/en/latest/).
+
 Customizing the Report
 ----------------------
 
@@ -200,15 +206,6 @@ Examples
         verbosity=Verbosity.MEDIUM,
         verbosity_univariate_analysis=Verbosity.HIGH,
     ).export_notebook("exported-report.ipynb")
-
-
-Exporting Notebooks to HTML
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A :py:class:`~edvart.report.Report` can be directly exported
-to HTML via the :py:meth:`~edvart.report.ReportBase.export_html` method.
-
-Jupyter notebooks can be exported to other formats including HTML, using a tool
-called `jupyter nbconvert` (https://nbconvert.readthedocs.io/en/latest/).
 
 
 Reports for Time Series Datasets
