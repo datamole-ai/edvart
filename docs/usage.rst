@@ -57,6 +57,8 @@ to HTML via the :py:meth:`~edvart.report.ReportBase.export_html` method.
 
 Jupyter notebooks can be exported to other formats including HTML, using a tool
 called `jupyter nbconvert` (https://nbconvert.readthedocs.io/en/latest/).
+This can be useful to create a HTML report from a notebook which was exported
+using the :py:meth:`~edvart.report.ReportBase.export_notebook` method.
 
 Customizing the Report
 ----------------------
