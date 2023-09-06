@@ -1,7 +1,6 @@
 """Module defines data types and helper function for recognizing them."""
 
 from enum import IntEnum
-from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -22,38 +21,36 @@ class DataType(IntEnum):
         return self.name.lower()
 
 
-def infer_data_type(series: pd.Series, string_representation: bool = False) -> Union[DataType, str]:
+# pylint: disable=too-many-return-statements
+def infer_data_type(series: pd.Series) -> DataType:
     """Infers the data type of the series passed in.
 
     Parameters
     ----------
     series : pd.Series
         Series from which to infer data type.
-    string_representation : bool
-        Whether to return the resulting data type as DataType enum value or string.
 
     Returns
     -------
-    DataType : Union[DataType, str]
-        Inferred custom edvart data type or its string representation.
+    DataType
+        Inferred custom edvart data type.
     """
-    ret = None
+    if series.empty:
+        return DataType.UNKNOWN
     if is_missing(series):
-        ret = DataType.MISSING
+        return DataType.MISSING
     if is_boolean(series):
-        ret = DataType.BOOLEAN
-    elif is_date(series):
-        ret = DataType.DATE
-    elif is_unique(series):
-        ret = DataType.UNIQUE
-    elif is_categorical(series):
-        ret = DataType.CATEGORICAL
-    elif is_numeric(series):
-        ret = DataType.NUMERIC
-    else:
-        ret = DataType.UNKNOWN
+        return DataType.BOOLEAN
+    if is_date(series):
+        return DataType.DATE
+    if is_unique(series):
+        return DataType.UNIQUE
+    if is_categorical(series):
+        return DataType.CATEGORICAL
+    if is_numeric(series):
+        return DataType.NUMERIC
 
-    return str(ret) if string_representation else ret
+    return DataType.UNKNOWN
 
 
 def is_unique(series: pd.Series) -> bool:

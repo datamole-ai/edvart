@@ -1,5 +1,4 @@
 """Univariate analysis package."""
-import warnings
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -174,9 +173,11 @@ class UnivariateAnalysis(Section):
             Additional kwargs passed to pandas.Series.bar.
         """
         if series.nunique() > plotting_threshold:
-            warnings.warn(
-                f"Number of unique values is greater than {plotting_threshold},"
-                " not plotting bar plot."
+            display(
+                Markdown(
+                    f"Number of unique values is greater than {plotting_threshold},"
+                    " not plotting bar plot."
+                )
             )
         else:
             value_counts = series.value_counts()
@@ -262,18 +263,16 @@ class UnivariateAnalysis(Section):
             df = df[columns]
 
         for col in df.columns:
-            if df[col].isnull().all():
-                display(Markdown(f"## *{col} - NULL*"))
-                display(Markdown("The column contains only null values."))
-                continue
-            data_type_name = infer_data_type(df[col], string_representation=True)
             data_type = infer_data_type(df[col])
+            data_type_name = str(data_type)
             display(Markdown(f"## *{col} - {data_type_name}*"))
             if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
                 UnivariateAnalysis.top_most_frequent(df[col])
                 UnivariateAnalysis.bar_plot(df[col])
             elif data_type == DataType.UNIQUE:
                 display(Markdown("Each value in the column is unique."))
+            elif data_type == DataType.MISSING:
+                display(Markdown("The column contains only missing values."))
             else:
                 UnivariateAnalysis.numeric_statistics(df[col])
                 UnivariateAnalysis.histogram(df[col])
@@ -308,7 +307,6 @@ class UnivariateAnalysis(Section):
             "import matplotlib.pyplot as plt",
             "%matplotlib inline",
             "import seaborn as sns",
-            "import warnings",
         ]
 
     def add_cells(self, cells: List[Dict[str, Any]]) -> None:
@@ -371,12 +369,8 @@ class UnivariateAnalysis(Section):
             cells.append(code_cell)
         else:
             for col in self.df.columns:
-                if self.df[col].isnull().all():
-                    display(Markdown(f"## *{col} - NULL*"))
-                    display(Markdown("The column contains only null values."))
-                    continue
-                data_type_name = infer_data_type(self.df[col], string_representation=True)
                 data_type = infer_data_type(self.df[col])
+                data_type_name = str(data_type)
                 column_header = nbfv4.new_markdown_cell(f"## *{col} - {data_type_name}*")
                 cells.append(column_header)
                 if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
@@ -389,6 +383,8 @@ class UnivariateAnalysis(Section):
                     )
                 elif data_type == DataType.UNIQUE:
                     cell = nbfv4.new_markdown_cell("Each value in the column is unique.")
+                elif data_type == DataType.MISSING:
+                    cell = nbfv4.new_markdown_cell("The column contains only missing values.")
                 else:
                     if self.verbosity == Verbosity.MEDIUM:
                         cell = nbfv4.new_code_cell(
@@ -425,18 +421,16 @@ class UnivariateAnalysis(Section):
 
         display(Markdown(self.get_title(section_level=1)))
         for col in df.columns:
-            if df[col].isnull().all():
-                display(Markdown(f"## *{col} - NULL*"))
-                display(Markdown("The column contains only null values."))
-                continue
-            data_type_name = infer_data_type(df[col], string_representation=True)
             data_type = infer_data_type(df[col])
+            data_type_name = str(data_type)
             display(Markdown(f"## *{col} - {data_type_name}*"))
             if data_type in (DataType.CATEGORICAL, DataType.BOOLEAN):
                 UnivariateAnalysis.top_most_frequent(df[col])
                 UnivariateAnalysis.bar_plot(df[col])
             elif data_type == DataType.UNIQUE:
                 display(Markdown("Each value in the column is unique."))
+            elif data_type == DataType.MISSING:
+                display(Markdown("The column contains only missing values."))
             else:
                 UnivariateAnalysis.numeric_statistics(df[col])
                 UnivariateAnalysis.histogram(df[col])
