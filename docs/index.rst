@@ -1,15 +1,27 @@
 EDVART
 ================================
 
-Exploratory Data Analysis (EDA) is a very initial task a data scientist
-or data analyst does when he reaches new data.
-EDA refers to the critical process of performing
-initial investigations on data to discover patterns, to spot
-anomalies, to test hypothesis and to check assumptions with the help
-of summary statistics and graphical representations.
+Edvart is an open-source Python library designed to simplify and streamline
+your exploratory data analysis (EDA) process.
+Edvart supports different levels of customization:
+from a default report generated in one line of code to a fully-customized
+report down to the level of code generating the visualizations.
 
-EDVART serves for speeding up EDA and for
-creating Data analysis reports.
+Key Features
+------------
+* **One-line Reports**: Generate a comprehensive set of pandas DataFrame visualizations using a single Python statement.
+  Edvart supports:
+    * Data overview,
+    * Univariate analysis,
+    * Bivariate analysis,
+    * Multivariate analysis,
+    * Grouped analysis,
+    * Time series analysis.
+
+* **Customizable Reports**: Produce, iterate, and style detailed reports in Jupyter notebooks and HTML formats.
+* **Flexible API**: From high-level simplicity in a single line of code to detailed control, choose the API level that fits your needs.
+* **Interactive Visualizations**: Many of the visualizations are interactive and can be used to explore the data in detail.
+
 
 Table of Contents
 -----------------
@@ -18,15 +30,16 @@ Table of Contents
   :maxdepth: 2
 
   installation.rst
-  getting_started.rst
-  advanced.rst
+  usage.rst
+  sections.rst
   api_reference.rst
 
 .. include:: installation.rst
-.. include:: getting_started.rst
+.. include:: usage.rst
+.. include:: sections.rst
 
 Links
------------
+-----
 * `GitHub repository <https://github.com/datamole-ai/edvart>`_
 
 * :ref:`modindex`
