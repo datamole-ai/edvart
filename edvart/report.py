@@ -291,9 +291,15 @@ class ReportBase(ABC):
         )
 
         # Add code cells to generated notebook
-        nb["cells"].append(nbf4.new_code_cell("import pickle\nimport base64"))
-        nb["cells"].append(nbf4.new_code_cell(unpickle_report))
-        nb["cells"].append(nbf4.new_code_cell("report.show()"))
+        for code_string in (
+            "import base64",
+            "import pickle",
+            unpickle_report,
+            "import plotly.io as pio",
+            "pio.renderers.default = 'notebook'",
+            "report.show()",
+        ):
+            nb["cells"].append(nbf4.new_code_cell(code_string))
 
         self._export_html(
             nb=nb,
@@ -374,7 +380,7 @@ class ReportBase(ABC):
                 verbosity_data_preview=verbosity_data_preview,
                 verbosity_missing_values=verbosity_missing_values,
                 verbosity_rows_with_missing_value=verbosity_rows_with_missing_value,
-                verbosity_constant_occurence=verbosity_constant_occurrence,
+                verbosity_constant_occurrence=verbosity_constant_occurrence,
                 verbosity_duplicate_rows=verbosity_duplicate_rows,
             )
         )
@@ -756,7 +762,7 @@ class TimeseriesReport(ReportBase):
         omit_columns: Optional[List[str]] = None,
         subsections: Optional[List[TimeseriesAnalysis.TimeseriesAnalysisSubsection]] = None,
         verbosity: Optional[Verbosity] = None,
-        verbosity_time_analysis_plot: Optional[Verbosity] = None,
+        verbosity_time_series_line_plot: Optional[Verbosity] = None,
         verbosity_rolling_statistics: Optional[Verbosity] = None,
         verbosity_boxplots_over_time: Optional[Verbosity] = None,
         verbosity_seasonal_decomposition: Optional[Verbosity] = None,
@@ -782,17 +788,8 @@ class TimeseriesReport(ReportBase):
             If None, all subsections are added.
         verbosity : Verbosity, optional
             The verbosity of the code generated in the exported notebook.
-            0
-                A single function call generates the entire bivariate analysis section.
-            1
-                Function calls to parameterizable functions are generated for each column separately
-                in separate cells.
-            2
-                Similar to 1, but in addition, function definitions are generated, column
-                data type inference and default statistics become customizable.
-
-        verbosity_time_analysis_plot : Verbosity, optional
-            Time analysis interactive plot subsection code verbosity.
+        verbosity_time_series_line_plot : Verbosity, optional
+            Time series line plot subsection code verbosity.
         verbosity_rolling_statistics : Verbosity, optional
             Rolling statistics interactive plot subsection code verbosity.
         verbosity_boxplots_over_time : Verbosity, optional
@@ -819,7 +816,7 @@ class TimeseriesReport(ReportBase):
                 subsections=subsections,
                 verbosity=verbosity or self.verbosity,
                 columns=self._select_columns(use_columns, omit_columns),
-                verbosity_time_analysis_plot=verbosity_time_analysis_plot,
+                verbosity_time_series_line_plot=verbosity_time_series_line_plot,
                 verbosity_rolling_statistics=verbosity_rolling_statistics,
                 verbosity_boxplots_over_time=verbosity_boxplots_over_time,
                 verbosity_seasonal_decomposition=verbosity_seasonal_decomposition,

@@ -1,6 +1,5 @@
 """Seasonal decomposition package."""
 
-import warnings
 from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -91,9 +90,13 @@ class SeasonalDecomposition(Section):
         """
         df = df.interpolate(method="time")
         if pd.infer_freq(df.index) is None and period is None:
-            warnings.warn(
-                "Period could not be inferred, please set the period parameter to a suitable value."
-                "Decomposition will not be plotted."
+            display(
+                Markdown(
+                    "<div class='alert alert-block alert-warning'>"
+                    "Period could not be inferred, please set the `period` parameter"
+                    " to a suitable value. Not plotting seasonal decomposition."
+                    "</div>"
+                )
             )
             return
         if columns is None:

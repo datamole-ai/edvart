@@ -5,12 +5,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+    types: [opened, edited, reopened, synchronize]
   merge_group:
     branches: [main]
 
 env:
-  POETRY_VERSION: 1.5.1
-  CONVCO_VERSION: v0.4.1
+  POETRY_VERSION: 1.6.1
+  CONVCO_VERSION: v0.4.2
 
 jobs:
   test-python:
