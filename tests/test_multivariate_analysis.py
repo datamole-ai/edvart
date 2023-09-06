@@ -197,7 +197,7 @@ def test_code_export_verbosity_medium_all_cols_valid():
     expected_code = [
         "pca_first_vs_second(df=df)",
         "pca_explained_variance(df=df)",
-        "parallel_categories(df=df)",
+        "parallel_categories(df=df, columns=['col2'])",
     ]
 
     assert len(exported_code) == len(expected_code)
@@ -228,14 +228,14 @@ def test_generated_code_verbosity_1():
                 )"""
             ),
             "parallel_coordinates(df=df)",
-            "parallel_categories(df=df)",
+            "parallel_categories(df=df, columns=['B'])",
         ]
     else:
         expected_code = [
             "pca_first_vs_second(df=df, columns=['A', 'C', 'D'])",
             "pca_explained_variance(df=df, columns=['A', 'C', 'D'])",
             "parallel_coordinates(df=df)",
-            "parallel_categories(df=df)",
+            "parallel_categories(df=df, columns=['B'])",
         ]
 
     assert len(exported_code) == len(expected_code)
@@ -275,7 +275,7 @@ def test_generated_code_verbosity_2():
             (
                 get_code(utils.discrete_colorscale),
                 get_code(multivariate_analysis.ParallelCategories.parallel_categories),
-                "parallel_categories(df=df)",
+                "parallel_categories(df=df, columns=['B'])",
             )
         ),
     ]
@@ -352,7 +352,7 @@ def test_verbosity_low_different_subsection_verbosities():
     expected_subsections_str = ", ".join(expected_subsections)
     expected_code = [
         "multivariate_analysis(df=df, " f"subsections=[{expected_subsections_str}])",
-        "parallel_categories(df=df)",
+        "parallel_categories(df=df, columns=['B'])",
         "\n\n".join(
             (
                 get_code(utils.discrete_colorscale),
