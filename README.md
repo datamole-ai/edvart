@@ -42,7 +42,9 @@ pip install edvart
 
 ## Usage
 
-See the notebook [api-example.ipynb](api-example.ipynb) for usage examples.
+See the notebook
+[api-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/api-example.ipynb)
+for usage examples.
 
 ## User documentation
 
