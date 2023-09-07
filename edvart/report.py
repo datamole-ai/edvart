@@ -11,6 +11,7 @@ import nbformat as nbf
 import nbformat.v4 as nbf4
 import pandas as pd
 
+from edvart.config import BivariateAnalysisConfig
 from edvart.data_types import is_date
 from edvart.report_sections.bivariate_analysis import BivariateAnalysis
 from edvart.report_sections.code_string_formatting import code_dedent
@@ -378,70 +379,18 @@ class ReportBase(ABC):
 
     def add_bivariate_analysis(
         self,
-        columns: Optional[List[str]] = None,
-        columns_x: Optional[List[str]] = None,
-        columns_y: Optional[List[str]] = None,
-        columns_pairs: Optional[List[Tuple[str, str]]] = None,
-        subsections: Optional[List[BivariateAnalysis.BivariateAnalysisSubsection]] = None,
-        verbosity: Optional[Verbosity] = None,
-        verbosity_correlations: Optional[Verbosity] = None,
-        verbosity_pairplot: Optional[Verbosity] = None,
-        verbosity_contingency_table: Optional[Verbosity] = None,
-        color_col: Optional[str] = None,
+        config: Optional[BivariateAnalysisConfig] = None,
     ) -> "ReportBase":
         """Adds bivariate analysis section to the report.
 
         Parameters
         ----------
-        columns : List[str], optional
-            Columns which to analyze.
-            If None, all columns are used.
-        columns_x : List[str], optional
-            If specified, correlations and pairplots are performed on the cartesian product of
-            `columns_x` and `columns_y`.
-            If `columns_x` is specified, then `columns_y` must also be specified.
-        columns_y : List[str], optional
-            If specified, correlations and pairplots are performed on the cartesian product of
-            `columns_x` and `columns_y`.
-            If `columns_y` is specified, then `columns_x` must also be specified.
-        columns_pairs : List[str], optional
-            List of columns pairs on which to perform bivariate analysis.
-            Used primarily in contingency tables.
-            If specified, `columns`, `columns_x` and `columns_y` are ignored in contingency tables.
-            Ignored in pairplots and correlations unless `columns_pairs` is specified and none of
-            `columns`, `columns_x`, `columns_y` is specified. In that case, the first elements
-            of each pair are treated as `columns_x` and the second elements as `columns_y` in
-            pairplots and correlations.
-        subsections : List[BivariateAnalysis.BivariateAnalysisSubsection], optional
-            List of sub-sections to include into the BivariateAnalysis section.
-            If None, all subsections are added.
-        verbosity : Verbosity, optional
-            The verbosity of the code generated in the exported notebook.
-        verbosity_correlations : Verbosity, optional
-            Correlation plots subsection code verbosity.
-        verbosity_pairplot : Verbosity, optional
-            Pairplot subsection code verbosity.
-        verbosity_contingency_table : Verbosity, optional
-            Contingency table code verbosity.
-        color_col : str, optional
-            Name of column according to use for coloring of the multivariate analysis subsections.
-            Coloring is currently supported in pairplot.
+        BivariateAnalysisConfig : BivariateAnalysisConfig, optional
         """
-        self.sections.append(
-            BivariateAnalysis(
-                subsections=subsections,
-                verbosity=verbosity or self.verbosity,
-                columns=columns,
-                columns_x=columns_x,
-                columns_y=columns_y,
-                columns_pairs=columns_pairs,
-                verbosity_correlations=verbosity_correlations,
-                verbosity_pairplot=verbosity_pairplot,
-                verbosity_contingency_table=verbosity_contingency_table,
-                color_col=color_col,
-            )
-        )
-
+        if config is None:
+            config = BivariateAnalysisConfig()
+        config.verbosity = config.verbosity or self.verbosity
+        self.sections.append(BivariateAnalysis(config=config))
         return self
 
     def add_multivariate_analysis(
