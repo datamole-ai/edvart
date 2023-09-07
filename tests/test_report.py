@@ -21,7 +21,7 @@ def test_report():
     report.add_overview(verbosity=Verbosity.MEDIUM)
     assert len(report.sections) == 1, "Report should have one section"
 
-    report.add_bivariate_analysis(verbosity=Verbosity.HIGH, use_columns=["Col1", "Col2", "Col3"])
+    report.add_bivariate_analysis(verbosity=Verbosity.HIGH, columns=["Col1", "Col2", "Col3"])
     assert len(report.sections) == 2, "Report should have two sections"
 
     assert report.sections[0].name == "Overview", "Wrong section name"
@@ -59,19 +59,13 @@ def test_column_selection():
     assert report.sections[0].columns is None, "Default column selection should be None"
 
     # Omitting columns
-    report.add_univariate_analysis(omit_columns=["Col15", "Col16"])
+    report.add_univariate_analysis(columns=set(test_df.columns) - {"Col15", "Col16"})
     univariate_analysis_columns = {f"Col{i}" for i in range(20) if i != 15 and i != 16}
     assert set(report.sections[1].columns) == univariate_analysis_columns, "Wrong column selection"
 
     # Specific column subset
-    report.add_overview(use_columns=["Col5", "Col7", "Col13"])
+    report.add_overview(columns=["Col5", "Col7", "Col13"])
     assert set(report.sections[2].columns) == {"Col5", "Col7", "Col13"}, "Wrong column selection"
-
-    # use_columns and omit_columns at the same time
-    use_columns = {"Col1", "Col2", "Col3", "Col4"}
-    omit_columns = {"Col4", "Col5", "Col6", "Col7"}
-    report.add_univariate_analysis(use_columns=use_columns, omit_columns=omit_columns)
-    assert set(report.sections[3].columns) == use_columns - omit_columns, "Wrong column selection"
 
 
 def test_show():

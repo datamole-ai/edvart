@@ -54,36 +54,6 @@ class ReportBase(ABC):
         for section in self.sections:
             section.show(self.df)
 
-    def _select_columns(
-        self,
-        use_columns: Optional[List[str]] = None,
-        omit_columns: Optional[List[str]] = None,
-    ) -> Optional[List[str]]:
-        """Returns list columns from self.df.
-
-        Includes columns from use_columns and excludes the ones in omit_columns.
-
-        Parameters
-        ----------
-        use_columns : List[str], optional
-            Columns of self.df to include in the resulting list.
-        omit_columns : List[str], optional
-            Columns of self.df to exclude from the resulting list.
-
-        Returns
-        -------
-        List[str], optional
-            List of columns, None if use_columns and omit_columns are None
-        """
-        if use_columns is None and omit_columns is None:
-            return None
-        if omit_columns is None:
-            return use_columns
-        if use_columns is None:
-            use_columns = list(self.df.columns)
-
-        return [col for col in use_columns if col not in omit_columns]
-
     def export_notebook(
         self,
         notebook_filepath: str,
@@ -324,8 +294,7 @@ class ReportBase(ABC):
 
     def add_overview(
         self,
-        use_columns: Optional[List[str]] = None,
-        omit_columns: Optional[List[str]] = None,
+        columns: Optional[List[str]] = None,
         subsections: Optional[List[Overview.OverviewSubsection]] = None,
         verbosity: Optional[Verbosity] = None,
         verbosity_quick_info: Optional[Verbosity] = None,
@@ -341,12 +310,9 @@ class ReportBase(ABC):
 
         Parameters
         ----------
-        use_columns : List[str], optional
+        columns : List[str], optional
             Columns which to include in the overview section.
             If None, all columns are used.
-        omit_columns : List[str], optional
-            Columns to exclude from the overview section.
-            If None, use_columns dictates column selection.
         subsections : List[Overview.OverviewSubsection], optional
             List of sub-sections to include into the Overview section.
             If None, all subsections are added.
@@ -374,7 +340,7 @@ class ReportBase(ABC):
             Overview(
                 subsections=subsections,
                 verbosity=verbosity or self.verbosity,
-                columns=self._select_columns(use_columns, omit_columns),
+                columns=columns,
                 verbosity_quick_info=verbosity_quick_info,
                 verbosity_data_types=verbosity_data_types,
                 verbosity_data_preview=verbosity_data_preview,
@@ -388,20 +354,16 @@ class ReportBase(ABC):
 
     def add_univariate_analysis(
         self,
-        use_columns: Optional[List[str]] = None,
-        omit_columns: Optional[List[str]] = None,
+        columns: Optional[List[str]] = None,
         verbosity: Optional[Verbosity] = None,
     ) -> "ReportBase":
         """Adds univariate section to the report.
 
         Parameters
         ----------
-        use_columns : List[str], optional
+        columns : List[str], optional
             Columns which to analyze.
             If None, all columns are used.
-        omit_columns : List[str], optional
-            Columns to exclude from analysis.
-            If None, use_columns dictates column selection.
         verbosity : Verbosity
             The verbosity of the code generated in the exported notebook.
         """
@@ -409,15 +371,14 @@ class ReportBase(ABC):
             UnivariateAnalysis(
                 df=self.df,
                 verbosity=verbosity or self.verbosity,
-                columns=self._select_columns(use_columns, omit_columns),
+                columns=columns,
             )
         )
         return self
 
     def add_bivariate_analysis(
         self,
-        use_columns: Optional[List[str]] = None,
-        omit_columns: Optional[List[str]] = None,
+        columns: Optional[List[str]] = None,
         columns_x: Optional[List[str]] = None,
         columns_y: Optional[List[str]] = None,
         columns_pairs: Optional[List[Tuple[str, str]]] = None,
@@ -432,12 +393,9 @@ class ReportBase(ABC):
 
         Parameters
         ----------
-        use_columns : List[str], optional
+        columns : List[str], optional
             Columns which to analyze.
             If None, all columns are used.
-        omit_columns : List[str], optional
-            Columns to exclude from analysis.
-            If None, use_columns dictates column selection.
         columns_x : List[str], optional
             If specified, correlations and pairplots are performed on the cartesian product of
             `columns_x` and `columns_y`.
@@ -473,7 +431,7 @@ class ReportBase(ABC):
             BivariateAnalysis(
                 subsections=subsections,
                 verbosity=verbosity or self.verbosity,
-                columns=self._select_columns(use_columns, omit_columns),
+                columns=columns,
                 columns_x=columns_x,
                 columns_y=columns_y,
                 columns_pairs=columns_pairs,
@@ -488,8 +446,7 @@ class ReportBase(ABC):
 
     def add_multivariate_analysis(
         self,
-        use_columns: Optional[List[str]] = None,
-        omit_columns: Optional[List[str]] = None,
+        columns: Optional[List[str]] = None,
         subsections: Optional[List[MultivariateAnalysis.MultivariateAnalysisSubsection]] = None,
         verbosity: Optional[Verbosity] = None,
         verbosity_pca: Optional[Verbosity] = None,
@@ -502,12 +459,9 @@ class ReportBase(ABC):
 
         Parameters
         ----------
-        use_columns : List[str], optional
+        columns : List[str], optional
             Columns which to analyze.
             If None, all columns are used.
-        omit_columns : List[str], optional
-            Columns to exclude from analysis.
-            If None, use_columns dictates column selection.
         subsections : List[MultivariateAnalysis.MultivariateAnalysisSubsection], optional
             List of sub-sections to include into the BivariateAnalysis section.
             If None, all subsections are added.
@@ -530,7 +484,7 @@ class ReportBase(ABC):
                 subsections=subsections,
                 df=self.df,
                 verbosity=verbosity or self.verbosity,
-                columns=self._select_columns(use_columns, omit_columns),
+                columns=columns,
                 verbosity_pca=verbosity_pca,
                 verbosity_umap=verbosity_umap,
                 verbosity_parallel_coordinates=verbosity_parallel_coordinates,
@@ -544,8 +498,7 @@ class ReportBase(ABC):
     def add_group_analysis(
         self,
         groupby: Union[str, List[str]],
-        use_columns: Optional[List[str]] = None,
-        omit_columns: Optional[List[str]] = None,
+        columns: Optional[List[str]] = None,
         verbosity: Optional[Verbosity] = None,
         show_within_group_statistics: bool = True,
         show_group_missing_values: bool = True,
@@ -557,12 +510,9 @@ class ReportBase(ABC):
         ----------
         groupby: Union[str, List[str]]
             Column or list of columns to group by in group analysis.
-        use_columns : List[str], optional
+        columns : List[str], optional
             Columns which to analyze.
             If None, all columns are used.
-        omit_columns : List[str], optional
-            Columns to exclude from analysis.
-            If None, use_columns dictates column selection.
         verbosity : Verbosity, optional
             The verbosity of the code generated in the exported notebook.
         show_within_group_statistics : bool (default = True)
@@ -577,7 +527,7 @@ class ReportBase(ABC):
                 df=self.df,
                 groupby=groupby,
                 verbosity=verbosity or self.verbosity,
-                columns=self._select_columns(use_columns, omit_columns),
+                columns=columns,
                 show_within_group_statistics=show_within_group_statistics,
                 show_group_missing_values=show_group_missing_values,
                 show_group_distribution_plots=show_group_distribution_plots,
@@ -696,10 +646,10 @@ class DefaultReport(Report):
 
         # Add default sections
         self.add_table_of_contents(include_subsections=True)
-        self.add_overview(verbosity=verbosity_overview, use_columns=columns_overview)
+        self.add_overview(verbosity=verbosity_overview, columns=columns_overview)
         self.add_univariate_analysis(
             verbosity=verbosity_univariate_analysis,
-            use_columns=columns_univariate_analysis,
+            columns=columns_univariate_analysis,
         )
         if isinstance(groupby, str):
             color_col = groupby
@@ -709,18 +659,18 @@ class DefaultReport(Report):
             color_col = None
         self.add_bivariate_analysis(
             verbosity=verbosity_bivariate_analysis,
-            use_columns=columns_bivariate_analysis,
+            columns=columns_bivariate_analysis,
             color_col=color_col,
         )
         self.add_multivariate_analysis(
             verbosity=verbosity_multivariate_analysis,
-            use_columns=columns_multivariate_analysis,
+            columns=columns_multivariate_analysis,
             color_col=color_col,
         )
         if groupby is not None:
             self.add_group_analysis(
                 groupby=groupby,
-                use_columns=columns_group_analysis,
+                columns=columns_group_analysis,
                 verbosity=verbosity_group_analysis,
             )
 
@@ -758,8 +708,7 @@ class TimeseriesReport(ReportBase):
 
     def add_timeseries_analysis(
         self,
-        use_columns: Optional[List[str]] = None,
-        omit_columns: Optional[List[str]] = None,
+        columns: Optional[List[str]] = None,
         subsections: Optional[List[TimeseriesAnalysis.TimeseriesAnalysisSubsection]] = None,
         verbosity: Optional[Verbosity] = None,
         verbosity_time_series_line_plot: Optional[Verbosity] = None,
@@ -777,12 +726,9 @@ class TimeseriesReport(ReportBase):
 
         Parameters
         ----------
-        use_columns : List[str], optional
+        columns : List[str], optional
             Columns which to analyze.
             If None, all columns are used.
-        omit_columns : List[str], optional
-            Columns to exclude from analysis.
-            If None, use_columns dictates column selection.
         subsections : List[TimeseriesAnalysis.TimeseriesAnalysisSubsection], optional
             List of sub-sections to include into the BivariateAnalysis section.
             If None, all subsections are added.
@@ -815,7 +761,7 @@ class TimeseriesReport(ReportBase):
             TimeseriesAnalysis(
                 subsections=subsections,
                 verbosity=verbosity or self.verbosity,
-                columns=self._select_columns(use_columns, omit_columns),
+                columns=columns,
                 verbosity_time_series_line_plot=verbosity_time_series_line_plot,
                 verbosity_rolling_statistics=verbosity_rolling_statistics,
                 verbosity_boxplots_over_time=verbosity_boxplots_over_time,
@@ -891,14 +837,14 @@ class DefaultTimeseriesReport(TimeseriesReport):
         if verbosity_timeseries_analysis is None:
             verbosity_timeseries_analysis = verbosity
         self.add_table_of_contents(include_subsections=True)
-        self.add_overview(verbosity=verbosity_overview, use_columns=columns_overview)
+        self.add_overview(verbosity=verbosity_overview, columns=columns_overview)
         self.add_univariate_analysis(
             verbosity=verbosity_univariate_analysis,
-            use_columns=columns_univariate_analysis,
+            columns=columns_univariate_analysis,
         )
         self.add_timeseries_analysis(
             verbosity=verbosity_timeseries_analysis,
-            use_columns=columns_timeseries_analysis,
+            columns=columns_timeseries_analysis,
             sampling_rate=sampling_rate,
             stft_window_size=stft_window_size,
         )
