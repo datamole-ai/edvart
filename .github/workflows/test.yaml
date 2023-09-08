@@ -49,6 +49,18 @@ jobs:
           poetry run black --check --line-length 100 edvart/ tests/
           poetry run isort --check --line-length 100 --profile black edvart/ tests/
 
+  dismiss-stale-reviews:
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'pull_request' && github.event.action == 'edited'
+    steps:
+      - name: Auth. Github-CLI
+        run: echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+      - name: Dismiss approvals
+        run: |
+          gh api repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews \
+            --jq '.[] | select(.state == "APPROVED") | .id' \
+            | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to PR edit." \
+            repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews/'{}'/dismissals
   commit-check:
     runs-on: ubuntu-22.04
     steps:
