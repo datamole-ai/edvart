@@ -120,8 +120,8 @@ For example you can define which columns should be used or omitted.
     df = edvart.example_datasets.dataset_titanic()
     report = (
         edvart.Report(df)
-        .add_overview(omit_columns=["PassengerId"])
-        .add_univariate_analysis(use_columns=["Name", "Sex", "Age"])
+        .add_overview(columns=["PassengerId"])
+        .add_univariate_analysis(columns=["Name", "Sex", "Age"])
     )
 
 
