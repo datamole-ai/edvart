@@ -22,7 +22,7 @@
 Edvart is an open-source Python library designed to simplify and streamline
 your exploratory data analysis (EDA) process.
 
-## Key features
+## Key Features
 * **One-line Reports**: Generate a comprehensive set of pandas DataFrame
 visualizations using a single Python statement.
 Edvart supports:
@@ -53,7 +53,7 @@ See the notebook
 [api-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/api-example.ipynb)
 for usage examples.
 
-### Creating a default report
+### Creating a Default Report
 
 ```python
 import edvart
@@ -70,7 +70,7 @@ report.export_html("report.html")
 report.export_notebook("report.ipynb")
 ```
 
-## User documentation
+## User Documentation
 
 The user documentation is available at https://datamole-ai.github.io/edvart/.
 
