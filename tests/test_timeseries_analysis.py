@@ -345,6 +345,7 @@ def test_verbosity_low_different_subsection_verbosities():
         sampling_rate=1,
         stft_window_size=2,
         verbosity_rolling_statistics=Verbosity.MEDIUM,
+        verbosity_fourier_transform=Verbosity.MEDIUM,
         verbosity_short_time_ft=Verbosity.HIGH,
     )
 
@@ -355,9 +356,9 @@ def test_verbosity_low_different_subsection_verbosities():
     expected_code = [
         "timeseries_analysis(df=df, "
         "subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot, "
-        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests, "
-        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime], sampling_rate=1)",
+        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime])",
+        "fourier_transform(df=df, sampling_rate=1)",
         "rolling_statistics(df=df)",
         (
             get_code(timeseries_analysis.ShortTimeFT.short_time_ft)
