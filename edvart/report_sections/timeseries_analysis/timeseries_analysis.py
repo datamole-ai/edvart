@@ -144,6 +144,17 @@ class TimeseriesAnalysis(ReportSection):
                 enum_to_implementation[subsec.ShortTimeFT] = ShortTimeFT(
                     sampling_rate, stft_window_size, verbosity_short_time_ft, columns
                 )
+            elif subsections is not None and subsec.ShortTimeFT in subsections:
+                raise ValueError(
+                    "Need to set an `stft_window_size` to plot Short-time Fourier transform."
+                )
+        elif subsections is not None:
+            if subsec.FourierTransform in subsections:
+                raise ValueError("Need to set a `sampling_rate` to plot Fourier transform.")
+            if subsec.ShortTimeFT in subsections:
+                raise ValueError(
+                    "Need to set a `sampling_rate` to plot Short-time Fourier transform."
+                )
 
         # By default use all subsections, FT and STFT only if required parameters specified
         if subsections is None:
@@ -162,17 +173,6 @@ class TimeseriesAnalysis(ReportSection):
         if subsections is None:
             subsections_implementations = list(enum_to_implementation.values())
         else:
-            if sampling_rate is None:
-                if subsec.FourierTransform in subsections:
-                    raise ValueError("Need to set a `sampling_rate` to plot Fourier transform.")
-                if subsec.ShortTimeFT in subsections:
-                    raise ValueError(
-                        "Need to set a `sampling_rate` to plot Short-time Fourier transform."
-                    )
-            if stft_window_size is None and subsec.ShortTimeFT in subsections:
-                raise ValueError(
-                    "Need to set an `stft_window_size` to plot Short-time Fourier transform."
-                )
             subsections_implementations = [enum_to_implementation[sub] for sub in subsections]
 
         super().__init__(subsections_implementations, verbosity, columns)
