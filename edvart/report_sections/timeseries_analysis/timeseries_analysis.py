@@ -114,7 +114,7 @@ class TimeseriesAnalysis(ReportSection):
 
         subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
 
-        verbosities = {
+        self.subsection_verbosities = {
             subsec.TimeSeriesLinePlot: verbosity_time_series_line_plot,
             subsec.RollingStatistics: verbosity_rolling_statistics,
             subsec.BoxplotsOverTime: verbosity_boxplots_over_time,
@@ -135,7 +135,7 @@ class TimeseriesAnalysis(ReportSection):
             subsec.StationarityTests: StationarityTests(verbosity_stationarity_tests, columns),
             subsec.Autocorrelation: Autocorrelation(verbosity_autocorrelation, columns),
         }
-
+        # Add FT and STFT only if required parameters specified
         if sampling_rate is not None:
             enum_to_implementation[subsec.FourierTransform] = FourierTransform(
                 sampling_rate, verbosity_fourier_transform, columns
@@ -156,24 +156,16 @@ class TimeseriesAnalysis(ReportSection):
                     "Need to set a `sampling_rate` to plot Short-time Fourier transform."
                 )
 
-        # By default use all subsections, FT and STFT only if required parameters specified
-        if subsections is None:
-            subsections_all = list(enum_to_implementation.keys())
-        else:
-            subsections_all = subsections
+        self.default_subsections_to_show = list(enum_to_implementation.keys())
 
-        # Store subsections with LOW verbosity
-        self.subsections_low_verbosity = [
-            sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW
+        if subsections is None:
+            self.subsections_to_show = self.default_subsections_to_show
+        else:
+            self.subsections_to_show = subsections
+
+        subsections_implementations = [
+            enum_to_implementation[sub] for sub in self.subsections_to_show
         ]
-
-        if len(self.subsections_low_verbosity) == len(subsections_all) and subsections is None:
-            self.subsections_low_verbosity = None
-
-        if subsections is None:
-            subsections_implementations = list(enum_to_implementation.values())
-        else:
-            subsections_implementations = [enum_to_implementation[sub] for sub in subsections]
 
         super().__init__(subsections_implementations, verbosity, columns)
 
@@ -245,24 +237,24 @@ class TimeseriesAnalysis(ReportSection):
         if self.verbosity == Verbosity.LOW:
             subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
             code = "timeseries_analysis(df=df"
-
-            if self.subsections_low_verbosity is not None:
+            subsections_to_show_with_low_verbosity = [
+                sub
+                for sub in self.subsections_to_show
+                if self.subsection_verbosities[sub] == Verbosity.LOW
+            ]
+            if subsections_to_show_with_low_verbosity != self.default_subsections_to_show:
                 arg_subsections_names = [
                     f"TimeseriesAnalysis.TimeseriesAnalysisSubsection.{str(sub)}"
-                    for sub in self.subsections_low_verbosity
+                    for sub in subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
-
-            stft_included_or_empty = (
-                self.subsections_low_verbosity is None
-                or subsec.ShortTimeFT in self.subsections_low_verbosity
-            )
+            stft_included = subsec.ShortTimeFT in subsections_to_show_with_low_verbosity
             include_sampling_rate = self.sampling_rate is not None and (
-                stft_included_or_empty or subsec.FourierTransform in self.subsections_low_verbosity
+                stft_included or subsec.FourierTransform in subsections_to_show_with_low_verbosity
             )
             if include_sampling_rate:
                 code += f", sampling_rate={self.sampling_rate}"
-                if self.stft_window_size is not None and stft_included_or_empty:
+                if self.stft_window_size is not None and stft_included:
                     code += f", stft_window_size={self.stft_window_size}"
 
             if self.columns is not None:

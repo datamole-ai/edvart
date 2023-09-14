@@ -70,6 +70,9 @@ class MultivariateAnalysis(ReportSection):
         def __str__(self):
             return self.name
 
+    # By default use all subsections
+    _DEFAULT_SUBSECTIONS_TO_SHOW = list(MultivariateAnalysisSubsection)
+
     def __init__(
         self,
         df: pd.DataFrame,
@@ -96,27 +99,18 @@ class MultivariateAnalysis(ReportSection):
         )
 
         subsec = MultivariateAnalysis.MultivariateAnalysisSubsection
-        verbosities = {
+        self.subsection_verbosities = {
             subsec.PCA: verbosity_pca,
             subsec.ParallelCoordinates: verbosity_parallel_coordinates,
             subsec.ParallelCategories: verbosity_parallel_categories,
         }
         if UMAP_AVAILABLE:
-            verbosities[subsec.UMAP] = verbosity_umap
+            self.subsection_verbosities[subsec.UMAP] = verbosity_umap
 
-        # By default use all subsections
         if subsections is None:
-            subsections_all = list(subsec)
+            self.subsections_to_show = self._DEFAULT_SUBSECTIONS_TO_SHOW
         else:
-            subsections_all = subsections
-
-        # Store subsections with LOW verbosity
-        self.subsections_low_verbosity = [
-            sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW
-        ]
-
-        if len(self.subsections_low_verbosity) == len(subsections_all) and subsections is None:
-            self.subsections_low_verbosity = None
+            self.subsections_to_show = subsections
 
         enum_to_implementation = {
             subsec.PCA: PCA(df, verbosity_pca, columns, color_col=color_col),
@@ -132,7 +126,9 @@ class MultivariateAnalysis(ReportSection):
                 df, verbosity_umap, columns, color_col=color_col
             )
 
-        subsections_implementations = [enum_to_implementation[sub] for sub in subsections_all]
+        subsections_implementations = [
+            enum_to_implementation[sub] for sub in self.subsections_to_show
+        ]
 
         self.color_col = color_col
         super().__init__(subsections_implementations, verbosity, columns)
@@ -212,10 +208,15 @@ class MultivariateAnalysis(ReportSection):
         cells.append(section_header)
         if self.verbosity == Verbosity.LOW:
             code = "multivariate_analysis(df=df"
-            if self.subsections_low_verbosity is not None:
+            subsections_to_show_with_low_verbosity = [
+                sub
+                for sub in self.subsections_to_show
+                if self.subsection_verbosities[sub] == Verbosity.LOW
+            ]
+            if subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
                     f"MultivariateAnalysis.MultivariateAnalysisSubsection.{str(sub)}"
-                    for sub in self.subsections_low_verbosity
+                    for sub in subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
             if self.columns is not None:

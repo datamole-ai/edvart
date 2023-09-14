@@ -79,6 +79,9 @@ class BivariateAnalysis(ReportSection):
         def __str__(self):
             return self.name
 
+    # By default use all subsections
+    _DEFAULT_SUBSECTIONS_TO_SHOW = list(BivariateAnalysisSubsection)
+
     def __init__(
         self,
         subsections: Optional[List[BivariateAnalysisSubsection]] = None,
@@ -99,25 +102,16 @@ class BivariateAnalysis(ReportSection):
         subsec = BivariateAnalysis.BivariateAnalysisSubsection
 
         # Store subsection verbosities
-        verbosities = {
+        self.subsection_verbosities = {
             subsec.CorrelationPlot: verbosity_correlations,
             subsec.PairPlot: verbosity_pairplot,
             subsec.ContingencyTable: verbosity_contingency_table,
         }
 
-        # By default use all subsections
         if subsections is None:
-            subsections_all = list(BivariateAnalysis.BivariateAnalysisSubsection)
+            self.subsections_to_show = self._DEFAULT_SUBSECTIONS_TO_SHOW
         else:
-            subsections_all = subsections
-
-        # Store subsections with LOW verbosity
-        self.subsections_low_verbosity = [
-            sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW
-        ]
-
-        if len(self.subsections_low_verbosity) == len(subsections_all) and subsections is None:
-            self.subsections_low_verbosity = None
+            self.subsections_to_show = subsections
 
         if (columns_x is None) != (columns_y is None):
             raise ValueError("Either both or neither of columns_x, columns_y must be specified.")
@@ -145,7 +139,9 @@ class BivariateAnalysis(ReportSection):
             ),
         }
 
-        subsections_implementations = [enum_to_implementation[sub] for sub in subsections_all]
+        subsections_implementations = [
+            enum_to_implementation[sub] for sub in self.subsections_to_show
+        ]
         super().__init__(subsections_implementations, verbosity, columns)
 
         self.columns_x = columns_x
@@ -229,10 +225,15 @@ class BivariateAnalysis(ReportSection):
         cells.append(section_header)
         if self.verbosity == Verbosity.LOW:
             code = "bivariate_analysis(df=df"
-            if self.subsections_low_verbosity is not None:
+            subsections_to_show_with_low_verbosity = [
+                sub
+                for sub in self.subsections_to_show
+                if self.subsection_verbosities[sub] == Verbosity.LOW
+            ]
+            if subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
                     f"BivariateAnalysis.BivariateAnalysisSubsection.{str(sub)}"
-                    for sub in self.subsections_low_verbosity
+                    for sub in subsections_to_show_with_low_verbosity
                 ]
 
                 code += f", subsections={arg_subsections_names}".replace("'", "")

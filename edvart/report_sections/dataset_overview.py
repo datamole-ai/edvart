@@ -67,6 +67,9 @@ class Overview(ReportSection):
         def __str__(self):
             return self.name
 
+    # By default use all subsections
+    _DEFAULT_SUBSECTIONS_TO_SHOW = list(OverviewSubsection)
+
     def __init__(
         self,
         subsections: Optional[List[OverviewSubsection]] = None,
@@ -93,7 +96,7 @@ class Overview(ReportSection):
         subsec = Overview.OverviewSubsection
 
         # Store subsection verbosities
-        verbosities = {
+        self.subsection_verbosities = {
             subsec.QuickInfo: verbosity_quick_info,
             subsec.DataTypes: verbosity_data_types,
             subsec.DataPreview: verbosity_data_preview,
@@ -103,19 +106,10 @@ class Overview(ReportSection):
             subsec.DuplicateRows: verbosity_duplicate_rows,
         }
 
-        # By default use all subsections
         if subsections is None:
-            subsections_all = list(Overview.OverviewSubsection)
+            self.subsections_to_show = self._DEFAULT_SUBSECTIONS_TO_SHOW
         else:
-            subsections_all = subsections
-
-        # Store subsections with LOW verbosity
-        self.subsections_low_verbosity = [
-            sub for sub in subsections_all if verbosities[sub] == Verbosity.LOW
-        ]
-
-        if len(self.subsections_low_verbosity) == len(subsections_all) and subsections is None:
-            self.subsections_low_verbosity = None
+            self.subsections_to_show = subsections
 
         # Construct objects that implement subsections
         enum_to_implementation = {
@@ -130,13 +124,9 @@ class Overview(ReportSection):
             subsec.DuplicateRows: DuplicateRows(verbosity_duplicate_rows, columns),
         }
 
-        # Store subsection selection
-        if subsections is None:
-            subsections_implementations = [
-                enum_to_implementation[sub] for sub in Overview.OverviewSubsection
-            ]
-        else:
-            subsections_implementations = [enum_to_implementation[sub] for sub in subsections]
+        subsections_implementations = [
+            enum_to_implementation[sub] for sub in self.subsections_to_show
+        ]
         super().__init__(subsections_implementations, verbosity, columns)
 
     @property
@@ -202,10 +192,15 @@ class Overview(ReportSection):
 
         if self.verbosity == Verbosity.LOW:
             code = "overview_analysis(df=df"
-            if self.subsections_low_verbosity is not None:
+            subsections_to_show_with_low_verbosity = [
+                sub
+                for sub in self.subsections_to_show
+                if self.subsection_verbosities[sub] == Verbosity.LOW
+            ]
+            if subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
                     f"Overview.OverviewSubsection.{str(sub)}"
-                    for sub in self.subsections_low_verbosity
+                    for sub in subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
             if self.columns is not None:
