@@ -237,20 +237,20 @@ class TimeseriesAnalysis(ReportSection):
         if self.verbosity == Verbosity.LOW:
             subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
             code = "timeseries_analysis(df=df"
-            subsections_to_show_with_low_verbo = [
+            subsections_to_show_with_low_verbosity = [
                 sub
                 for sub in self.subsections_to_show
                 if self.subsection_verbosities[sub] == Verbosity.LOW
             ]
-            if subsections_to_show_with_low_verbo != self.default_subsections_to_show:
+            if subsections_to_show_with_low_verbosity != self.default_subsections_to_show:
                 arg_subsections_names = [
                     f"TimeseriesAnalysis.TimeseriesAnalysisSubsection.{str(sub)}"
-                    for sub in subsections_to_show_with_low_verbo
+                    for sub in subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
-            stft_included = subsec.ShortTimeFT in subsections_to_show_with_low_verbo
+            stft_included = subsec.ShortTimeFT in subsections_to_show_with_low_verbosity
             include_sampling_rate = self.sampling_rate is not None and (
-                stft_included or subsec.FourierTransform in subsections_to_show_with_low_verbo
+                stft_included or subsec.FourierTransform in subsections_to_show_with_low_verbosity
             )
             if include_sampling_rate:
                 code += f", sampling_rate={self.sampling_rate}"

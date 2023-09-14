@@ -208,15 +208,15 @@ class MultivariateAnalysis(ReportSection):
         cells.append(section_header)
         if self.verbosity == Verbosity.LOW:
             code = "multivariate_analysis(df=df"
-            subsections_to_show_with_low_verbo = [
+            subsections_to_show_with_low_verbosity = [
                 sub
                 for sub in self.subsections_to_show
                 if self.subsection_verbosities[sub] == Verbosity.LOW
             ]
-            if subsections_to_show_with_low_verbo != self._DEFAULT_SUBSECTIONS_TO_SHOW:
+            if subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
                     f"MultivariateAnalysis.MultivariateAnalysisSubsection.{str(sub)}"
-                    for sub in subsections_to_show_with_low_verbo
+                    for sub in subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
             if self.columns is not None:
