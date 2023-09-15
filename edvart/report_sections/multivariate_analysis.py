@@ -584,7 +584,7 @@ class ParallelCoordinates(Section):
         if drop_na:
             df = df.dropna()
         if color_col is not None:
-            is_categorical_color = not is_numeric(df[color_col])
+            is_categorical_color = not is_numeric(df[color_col]) or is_boolean(df[color_col])
 
             if is_categorical_color:
                 categories = df[color_col].unique()
@@ -786,7 +786,7 @@ class ParallelCategories(Section):
         if drop_na:
             df = df.dropna()
         if color_col is not None:
-            categorical_color = not is_numeric(df[color_col])
+            categorical_color = not is_numeric(df[color_col]) or is_boolean(df[color_col])
             if categorical_color:
                 categories = df[color_col].unique()
                 colorscale = list(discrete_colorscale(len(categories)))
