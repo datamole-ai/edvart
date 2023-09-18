@@ -14,6 +14,10 @@ from edvart.data_types import is_boolean, is_categorical, is_numeric
 _INCHES_TO_PIXELS = 64
 
 
+def _is_color_col_categorical(column: pd.Series) -> bool:
+    return is_categorical(column) or is_boolean(column) or not is_numeric(column)
+
+
 # pylint: disable=too-many-locals, too-many-branches
 def scatter_plot_2d(
     df: pd.DataFrame,
@@ -100,11 +104,7 @@ def _scatter_plot_2d_noninteractive(
 ) -> None:
     _fig, ax = plt.subplots(figsize=figsize)
     if color_col is not None:
-        is_color_categorical = (
-            is_categorical(df[color_col])
-            or is_boolean(df[color_col])
-            or not is_numeric(df[color_col])
-        )
+        is_color_categorical = _is_color_col_categorical(df[color_col])
         if is_color_categorical:
             color_categorical = pd.Categorical(df[color_col])
             color_codes = color_categorical.codes
@@ -166,11 +166,7 @@ def _scatter_plot_2d_interactive(
         layout.yaxis.scaleratio = 1
     fig = go.Figure(layout=layout)
     if color_col is not None:
-        is_color_categorical = (
-            is_categorical(df[color_col])
-            or is_boolean(df[color_col])
-            or not is_numeric(df[color_col])
-        )
+        is_color_categorical = _is_color_col_categorical(df[color_col])
         if is_color_categorical:
             df = df.copy()
             x_name, y_name = "__edvart_scatter_x", "__edvart_scatter_y"
