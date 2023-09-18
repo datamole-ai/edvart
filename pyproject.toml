@@ -22,7 +22,7 @@ ipywidgets = "^7.5"
 colorlover = "*"
 scikit-learn = ">=0.22.1"
 nbconvert = "^7.0.0"    # Required for exporting to HTML
-umap-learn = { version = "^0.5.0", optional = true}
+umap-learn = { version = "^0.5.4", optional = true}
 # umap-learn dependes on numba. It is specified explicitly to install
 # a newer version, since by default it installs an older version of numba,
 # which also installs an older version of llmvlite, which is incompatible
