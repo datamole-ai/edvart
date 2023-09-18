@@ -188,7 +188,7 @@ class MultivariateAnalysis(ReportSection):
             return list(imports)
         return super().required_imports()
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells.
 
         Cells can be either code cells or markdown cells.
@@ -197,6 +197,8 @@ class MultivariateAnalysis(ReportSection):
         ----------
         cells : List[Dict[str, Any]]
             List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
@@ -221,9 +223,9 @@ class MultivariateAnalysis(ReportSection):
             cells.append(nbfv4.new_code_cell(code))
             for sub in self.subsections:
                 if sub.verbosity > Verbosity.LOW:
-                    sub.add_cells(cells)
+                    sub.add_cells(cells=cells, df=df)
         else:
-            super().add_cells(cells)
+            super().add_cells(cells=cells, df=df)
 
     def show(self, df: pd.DataFrame) -> None:
         """Generates cell output of this section in the calling notebook.
@@ -411,13 +413,15 @@ class PCA(Section):
             "from sklearn.preprocessing import StandardScaler",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells. Cells can be either code cells or markdown cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -455,10 +459,10 @@ class PCA(Section):
             cells.append(nbfv4.new_code_cell(first_vs_second_code))
 
             cells.append(explained_variance_header)
-            exaplained_variance_code = (
+            explained_variance_code = (
                 get_code(PCA.pca_explained_variance) + "\n\n" + explained_variance_call
             )
-            cells.append(nbfv4.new_code_cell(exaplained_variance_code))
+            cells.append(nbfv4.new_code_cell(explained_variance_code))
 
     def show(self, df: pd.DataFrame) -> None:
         """Generates the PCA section in the calling notebook.
@@ -617,18 +621,21 @@ class ParallelCoordinates(Section):
             ]
         return [
             "from edvart.utils import discrete_colorscale",
+            "from typing import Iterable",
             "import plotly",
             "import plotly.graph_objects as go",
             "plotly.offline.init_notebook_mode()",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells. Cells can be either code cells or markdown cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -790,13 +797,15 @@ class ParallelCategories(Section):
             "plotly.offline.init_notebook_mode()",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells. Cells can be either code cells or markdown cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)

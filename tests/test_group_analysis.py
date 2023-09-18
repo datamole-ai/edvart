@@ -81,7 +81,7 @@ def test_code_export_verbosity_low():
 
     # Export code
     exported_cells = []
-    group_section.add_cells(exported_cells)
+    group_section.add_cells(exported_cells, df=df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -97,7 +97,7 @@ def test_code_export_verbosity_medium():
 
     # Export code
     exported_cells = []
-    group_section.add_cells(exported_cells)
+    group_section.add_cells(exported_cells, df=df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -123,7 +123,7 @@ def test_code_export_verbosity_high():
 
     # Export code
     exported_cells = []
-    group_section.add_cells(exported_cells)
+    group_section.add_cells(exported_cells, df=df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -183,7 +183,7 @@ def test_columns_parameter():
     assert ga.groupby == ["A"]
     assert ga.columns is None
     ga.show(df)
-    ga.add_cells([])
+    ga.add_cells([], df=df)
     assert ga.groupby == ["A"]
     assert ga.columns is None
 

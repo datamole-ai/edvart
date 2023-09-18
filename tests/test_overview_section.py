@@ -10,7 +10,9 @@ from edvart.data_types import (
     is_boolean,
     is_categorical,
     is_date,
+    is_missing,
     is_numeric,
+    is_unique,
 )
 from edvart.pandas_formatting import render_dictionary, series_to_frame
 from edvart.report_sections import dataset_overview
@@ -126,7 +128,7 @@ def test_code_export_verbosity_low():
     overview_section = Overview(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
-    overview_section.add_cells(exported_cells)
+    overview_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -145,7 +147,7 @@ def test_code_export_verbosity_low_with_subsections():
     )
     # Export code
     exported_cells = []
-    overview_section.add_cells(exported_cells)
+    overview_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -173,7 +175,7 @@ def test_code_export_verbosity_medium():
     )
     # Export code
     exported_cells = []
-    overview_section.add_cells(exported_cells)
+    overview_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -207,7 +209,7 @@ def test_code_export_verbosity_high():
     )
     # Export code
     exported_cells = []
-    overview_section.add_cells(exported_cells)
+    overview_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -223,7 +225,9 @@ def test_code_export_verbosity_high():
             (
                 get_code(series_to_frame),
                 get_code(DataType),
+                get_code(is_unique),
                 get_code(is_numeric),
+                get_code(is_missing),
                 get_code(is_categorical),
                 get_code(is_boolean),
                 get_code(is_date),
@@ -275,7 +279,7 @@ def test_verbosity_low_different_subsection_verbosities():
     )
 
     overview_cells = []
-    overview_section.add_cells(overview_cells)
+    overview_section.add_cells(overview_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in overview_cells if cell["cell_type"] == "code"]
 
     expected_code = [

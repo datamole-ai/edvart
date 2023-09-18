@@ -123,7 +123,7 @@ def test_code_export_verbosity_low():
     bivariate_section = bivariate_analysis.BivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
-    bivariate_section.add_cells(exported_cells)
+    bivariate_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -143,7 +143,7 @@ def test_code_export_verbosity_low_with_subsections():
     )
     # Export code
     exported_cells = []
-    bivariate_section.add_cells(exported_cells)
+    bivariate_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -172,7 +172,7 @@ def test_generated_code_verbosity_low_columns():
     )
     # Export code
     exported_cells = []
-    bivariate_section.add_cells(exported_cells)
+    bivariate_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -196,7 +196,7 @@ def test_generated_code_verbosity_medium():
     )
 
     exported_cells = []
-    bivariate_section.add_cells(exported_cells)
+    bivariate_section.add_cells(exported_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
     expected_code = [
@@ -226,7 +226,7 @@ def test_generated_code_verbosity_medium_columns_x_y():
     )
 
     exported_cells = []
-    bivariate_section.add_cells(exported_cells)
+    bivariate_section.add_cells(exported_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
     expected_code = [
@@ -255,7 +255,7 @@ def test_generated_code_verbosity_medium_columns_pairs():
     )
 
     exported_cells = []
-    bivariate_section.add_cells(exported_cells)
+    bivariate_section.add_cells(exported_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
     expected_code = [
@@ -280,7 +280,7 @@ def test_generated_code_verbosity_high():
     )
 
     pairplot_cells = []
-    bivariate_section.add_cells(pairplot_cells)
+    bivariate_section.add_cells(pairplot_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in pairplot_cells if cell["cell_type"] == "code"]
 
     expected_code = [
@@ -328,7 +328,7 @@ def test_verbosity_low_different_subsection_verbosities():
     )
 
     bivariate_cells = []
-    bivariate_section.add_cells(bivariate_cells)
+    bivariate_section.add_cells(bivariate_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in bivariate_cells if cell["cell_type"] == "code"]
 
     expected_code = [

@@ -221,7 +221,7 @@ class TimeseriesAnalysis(ReportSection):
         for sub in timeseries_analysis.subsections:
             sub.show(df)
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Add cells to the list of cells.
 
         Cells can be either code cells or markdown cells.
@@ -230,6 +230,8 @@ class TimeseriesAnalysis(ReportSection):
         ----------
         cells : List[Dict[str, Any]]
             List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
@@ -264,9 +266,9 @@ class TimeseriesAnalysis(ReportSection):
 
             for sub in self.subsections:
                 if sub.verbosity > Verbosity.LOW:
-                    sub.add_cells(cells)
+                    sub.add_cells(cells=cells, df=df)
         else:
-            super().add_cells(cells)
+            super().add_cells(cells, df=df)
 
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.

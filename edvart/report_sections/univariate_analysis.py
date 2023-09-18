@@ -309,13 +309,15 @@ class UnivariateAnalysis(Section):
             "import seaborn as sns",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds univariate analysis cells to the list of cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         if self.columns is not None:
             self.df = self.df[self.columns]
