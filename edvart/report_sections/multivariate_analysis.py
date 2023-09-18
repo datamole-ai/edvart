@@ -19,7 +19,7 @@ from edvart.report_sections.section_base import ReportSection, Section, Verbosit
 from edvart.utils import discrete_colorscale
 
 try:
-    from edvart.report_sections.umap import UMAP
+    from edvart.report_sections.umap import UMAP  # pylint: disable=cyclic-import
 except ImportError:
     UMAP_AVAILABLE = False
 else:
@@ -33,8 +33,6 @@ class MultivariateAnalysis(ReportSection):
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Data for which to perform analysis.
     subsections : List[MultivariateAnalysisSubsection], optional
         List of subsections to include.
         All subsection in MultivariateAnalysisSubsection are included by default.
@@ -75,7 +73,6 @@ class MultivariateAnalysis(ReportSection):
 
     def __init__(
         self,
-        df: pd.DataFrame,
         subsections: Optional[List[MultivariateAnalysisSubsection]] = None,
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
@@ -113,18 +110,16 @@ class MultivariateAnalysis(ReportSection):
             self.subsections_to_show = subsections
 
         enum_to_implementation = {
-            subsec.PCA: PCA(df, verbosity_pca, columns, color_col=color_col),
+            subsec.PCA: PCA(verbosity_pca, columns, color_col=color_col),
             subsec.ParallelCoordinates: ParallelCoordinates(
-                df, verbosity_parallel_coordinates, columns, color_col=color_col
+                verbosity_parallel_coordinates, columns, color_col=color_col
             ),
             subsec.ParallelCategories: ParallelCategories(
-                df, verbosity_parallel_categories, columns, color_col=color_col
+                verbosity_parallel_categories, columns, color_col=color_col
             ),
         }
         if UMAP_AVAILABLE:
-            enum_to_implementation[subsec.UMAP] = UMAP(
-                df, verbosity_umap, columns, color_col=color_col
-            )
+            enum_to_implementation[subsec.UMAP] = UMAP(verbosity_umap, columns, color_col=color_col)
 
         subsections_implementations = [
             enum_to_implementation[sub] for sub in self.subsections_to_show
@@ -163,7 +158,6 @@ class MultivariateAnalysis(ReportSection):
             df = df[columns]
 
         multivariate_analysis = MultivariateAnalysis(
-            df=df,
             subsections=subsections,
             verbosity=Verbosity.LOW,
             columns=columns,
@@ -248,8 +242,6 @@ class PCA(Section):
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Data on which to perform PCA.
     verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
@@ -267,29 +259,12 @@ class PCA(Section):
 
     def __init__(
         self,
-        df: pd.DataFrame,
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         color_col: Optional[str] = None,
         standardize: bool = True,
         interactive: bool = True,
     ):
-        # By default use only numeric columns
-        if columns is None:
-            columns = [col for col in df.columns if is_numeric(df[col])]
-            # If all columns are numeric we don't want to list them all in the generated call
-            # Setting columns to None will result in the columns argumented not being included
-            # instead of showing a potentially long list of all columns
-            # in the generated call, therefore the default (all columns) will be used
-            if len(columns) == len(df.columns):
-                columns = None
-        else:
-            for col in columns:
-                if not is_numeric(df[col]):
-                    raise ValueError(
-                        f"Cannot use non-numeric column {col} of dtype {df[col].dtype} in PCA"
-                    )
-
         self.color_col = color_col
         self.interactive = interactive
         self.standardize = standardize
@@ -329,6 +304,7 @@ class PCA(Section):
         opacity : float (default = 0.8)
             Opacity of the points in the plot. Higher means more opaque (less transparent).
         """
+        columns = filter_columns(df, columns)
         df = df.dropna(subset=columns)
 
         pca = sklearn.decomposition.PCA(n_components=2)
@@ -381,6 +357,7 @@ class PCA(Section):
         figsize : Tuple[float, float] (default = (10, 7))
             Size of the plot.
         """
+        columns = filter_columns(df, columns)
         df = df.dropna(subset=columns)
 
         pca = sklearn.decomposition.PCA()
@@ -471,6 +448,9 @@ class PCA(Section):
             cells.append(explained_variance_header)
             cells.append(nbfv4.new_code_cell(explained_variance_call))
         else:
+            filter_columns_code = get_code(filter_columns)
+            cells.append(nbfv4.new_code_cell(filter_columns_code))
+
             first_vs_second_code = get_code(PCA.pca_first_vs_second) + "\n\n" + first_vs_second_call
             cells.append(nbfv4.new_code_cell(first_vs_second_code))
 
@@ -506,16 +486,11 @@ class ParallelCoordinates(Section):
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Data for which to generate the parallel coordinates plot.
     verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns for which to generate parallel coordinates. All columns which are either numeric or
         categorical with at most `nunique_max` unique values are used by default.
-    nunique_max : int (default = 20)
-        Maximum number of unqiue values for non-numeric columns to be plotted.
-        Ignored if set to a negative number.
     color_col : str, optional
         Name of column determining color of the coordinate lines.
         Both numeric and categorical columns are supported.
@@ -523,28 +498,11 @@ class ParallelCoordinates(Section):
 
     def __init__(
         self,
-        df: pd.DataFrame,
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
-        nunique_max: int = 20,
         color_col: Optional[str] = None,
     ):
         self.color_col = color_col
-        if columns is None:
-            columns = [
-                col
-                for col in df.columns
-                if is_categorical(df[col], unique_value_count_threshold=nunique_max)
-                or is_boolean(df[col])
-                or is_numeric(df[col])
-            ]
-            # If all columns are numeric we don't want to list them all in the generated call
-            # Setting columns to None will result in the columns argument not being included
-            # instead of showing a potentially long list of all columns
-            # in the generated call, therefore the default (all columns) will be used
-            if len(columns) == len(df.columns):
-                columns = None
-
         super().__init__(verbosity, columns)
 
     @property
@@ -577,8 +535,15 @@ class ParallelCoordinates(Section):
         show_colorscale : bool (default = True)
             Whether to show a color scale on the right side of the plot.
         """
+        numeric_columns = [col for col in df.columns if is_numeric(df[col])]
+        non_numeric_columns = [col for col in df.columns if not is_numeric(df[col])]
         if columns is None:
-            columns = df.columns
+            non_numeric_columns = [
+                col
+                for col in non_numeric_columns
+                if (is_categorical(df[col]) and df[col].nunique() < 20) or is_boolean(df[col])
+            ]
+            columns = numeric_columns + non_numeric_columns
         if hide_columns is not None:
             columns = [col for col in columns if col not in hide_columns]
         if drop_na:
@@ -614,13 +579,10 @@ class ParallelCoordinates(Section):
         else:
             line = None
 
-        numeric_columns = [col for col in columns if is_numeric(df[col])]
-        categorical_columns = [col for col in columns if not is_numeric(df[col])]
-
         # Add numeric columns to dimensions
         dimensions = [{"label": col_name, "values": df[col_name]} for col_name in numeric_columns]
         # Add categorical columns to dimensions
-        for col_name in categorical_columns:
+        for col_name in non_numeric_columns:
             categories = df[col_name].unique()
             values = pd.Series(pd.Categorical(df[col_name]).codes)
             dimensions.append(
@@ -705,22 +667,47 @@ class ParallelCoordinates(Section):
         )
 
 
+def filter_columns(df: pd.DataFrame, columns: Optional[List[str]]) -> List[str]:
+    """
+    Filter columns to use in PCA.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to perform PCA on.
+    columns : List[str], optional
+        Columns specified for the PCA.
+
+    Returns
+    -------
+    List[str]
+        List of columns to use in PCA.
+
+    Raises
+    ------
+    ValueError
+        If a non-numeric column is specified in `columns`.
+    """
+    # By default use only numeric columns
+    if columns is None:
+        return [col for col in df.columns if is_numeric(df[col])]
+    for col in columns:
+        if not is_numeric(df[col]):
+            raise ValueError(f"Cannot use non-numeric column {col} of dtype {df[col].dtype} in PCA")
+    return columns
+
+
 class ParallelCategories(Section):
     """
     Generates the Parallel categories subsection.
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Data for which to generate the parallel coordinates plot.
     verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
         Columns for which to generate parallel coordinates.
         All categorical columns with at most `nunique_max` unique values are used by default.
-    nunique_max : int (default = 20)
-        Maximum number of unqiue values for non-numeric columns to be plotted.
-        Ignored if set to a negative number.
     color_col : str, optional
         Name of column determining colors within categories.
         Both numeric and categorical columns are supported.
@@ -728,28 +715,11 @@ class ParallelCategories(Section):
 
     def __init__(
         self,
-        df: pd.DataFrame,
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
-        nunique_max: int = 20,
         color_col: Optional[str] = None,
     ):
         self.color_col = color_col
-        if columns is None:
-            columns = [
-                col
-                for col in df.columns
-                if is_categorical(df[col], unique_value_count_threshold=nunique_max)
-                or is_boolean(df[col])
-            ]
-
-            # If all columns are numeric we don't want to list them all in the generated call
-            # Setting columns to None will result in the columns argumented not being included
-            # instead of showing a potentially long list of all columns
-            # in the generated call, therefore the default (all columns) will be used
-            if len(columns) == len(df.columns):
-                columns = None
-
         super().__init__(verbosity, columns)
 
     @property
@@ -780,7 +750,11 @@ class ParallelCategories(Section):
             Which column to use for coloring of lines. Can be both numeric and categorical.
         """
         if columns is None:
-            columns = df.columns
+            columns = [
+                col
+                for col in df.columns
+                if is_categorical(df[col]) and df[col].nunique() < 20 or is_boolean(df[col])
+            ]
         if hide_columns is not None:
             columns = [col for col in columns if col not in hide_columns]
         if drop_na:

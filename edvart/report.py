@@ -482,7 +482,6 @@ class ReportBase(ABC):
         self.sections.append(
             MultivariateAnalysis(
                 subsections=subsections,
-                df=self.df,
                 verbosity=verbosity or self.verbosity,
                 columns=columns,
                 verbosity_pca=verbosity_pca,
