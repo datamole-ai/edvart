@@ -1,5 +1,6 @@
 """Bivariate analysis section package."""
 
+import itertools
 from enum import IntEnum
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -826,25 +827,28 @@ class ContingencyTable(Section):
         """
 
         def include_column(col: str) -> bool:
-            return (table_threshold < 0 or df[col].nunique() <= table_threshold) and (
-                not df[col].isnull().all()
+            n_unique = df[col].nunique()
+            return (
+                (table_threshold < 0 or n_unique <= table_threshold)
+                and (not df[col].isnull().all())
+                and n_unique > 1
             )
-
-        def include_column_pair(col_pair: Tuple[str, str]) -> bool:
-            if col_pair[0] == col_pair[1]:
-                return False
-            return include_column(col_pair[0]) and include_column(col_pair[1])
 
         if (columns_x is None) != (columns_y is None):
             raise ValueError("Either both or neither of columns_x, columns_y must be specified.")
         if columns_pairs is None:
             if columns_x is None:
                 if columns is None:
-                    columns = [col for col in df.columns if df[col].nunique() > 1]
-                columns_x = columns
-                columns_y = columns
-            columns_pairs = [(col_x, col_y) for col_x in columns_x for col_y in columns_y]
-        columns_pairs = list(filter(include_column_pair, columns_pairs))
+                    columns = [col for col in df.columns if include_column(col)]
+                columns_pairs = list(itertools.combinations(columns, 2))
+            else:
+                columns_pairs = [
+                    (col_x, col_y)
+                    for (col_x, col_y) in itertools.product(columns_x, columns_y)
+                    # Filter out pairs of columns which contain the same column since
+                    # they make no sense in a contingency table
+                    if col_x != col_y
+                ]
 
         for column1, column2 in columns_pairs:
             ContingencyTable.contingency_table(df, column1, column2)
