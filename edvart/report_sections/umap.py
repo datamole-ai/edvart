@@ -215,16 +215,14 @@ class UMAP(Section):
                 n_neighbors={self.n_neighbors},
                 min_dist={self.min_dist},
                 metric='{self.metric}',
-            """[
-                :-1
-            ]
+            """.rstrip()
         )
         if self.columns is not None:
-            default_call += f"    columns={self.columns},"
+            default_call += f"\n    columns={self.columns},"
         if self.color_col is not None:
-            default_call += f"    color_col='{self.color_col}',"
+            default_call += f"\n    color_col='{self.color_col}',"
         if not self.interactive:
-            default_call += "    interactive=False,"
+            default_call += "\n    interactive=False,"
         default_call += "\n)"
 
         if self.verbosity <= Verbosity.MEDIUM:
