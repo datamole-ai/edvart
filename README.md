@@ -53,6 +53,9 @@ See the notebook
 [api-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/api-example.ipynb)
 for usage examples.
 
+See the [Usage section](https://datamole-ai.github.io/edvart/usage.html) of the documentation
+for more information.
+
 ### Creating a Default Report
 
 ```python
