@@ -842,11 +842,11 @@ class ContingencyTable(Section):
                     columns = [col for col in df.columns if include_column(col)]
                 columns_pairs = list(itertools.combinations(columns, 2))
             else:
-                # Filter out pairs of columns which contain the same column since
-                # they make no sense in a contingency table
                 columns_pairs = [
                     (col_x, col_y)
                     for (col_x, col_y) in itertools.product(columns_x, columns_y)
+                    # Filter out pairs of columns which contain the same column since
+                    # they make no sense in a contingency table
                     if col_x != col_y
                 ]
 
