@@ -1,4 +1,5 @@
 import warnings
+
 import matplotlib.pyplot as plt
 
 # switch matplotlib backend to non-Gui, preventing plots being displayed
