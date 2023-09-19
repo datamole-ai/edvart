@@ -13,6 +13,7 @@ from edvart.report_sections import multivariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.multivariate_analysis import UMAP_AVAILABLE, MultivariateAnalysis
 from edvart.report_sections.section_base import Verbosity
+from edvart.utils import select_numeric_columns
 
 
 def get_test_df() -> pd.DataFrame:
@@ -243,7 +244,7 @@ def test_generated_code_verbosity_2():
     multivariate_section.add_cells(multivariate_cells)
     exported_code = [cell["source"] for cell in multivariate_cells if cell["cell_type"] == "code"]
     expected_code = [
-        get_code(multivariate_analysis.filter_columns),
+        get_code(select_numeric_columns),
         "\n\n".join(
             (
                 get_code(multivariate_analysis.PCA.pca_first_vs_second),

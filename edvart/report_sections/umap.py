@@ -7,8 +7,8 @@ from IPython.display import Markdown, display
 
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import code_dedent, get_code, total_dedent
-from edvart.report_sections.multivariate_analysis import filter_columns
 from edvart.report_sections.section_base import Section, Verbosity
+from edvart.utils import select_numeric_columns
 
 try:
     with warnings.catch_warnings():
@@ -122,7 +122,7 @@ class UMAP(Section):
         show_message : bool (default = True)
             Whether to show a message informing the user to tune the embedding parameters.
         """
-        columns = filter_columns(df, columns)
+        columns = select_numeric_columns(df, columns)
         df = df.dropna(subset=columns)
         embedder = umap.UMAP(
             n_neighbors=n_neighbors, min_dist=min_dist, metric=metric, random_state=random_state
@@ -205,7 +205,7 @@ class UMAP(Section):
             code = default_call
         else:
             code = (
-                get_code(filter_columns)
+                get_code(select_numeric_columns)
                 + "\n\n"
                 + get_code(UMAP.plot_umap).replace("UMAP.", "")
                 + "\n\n"

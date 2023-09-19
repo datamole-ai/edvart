@@ -16,7 +16,7 @@ from edvart.data_types import is_boolean, is_categorical, is_numeric
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
 from edvart.report_sections.section_base import ReportSection, Section, Verbosity
-from edvart.utils import discrete_colorscale
+from edvart.utils import discrete_colorscale, select_numeric_columns
 
 try:
     from edvart.report_sections.umap import UMAP  # pylint: disable=cyclic-import
@@ -304,7 +304,7 @@ class PCA(Section):
         opacity : float (default = 0.8)
             Opacity of the points in the plot. Higher means more opaque (less transparent).
         """
-        columns = filter_columns(df, columns)
+        columns = select_numeric_columns(df, columns)
         df = df.dropna(subset=columns)
 
         pca = sklearn.decomposition.PCA(n_components=2)
@@ -357,7 +357,7 @@ class PCA(Section):
         figsize : Tuple[float, float] (default = (10, 7))
             Size of the plot.
         """
-        columns = filter_columns(df, columns)
+        columns = select_numeric_columns(df, columns)
         df = df.dropna(subset=columns)
 
         pca = sklearn.decomposition.PCA()
@@ -448,8 +448,8 @@ class PCA(Section):
             cells.append(explained_variance_header)
             cells.append(nbfv4.new_code_cell(explained_variance_call))
         else:
-            filter_columns_code = get_code(filter_columns)
-            cells.append(nbfv4.new_code_cell(filter_columns_code))
+            select_columns_code = get_code(select_numeric_columns)
+            cells.append(nbfv4.new_code_cell(select_columns_code))
 
             first_vs_second_code = get_code(PCA.pca_first_vs_second) + "\n\n" + first_vs_second_call
             cells.append(nbfv4.new_code_cell(first_vs_second_code))
@@ -665,36 +665,6 @@ class ParallelCoordinates(Section):
         ParallelCoordinates.parallel_coordinates(
             df=df, columns=self.columns, color_col=self.color_col
         )
-
-
-def filter_columns(df: pd.DataFrame, columns: Optional[List[str]]) -> List[str]:
-    """
-    Filter columns to use in PCA.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Data to perform PCA on.
-    columns : List[str], optional
-        Columns specified for the PCA.
-
-    Returns
-    -------
-    List[str]
-        List of columns to use in PCA.
-
-    Raises
-    ------
-    ValueError
-        If a non-numeric column is specified in `columns`.
-    """
-    # By default use only numeric columns
-    if columns is None:
-        return [col for col in df.columns if is_numeric(df[col])]
-    for col in columns:
-        if not is_numeric(df[col]):
-            raise ValueError(f"Cannot use non-numeric column {col} of dtype {df[col].dtype} in PCA")
-    return columns
 
 
 class ParallelCategories(Section):
