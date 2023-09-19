@@ -10,7 +10,9 @@ from edvart.data_types import (
     is_boolean,
     is_categorical,
     is_date,
+    is_missing,
     is_numeric,
+    is_unique,
 )
 from edvart.pandas_formatting import render_dictionary, series_to_frame
 from edvart.report_sections import dataset_overview
@@ -223,7 +225,9 @@ def test_code_export_verbosity_high():
             (
                 get_code(series_to_frame),
                 get_code(DataType),
+                get_code(is_unique),
                 get_code(is_numeric),
+                get_code(is_missing),
                 get_code(is_categorical),
                 get_code(is_boolean),
                 get_code(is_date),

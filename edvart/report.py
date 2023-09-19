@@ -121,7 +121,7 @@ class ReportBase(ABC):
         imports_set = {
             "import pandas as pd",
             "import os",
-            "from typing import Any, Callable, Dict, List, Optional, Tuple, Union",
+            "from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union",
             "import plotly.offline as py",
             "py.init_notebook_mode()",
             "import plotly.io as pio",
