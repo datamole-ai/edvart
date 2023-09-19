@@ -51,7 +51,10 @@ pip install edvart
 
 
 See the notebook
-[examples/report-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/examples/report-example.ipynb) for an example report or [examples/time-series-report-time-series-report-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/examples/time-series-report-example.ipynb)
+[examples/report-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/examples/report-example.ipynb)
+for an example report or
+[examples/time-series-report-time-series-report-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/examples/time-series-report-example.ipynb)
+for an example report on a time-series dataset.
 
 ### Creating a Default Report
 
