@@ -177,7 +177,7 @@ class Overview(ReportSection):
             return list(imports)
         return super().required_imports()
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells.
 
         Cells can be either code cells or markdown cells.
@@ -185,7 +185,9 @@ class Overview(ReportSection):
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
@@ -209,9 +211,9 @@ class Overview(ReportSection):
             cells.append(nbfv4.new_code_cell(code))
             for subsec in self.subsections:
                 if subsec.verbosity > Verbosity.LOW:
-                    subsec.add_cells(cells)
+                    subsec.add_cells(cells, df=df)
         else:
-            super().add_cells(cells)
+            super().add_cells(cells, df=df)
 
     def show(self, df: pd.DataFrame) -> None:
         """Generates cell output of this section in the calling notebook.
@@ -302,13 +304,15 @@ class QuickInfo(Section):
             ]
         return []
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -410,13 +414,15 @@ class DataTypes(Section):
             "from IPython.display import display",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds data type inference cells to the list of cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -537,13 +543,15 @@ class DataPreview(Section):
             "from IPython.display import Markdown",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds dataframe preview cells to the list of cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -691,13 +699,15 @@ class MissingValues(Section):
             "import matplotlib.pyplot as plt",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds code cells which calculate missing values percentage table to the list of cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -822,13 +832,15 @@ class ConstantOccurrence(Section):
             ]
         return base_imports + ["from IPython.display import display"]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds code cells which calculate constant occurrence table to the list of cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -931,13 +943,15 @@ class RowsWithMissingValue(Section):
             ]
         return ["from IPython.display import display"]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds code cells which count the number of rows with missing value to the list of cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -1040,13 +1054,15 @@ class DuplicateRows(Section):
             ]
         return ["from IPython.display import display"]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds code cells which count the number of duplicated rows to the list of cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)

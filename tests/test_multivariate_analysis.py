@@ -126,12 +126,13 @@ def test_section_adding():
 
 
 def test_code_export_verbosity_low():
+    df = get_test_df()
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=get_test_df(), verbosity=Verbosity.LOW
+        df=df, verbosity=Verbosity.LOW
     )
     # Export code
     exported_cells = []
-    multivariate_section.add_cells(exported_cells)
+    multivariate_section.add_cells(exported_cells, df=df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -146,13 +147,14 @@ def test_code_export_verbosity_low_with_subsections():
     subsections = [subsec.ParallelCategories, subsec.PCA, subsec.ParallelCoordinates, subsec.PCA]
     if UMAP_AVAILABLE:
         subsections.append(subsec.UMAP)
+    df = get_test_df()
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=get_test_df(), subsections=subsections, verbosity=Verbosity.LOW
+        df=df, subsections=subsections, verbosity=Verbosity.LOW
     )
 
     # Export code
     exported_cells = []
-    multivariate_section.add_cells(exported_cells)
+    multivariate_section.add_cells(exported_cells, df=df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     if UMAP_AVAILABLE:
@@ -191,7 +193,7 @@ def test_code_export_verbosity_medium_all_cols_valid():
     )
 
     exported_cells = []
-    multivariate_section.add_cells(exported_cells)
+    multivariate_section.add_cells(exported_cells, df=all_numeric_df)
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
     expected_code = [
@@ -206,12 +208,13 @@ def test_code_export_verbosity_medium_all_cols_valid():
 
 
 def test_generated_code_verbosity_1():
+    df = get_test_df()
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
         df=get_test_df(), verbosity=Verbosity.MEDIUM
     )
 
     exported_cells = []
-    multivariate_section.add_cells(exported_cells)
+    multivariate_section.add_cells(exported_cells, df=df)
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     if UMAP_AVAILABLE:
         expected_code = [
@@ -244,12 +247,13 @@ def test_generated_code_verbosity_1():
 
 
 def test_generated_code_verbosity_2():
+    df = get_test_df()
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=get_test_df(), verbosity=Verbosity.HIGH
+        df=df, verbosity=Verbosity.HIGH
     )
 
     multivariate_cells = []
-    multivariate_section.add_cells(multivariate_cells)
+    multivariate_section.add_cells(multivariate_cells, df=df)
     exported_code = [cell["source"] for cell in multivariate_cells if cell["cell_type"] == "code"]
     expected_code = [
         "\n\n".join(
@@ -313,7 +317,7 @@ def test_verbosity_medium_non_categorical_col():
     )
 
     multivariate_cells = []
-    multivariate_section.add_cells(multivariate_cells)
+    multivariate_section.add_cells(multivariate_cells, df=random_df)
     exported_code = [cell["source"] for cell in multivariate_cells if cell["cell_type"] == "code"]
 
     expected_code = ["parallel_categories(df=df, columns=[])"]
@@ -332,8 +336,9 @@ def test_verbosity_low_different_subsection_verbosities():
     ]
     if UMAP_AVAILABLE:
         subsections.insert(2, MultivariateAnalysis.MultivariateAnalysisSubsection.UMAP)
+    df = get_test_df()
     multivariate_section = MultivariateAnalysis(
-        df=get_test_df(),
+        df=df,
         verbosity=Verbosity.LOW,
         subsections=subsections,
         verbosity_parallel_categories=Verbosity.MEDIUM,
@@ -341,7 +346,7 @@ def test_verbosity_low_different_subsection_verbosities():
     )
 
     multivariate_cells = []
-    multivariate_section.add_cells(multivariate_cells)
+    multivariate_section.add_cells(multivariate_cells, df=df)
     exported_code = [cell["source"] for cell in multivariate_cells if cell["cell_type"] == "code"]
     expected_subsections = [
         "MultivariateAnalysis.MultivariateAnalysisSubsection.PCA",

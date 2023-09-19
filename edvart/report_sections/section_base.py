@@ -117,7 +117,7 @@ class Section(ABC):
         """
 
     @abstractmethod
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells.
 
         Cells can be either code cells or markdown cells.
@@ -125,7 +125,9 @@ class Section(ABC):
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
             The dictionaries can be generated with nbformat.v4.new_code_cell() and/or
             nbformat.v4.new_markdown_cell().
         """
@@ -181,7 +183,7 @@ class ReportSection(Section):
 
         return list(imports_set)
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells.
 
         Cells can be either code cells or markdown cells.
@@ -189,10 +191,12 @@ class ReportSection(Section):
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         for subsec in self.subsections:
-            subsec.add_cells(cells)
+            subsec.add_cells(cells=cells, df=df)
 
     def show(self, df: pd.DataFrame) -> None:
         """Generates cell output of this section in the calling notebook.

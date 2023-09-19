@@ -71,7 +71,7 @@ class TableOfContents(Section):
             for subsection in section.subsections:
                 self._add_section_lines(subsection, section_level + 1, lines, True)
 
-    # pylint: disable=arguments-differ
+    # pylint: disable=arguments-renamed
     def add_cells(self, sections: List[Section], cells: List[Dict[str, Any]]) -> None:
         """Adds table of contents cells to the list of cells. The subsections won't be included.
 

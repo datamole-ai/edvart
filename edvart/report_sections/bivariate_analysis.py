@@ -212,7 +212,7 @@ class BivariateAnalysis(ReportSection):
         for sub in bivariate_analysis.subsections:
             sub.show(df)
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells.
 
         Cells can be either code cells or markdown cells.
@@ -221,6 +221,8 @@ class BivariateAnalysis(ReportSection):
         ----------
         cells : List[Dict[str, Any]]
             List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
@@ -251,9 +253,9 @@ class BivariateAnalysis(ReportSection):
             cells.append(nbfv4.new_code_cell(code))
             for sub in self.subsections:
                 if sub.verbosity > Verbosity.LOW:
-                    sub.add_cells(cells)
+                    sub.add_cells(cells=cells, df=df)
         else:
-            super().add_cells(cells)
+            super().add_cells(cells=cells, df=df)
 
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
@@ -518,13 +520,15 @@ class CorrelationPlot(Section):
             "from edvart.data_types import is_numeric",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells. Cells can be either code cells or markdown cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -697,13 +701,15 @@ class PairPlot(Section):
             "import seaborn as sns",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells. Cells can be either code cells or markdown cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
@@ -958,13 +964,15 @@ class ContingencyTable(Section):
             "import matplotlib.pyplot as plt",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells. Cells can be either code cells or markdown cells.
 
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)

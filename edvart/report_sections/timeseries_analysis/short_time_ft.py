@@ -171,7 +171,7 @@ class ShortTimeFT(Section):
             "from scipy import signal",
         ]
 
-    def add_cells(self, cells: List[Dict[str, Any]]) -> None:
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells.
 
         Cells can be either code cells or markdown cells.
@@ -179,7 +179,9 @@ class ShortTimeFT(Section):
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)

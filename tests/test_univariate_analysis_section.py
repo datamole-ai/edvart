@@ -28,7 +28,7 @@ def test_code_export_verbosity_low():
     univariate_section = univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
-    univariate_section.add_cells(exported_cells)
+    univariate_section.add_cells(exported_cells, df=test_df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -45,7 +45,7 @@ def test_code_export_verbosity_medium():
     )
     # Export code
     exported_cells = []
-    univariate_section.add_cells(exported_cells)
+    univariate_section.add_cells(exported_cells, df=test_df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -66,7 +66,7 @@ def test_code_export_verbosity_high():
     )
     # Export code
     exported_cells = []
-    univariate_section.add_cells(exported_cells)
+    univariate_section.add_cells(exported_cells, df=test_df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code

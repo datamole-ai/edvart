@@ -593,7 +593,9 @@ class GroupAnalysis(Section):
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         code = (
             get_code(GroupAnalysis.default_group_quantile_stats)
@@ -621,7 +623,9 @@ class GroupAnalysis(Section):
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         column_name : str
             Name of column for which to generate code.
         """
@@ -654,7 +658,7 @@ class GroupAnalysis(Section):
             code += f"overlaid_histograms(df=df, groupby={self.groupby}, column='{column_name}')"
         cells.append(nbfv4.new_code_cell(code))
 
-    def add_cells(self, cells: List[Dict[str, Any]]):
+    def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Add cells to the list of cells.
 
         Cells can be either code cells or markdown cells.
@@ -662,7 +666,9 @@ class GroupAnalysis(Section):
         Parameters
         ----------
         cells : List[Dict[str, Any]]
-            List of generated notebook cells which are represented as dictionaries.
+            List of generated notebook cells which are represented as dictionaries
+        df: pd.DataFrame
+            Data for which to add the cells.
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)

@@ -2,6 +2,7 @@ import datetime
 import warnings
 from contextlib import redirect_stdout
 
+import pandas as pd
 import pytest
 
 import edvart
@@ -170,7 +171,7 @@ def test_code_export_verbosity_low():
     ts_section = TimeseriesAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
-    ts_section.add_cells(exported_cells)
+    ts_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -190,7 +191,7 @@ def test_code_export_verbosity_low_with_subsections():
     )
     # Export code
     exported_cells = []
-    ts_section.add_cells(exported_cells)
+    ts_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -216,7 +217,7 @@ def test_code_export_verbosity_low_with_fft_stft():
     )
     # Export code
     exported_cells = []
-    ts_section.add_cells(exported_cells)
+    ts_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -235,7 +236,7 @@ def test_generated_code_verbosity_medium():
     ts_section = TimeseriesAnalysis(verbosity=Verbosity.MEDIUM)
 
     exported_cells = []
-    ts_section.add_cells(exported_cells)
+    ts_section.add_cells(exported_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
     expected_code = [
@@ -257,7 +258,7 @@ def test_generated_code_verbosity_high():
     ts_section = TimeseriesAnalysis(verbosity=Verbosity.HIGH, sampling_rate=1, stft_window_size=1)
 
     pairplot_cells = []
-    ts_section.add_cells(pairplot_cells)
+    ts_section.add_cells(pairplot_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in pairplot_cells if cell["cell_type"] == "code"]
 
     expected_code = [
@@ -350,7 +351,7 @@ def test_verbosity_low_different_subsection_verbosities():
     )
 
     ts_cells = []
-    ts_section.add_cells(ts_cells)
+    ts_section.add_cells(ts_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in ts_cells if cell["cell_type"] == "code"]
 
     expected_code = [
@@ -379,7 +380,7 @@ def test_boxplots_over_time_def():
     boxplots_sub = BoxplotsOverTime(grouping_name="Month", grouping_function=month_func)
     # Export code
     exported_cells = []
-    boxplots_sub.add_cells(exported_cells)
+    boxplots_sub.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
@@ -400,7 +401,7 @@ def test_boxplots_over_time_lambda():
 
     # Export code
     exported_cells = []
-    boxplots_sub.add_cells(exported_cells)
+    boxplots_sub.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
