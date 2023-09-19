@@ -846,7 +846,7 @@ class ContingencyTable(Section):
                 # they make no sense in a contingency table
                 columns_pairs = [
                     (col_x, col_y)
-                    for (col_x, col_y) in list(itertools.product(columns_x, columns_y))
+                    for (col_x, col_y) in itertools.product(columns_x, columns_y)
                     if col_x != col_y
                 ]
 
