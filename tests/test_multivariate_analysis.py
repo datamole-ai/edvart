@@ -276,7 +276,7 @@ def test_generated_code_verbosity_2():
         expected_code.insert(
             3,
             (
-                get_code(multivariate_analysis.UMAP.filter_columns)
+                get_code(select_numeric_columns)
                 + "\n\n"
                 + get_code(multivariate_analysis.UMAP.plot_umap)
                 + "\n\n"
