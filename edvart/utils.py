@@ -2,10 +2,12 @@
 
 import os
 from contextlib import contextmanager
-from typing import Any, Dict, Iterable, Iterator, Literal, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Tuple, Union
 
 import pandas as pd
 import statsmodels.api as sm
+
+from edvart.data_types import is_numeric
 
 
 def top_frequent_values(series: pd.Series, n_top: int = 10) -> Dict[Any, float]:
@@ -144,6 +146,37 @@ def discrete_colorscale(n, saturation=0.5, lightness=0.5) -> Iterable[Tuple[floa
         color = f"hsl({(i / n) * 360 :.2f}, {saturation * 100 :.2f}%, {lightness * 100 :.2f}%)"
         yield (i / n, color)
         yield ((i + 1) / n, color)
+
+
+def select_numeric_columns(df: pd.DataFrame, columns: Optional[List[str]]) -> List[str]:
+    """
+    Select all numeric columns from a DataFrame if `columns` is `None`,
+    or check if all specified columns are numeric if `columns` is a list of column names.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame to select or check columns from.
+    columns : List[str], optional
+        Specified columns.
+
+    Returns
+    -------
+    List[str]
+        List of numeric or specified columns
+
+    Raises
+    ------
+    ValueError
+        If a non-numeric column is specified in `columns`.
+    """
+    # By default use only numeric columns
+    if columns is None:
+        return [col for col in df.columns if is_numeric(df[col])]
+    for col in columns:
+        if not is_numeric(df[col]):
+            raise ValueError(f"Cannot use non-numeric column {col} of dtype {df[col].dtype}.")
+    return columns
 
 
 #######################

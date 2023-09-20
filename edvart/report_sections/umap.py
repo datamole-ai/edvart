@@ -5,10 +5,10 @@ import nbformat.v4 as nbfv4
 import pandas as pd
 from IPython.display import Markdown, display
 
-from edvart.data_types import is_numeric
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import code_dedent, get_code, total_dedent
 from edvart.report_sections.section_base import Section, Verbosity
+from edvart.utils import select_numeric_columns
 
 try:
     with warnings.catch_warnings():
@@ -25,8 +25,6 @@ class UMAP(Section):
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Data to analyze.
     verbosity : Verbosity (default = Verbosity.LOW)
         Verbosity of the code generated in the exported notebook.
     columns : List[str], optional
@@ -54,7 +52,6 @@ class UMAP(Section):
 
     def __init__(
         self,
-        df: pd.DataFrame,
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         color_col: Optional[str] = None,
@@ -63,21 +60,6 @@ class UMAP(Section):
         min_dist: float = 0.1,
         metric: str = "euclidean",
     ):
-        # By default use only numeric columns
-        if columns is None:
-            columns = [col for col in df.columns if is_numeric(df[col])]
-            # If all columns are numeric we don't want to list them all in the generated call
-            # Setting columns to None will result in the columns argumented not being included
-            # instead of showing a potentially long list of all columns
-            # in the generated call, therefore the default (all columns) will be used
-            if len(columns) == len(df.columns):
-                columns = None
-        else:
-            for col in columns:
-                if not is_numeric(df[col]):
-                    raise ValueError(
-                        f"Cannot use non-numeric column {col} of dtype {df[col].dtype} in UMAP"
-                    )
         self.color_col = color_col
         self.interactive = interactive
         self.n_neighbors = n_neighbors
@@ -140,15 +122,7 @@ class UMAP(Section):
         show_message : bool (default = True)
             Whether to show a message informing the user to tune the embedding parameters.
         """
-        if columns is None:
-            columns = [col for col in df.columns if is_numeric(df[col])]
-        else:
-            for col in columns:
-                if not is_numeric(df[col]):
-                    raise ValueError(
-                        f"Cannot use non-numeric column {col} of dtype {df[col].dtype} in UMAP"
-                    )
-
+        columns = select_numeric_columns(df, columns)
         df = df.dropna(subset=columns)
         embedder = umap.UMAP(
             n_neighbors=n_neighbors, min_dist=min_dist, metric=metric, random_state=random_state
@@ -230,7 +204,13 @@ class UMAP(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
-            code = get_code(UMAP.plot_umap) + "\n\n" + default_call
+            code = (
+                get_code(select_numeric_columns)
+                + "\n\n"
+                + get_code(UMAP.plot_umap).replace("UMAP.", "")
+                + "\n\n"
+                + default_call
+            )
 
         cells.append(nbfv4.new_code_cell(code))
 

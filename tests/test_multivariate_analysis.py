@@ -13,6 +13,7 @@ from edvart.report_sections import multivariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.multivariate_analysis import UMAP_AVAILABLE, MultivariateAnalysis
 from edvart.report_sections.section_base import Verbosity
+from edvart.utils import select_numeric_columns
 
 
 def get_test_df() -> pd.DataFrame:
@@ -31,7 +32,7 @@ def get_test_df() -> pd.DataFrame:
 
 
 def test_default_config_verbosity():
-    multivariate_section = MultivariateAnalysis(get_test_df())
+    multivariate_section = MultivariateAnalysis()
     assert multivariate_section.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
     for s in multivariate_section.subsections:
         assert s.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
@@ -39,14 +40,13 @@ def test_default_config_verbosity():
 
 def test_high_verbosities():
     with pytest.raises(ValueError):
-        MultivariateAnalysis(df=get_test_df(), verbosity=4)
+        MultivariateAnalysis(verbosity=4)
     with pytest.raises(ValueError):
-        MultivariateAnalysis(df=get_test_df(), verbosity_pca=5)
+        MultivariateAnalysis(verbosity_pca=5)
 
 
 def test_global_verbosity_overriding():
     multivariate_section = MultivariateAnalysis(
-        get_test_df(),
         verbosity=Verbosity.LOW,
         verbosity_pca=Verbosity.HIGH,
         verbosity_umap=Verbosity.MEDIUM,
@@ -74,7 +74,7 @@ def test_global_verbosity_overriding():
 
 
 def test_verbosity_propagation():
-    multivariate_section = MultivariateAnalysis(get_test_df(), verbosity=Verbosity.HIGH)
+    multivariate_section = MultivariateAnalysis(verbosity=Verbosity.HIGH)
     assert (
         multivariate_section.verbosity == Verbosity.HIGH
     ), "Multivariate analysis global verbosity should be Verbosity.HIGH."
@@ -88,9 +88,9 @@ def test_verbosity_propagation():
 def test_negative_verbosities():
     test_df = get_test_df()
     with pytest.raises(ValueError):
-        MultivariateAnalysis(test_df, verbosity=-2)
+        MultivariateAnalysis(verbosity=-2)
     with pytest.raises(ValueError):
-        multivariate_analysis.MultivariateAnalysis(test_df, verbosity_pca=-1)
+        multivariate_analysis.MultivariateAnalysis(verbosity_pca=-1)
 
 
 def test_section_adding():
@@ -102,7 +102,7 @@ def test_section_adding():
     ]
     if UMAP_AVAILABLE:
         subsections.append(MultivariateAnalysis.MultivariateAnalysisSubsection.UMAP)
-    multivariate_section = MultivariateAnalysis(df=get_test_df(), subsections=subsections)
+    multivariate_section = MultivariateAnalysis(subsections=subsections)
     if UMAP_AVAILABLE:
         assert len(multivariate_section.subsections) == 5
     else:
@@ -127,9 +127,7 @@ def test_section_adding():
 
 def test_code_export_verbosity_low():
     df = get_test_df()
-    multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=df, verbosity=Verbosity.LOW
-    )
+    multivariate_section = multivariate_analysis.MultivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
     multivariate_section.add_cells(exported_cells, df=df)
@@ -149,7 +147,7 @@ def test_code_export_verbosity_low_with_subsections():
         subsections.append(subsec.UMAP)
     df = get_test_df()
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=df, subsections=subsections, verbosity=Verbosity.LOW
+        subsections=subsections, verbosity=Verbosity.LOW
     )
 
     # Export code
@@ -187,7 +185,6 @@ def test_code_export_verbosity_medium_all_cols_valid():
 
     subsec = multivariate_analysis.MultivariateAnalysis.MultivariateAnalysisSubsection
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=all_numeric_df,
         subsections=[subsec.PCA, subsec.ParallelCategories],
         verbosity=Verbosity.MEDIUM,
     )
@@ -199,7 +196,7 @@ def test_code_export_verbosity_medium_all_cols_valid():
     expected_code = [
         "pca_first_vs_second(df=df)",
         "pca_explained_variance(df=df)",
-        "parallel_categories(df=df, columns=['col2'])",
+        "parallel_categories(df=df)",
     ]
 
     assert len(exported_code) == len(expected_code)
@@ -208,18 +205,16 @@ def test_code_export_verbosity_medium_all_cols_valid():
 
 
 def test_generated_code_verbosity_1():
+    multivariate_section = multivariate_analysis.MultivariateAnalysis(verbosity=Verbosity.MEDIUM)
     df = get_test_df()
-    multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=get_test_df(), verbosity=Verbosity.MEDIUM
-    )
 
     exported_cells = []
     multivariate_section.add_cells(exported_cells, df=df)
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     if UMAP_AVAILABLE:
         expected_code = [
-            "pca_first_vs_second(df=df, columns=['A', 'C', 'D'])",
-            "pca_explained_variance(df=df, columns=['A', 'C', 'D'])",
+            "pca_first_vs_second(df=df)",
+            "pca_explained_variance(df=df)",
             code_dedent(
                 """
                 plot_umap(
@@ -227,18 +222,17 @@ def test_generated_code_verbosity_1():
                     n_neighbors=15,
                     min_dist=0.1,
                     metric='euclidean',
-                    columns=['A', 'C', 'D'],
                 )"""
             ),
             "parallel_coordinates(df=df)",
-            "parallel_categories(df=df, columns=['B'])",
+            "parallel_categories(df=df)",
         ]
     else:
         expected_code = [
-            "pca_first_vs_second(df=df, columns=['A', 'C', 'D'])",
-            "pca_explained_variance(df=df, columns=['A', 'C', 'D'])",
+            "pca_first_vs_second(df=df)",
+            "pca_explained_variance(df=df)",
             "parallel_coordinates(df=df)",
-            "parallel_categories(df=df, columns=['B'])",
+            "parallel_categories(df=df)",
         ]
 
     assert len(exported_code) == len(expected_code)
@@ -248,24 +242,23 @@ def test_generated_code_verbosity_1():
 
 def test_generated_code_verbosity_2():
     df = get_test_df()
-    multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=df, verbosity=Verbosity.HIGH
-    )
+    multivariate_section = multivariate_analysis.MultivariateAnalysis(verbosity=Verbosity.HIGH)
 
     multivariate_cells = []
     multivariate_section.add_cells(multivariate_cells, df=df)
     exported_code = [cell["source"] for cell in multivariate_cells if cell["cell_type"] == "code"]
     expected_code = [
+        get_code(select_numeric_columns),
         "\n\n".join(
             (
                 get_code(multivariate_analysis.PCA.pca_first_vs_second),
-                "pca_first_vs_second(df=df, columns=['A', 'C', 'D'])",
+                "pca_first_vs_second(df=df)",
             )
         ),
         "\n\n".join(
             (
                 get_code(multivariate_analysis.PCA.pca_explained_variance),
-                "pca_explained_variance(df=df, columns=['A', 'C', 'D'])",
+                "pca_explained_variance(df=df)",
             )
         ),
         "\n\n".join(
@@ -279,15 +272,17 @@ def test_generated_code_verbosity_2():
             (
                 get_code(utils.discrete_colorscale),
                 get_code(multivariate_analysis.ParallelCategories.parallel_categories),
-                "parallel_categories(df=df, columns=['B'])",
+                "parallel_categories(df=df)",
             )
         ),
     ]
     if UMAP_AVAILABLE:
         expected_code.insert(
-            2,
+            3,
             (
-                get_code(multivariate_analysis.UMAP.plot_umap)
+                get_code(select_numeric_columns)
+                + "\n\n"
+                + get_code(multivariate_analysis.UMAP.plot_umap)
                 + "\n\n"
                 + code_dedent(
                     """
@@ -296,7 +291,6 @@ def test_generated_code_verbosity_2():
                         n_neighbors=15,
                         min_dist=0.1,
                         metric='euclidean',
-                        columns=['A', 'C', 'D'],
                     )"""
                 )
             ),
@@ -313,14 +307,14 @@ def test_verbosity_medium_non_categorical_col():
     random_df = random_df.astype({"integral": int, "floating": float, "cat": "category"})
     subsec = multivariate_analysis.MultivariateAnalysis.MultivariateAnalysisSubsection
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
-        df=random_df, subsections=[subsec.ParallelCategories], verbosity=Verbosity.MEDIUM
+        subsections=[subsec.ParallelCategories], verbosity=Verbosity.MEDIUM
     )
 
     multivariate_cells = []
     multivariate_section.add_cells(multivariate_cells, df=random_df)
     exported_code = [cell["source"] for cell in multivariate_cells if cell["cell_type"] == "code"]
 
-    expected_code = ["parallel_categories(df=df, columns=[])"]
+    expected_code = ["parallel_categories(df=df)"]
 
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
@@ -338,7 +332,6 @@ def test_verbosity_low_different_subsection_verbosities():
         subsections.insert(2, MultivariateAnalysis.MultivariateAnalysisSubsection.UMAP)
     df = get_test_df()
     multivariate_section = MultivariateAnalysis(
-        df=df,
         verbosity=Verbosity.LOW,
         subsections=subsections,
         verbosity_parallel_categories=Verbosity.MEDIUM,
@@ -357,7 +350,7 @@ def test_verbosity_low_different_subsection_verbosities():
     expected_subsections_str = ", ".join(expected_subsections)
     expected_code = [
         "multivariate_analysis(df=df, " f"subsections=[{expected_subsections_str}])",
-        "parallel_categories(df=df, columns=['B'])",
+        "parallel_categories(df=df)",
         "\n\n".join(
             (
                 get_code(utils.discrete_colorscale),
@@ -373,7 +366,7 @@ def test_verbosity_low_different_subsection_verbosities():
 
 
 def test_imports_verbosity_low():
-    multivariate_section = MultivariateAnalysis(df=get_test_df(), verbosity=Verbosity.LOW)
+    multivariate_section = MultivariateAnalysis(verbosity=Verbosity.LOW)
 
     exported_imports = multivariate_section.required_imports()
     expected_imports = [
@@ -388,7 +381,7 @@ def test_imports_verbosity_low():
 
 
 def test_imports_verbosity_medium():
-    multivariate_section = MultivariateAnalysis(df=get_test_df(), verbosity=Verbosity.MEDIUM)
+    multivariate_section = MultivariateAnalysis(verbosity=Verbosity.MEDIUM)
 
     exported_imports = multivariate_section.required_imports()
     expected_imports = list(
@@ -402,7 +395,7 @@ def test_imports_verbosity_medium():
 
 
 def test_imports_verbosity_high():
-    multivariate_section = MultivariateAnalysis(df=get_test_df(), verbosity=Verbosity.HIGH)
+    multivariate_section = MultivariateAnalysis(verbosity=Verbosity.HIGH)
 
     exported_imports = multivariate_section.required_imports()
     expected_imports = list(
@@ -425,7 +418,6 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     if UMAP_AVAILABLE:
         subsections.insert(3, MultivariateAnalysis.MultivariateAnalysisSubsection.UMAP)
     multivariate_section = MultivariateAnalysis(
-        df=get_test_df(),
         verbosity=Verbosity.LOW,
         subsections=subsections,
         verbosity_parallel_categories=Verbosity.MEDIUM,
@@ -448,7 +440,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
 def test_show():
     df = get_test_df()
-    multivariate_section = MultivariateAnalysis(df)
+    multivariate_section = MultivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):
