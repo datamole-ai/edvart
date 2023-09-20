@@ -12,7 +12,9 @@ from edvart.data_types import (
     is_boolean,
     is_categorical,
     is_date,
+    is_missing,
     is_numeric,
+    is_unique,
 )
 from edvart.pandas_formatting import hide_index, render_dictionary, series_to_frame
 from edvart.report_sections.code_string_formatting import get_code, total_dedent
@@ -435,24 +437,25 @@ class DataTypes(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         elif self.verbosity == Verbosity.HIGH:
-            code = (
-                get_code(series_to_frame)
-                + 2 * "\n"
-                + get_code(DataType)
-                + 2 * "\n"
-                + get_code(is_numeric)
-                + 2 * "\n"
-                + get_code(is_categorical)
-                + 2 * "\n"
-                + get_code(is_boolean)
-                + 2 * "\n"
-                + get_code(is_date)
-                + 2 * "\n"
-                + get_code(infer_data_type)
-                + 2 * "\n"
-                + get_code(DataTypes.data_types)
-                + 2 * "\n"
-                + default_call
+            code = "\n\n".join(
+                (
+                    *(
+                        get_code(function_or_class)
+                        for function_or_class in (
+                            series_to_frame,
+                            DataType,
+                            is_unique,
+                            is_numeric,
+                            is_missing,
+                            is_categorical,
+                            is_boolean,
+                            is_date,
+                            infer_data_type,
+                            DataTypes.data_types,
+                        )
+                    ),
+                    default_call,
+                )
             )
 
         cells.append(nbfv4.new_code_cell(code))
