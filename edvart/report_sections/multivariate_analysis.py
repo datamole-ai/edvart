@@ -475,10 +475,10 @@ class PCA(Section):
             cells.append(nbfv4.new_code_cell(first_vs_second_code))
 
             cells.append(explained_variance_header)
-            exaplained_variance_code = (
+            explained_variance_code = (
                 get_code(PCA.pca_explained_variance) + "\n\n" + explained_variance_call
             )
-            cells.append(nbfv4.new_code_cell(exaplained_variance_code))
+            cells.append(nbfv4.new_code_cell(explained_variance_code))
 
     def show(self, df: pd.DataFrame) -> None:
         """Generates the PCA section in the calling notebook.
