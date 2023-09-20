@@ -49,9 +49,12 @@ pip install edvart
 
 ## Usage
 
+
 See the notebook
-[api-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/api-example.ipynb)
-for usage examples.
+[examples/report-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/examples/report-example.ipynb)
+for an example report on a tabular dataset or
+[examples/time-series-report-time-series-report-example.ipynb](https://nbviewer.org/github/datamole-ai/edvart/blob/main/examples/time-series-report-example.ipynb)
+for an example report on a time-series dataset.
 
 See the [Usage section](https://datamole-ai.github.io/edvart/usage.html) of the documentation
 for more information.
