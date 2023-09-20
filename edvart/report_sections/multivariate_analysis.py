@@ -655,6 +655,7 @@ class ParallelCoordinates(Section):
             ]
         return [
             "from edvart.utils import discrete_colorscale",
+            "from typing import Iterable",
             "import plotly",
             "import plotly.graph_objects as go",
             "plotly.offline.init_notebook_mode()",
