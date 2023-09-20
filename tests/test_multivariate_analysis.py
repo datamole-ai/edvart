@@ -126,6 +126,7 @@ def test_section_adding():
 
 
 def test_code_export_verbosity_low():
+    df = get_test_df()
     multivariate_section = multivariate_analysis.MultivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
