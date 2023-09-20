@@ -369,7 +369,6 @@ class ReportBase(ABC):
         """
         self.sections.append(
             UnivariateAnalysis(
-                df=self.df,
                 verbosity=verbosity or self.verbosity,
                 columns=columns,
             )
@@ -523,7 +522,6 @@ class ReportBase(ABC):
         """
         self.sections.append(
             GroupAnalysis(
-                df=self.df,
                 groupby=groupby,
                 verbosity=verbosity or self.verbosity,
                 columns=columns,

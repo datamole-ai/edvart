@@ -11,21 +11,20 @@ from edvart.report_sections.section_base import Verbosity
 
 
 def test_invalid_verbosity():
-    test_df = pd.DataFrame(data=[[1, 2], [2, 3], [3, 4]], columns=["A", "B"])
     with pytest.raises(ValueError):
-        univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=-1)
+        univariate_analysis.UnivariateAnalysis(verbosity=-1)
     with pytest.raises(ValueError):
-        univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=4)
+        univariate_analysis.UnivariateAnalysis(verbosity=4)
     with pytest.raises(ValueError):
-        univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=100)
+        univariate_analysis.UnivariateAnalysis(verbosity=100)
     with pytest.raises(ValueError):
-        univariate_analysis.UnivariateAnalysis(df=test_df, verbosity="1")
+        univariate_analysis.UnivariateAnalysis(verbosity="1")
 
 
 def test_code_export_verbosity_low():
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
     # Construct univariate analysis section
-    univariate_section = univariate_analysis.UnivariateAnalysis(df=test_df, verbosity=Verbosity.LOW)
+    univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
     univariate_section.add_cells(exported_cells, df=test_df)
@@ -40,9 +39,7 @@ def test_code_export_verbosity_low():
 def test_code_export_verbosity_medium():
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
     # Construct univariate analysis section
-    univariate_section = univariate_analysis.UnivariateAnalysis(
-        df=test_df, verbosity=Verbosity.MEDIUM
-    )
+    univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.MEDIUM)
     # Export code
     exported_cells = []
     univariate_section.add_cells(exported_cells, df=test_df)
@@ -61,9 +58,7 @@ def test_code_export_verbosity_medium():
 def test_code_export_verbosity_high():
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
     # Construct univariate analysis section
-    univariate_section = univariate_analysis.UnivariateAnalysis(
-        df=test_df, verbosity=Verbosity.HIGH
-    )
+    univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.HIGH)
     # Export code
     exported_cells = []
     univariate_section.add_cells(exported_cells, df=test_df)
@@ -114,7 +109,7 @@ def test_code_export_verbosity_high():
 
 def test_show():
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
-    univariate_section = univariate_analysis.UnivariateAnalysis(df=test_df)
+    univariate_section = univariate_analysis.UnivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):
