@@ -127,7 +127,7 @@ def test_code_export_verbosity_low():
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
-    expected_code = ["bivariate_analysis(df=df)"]
+    expected_code = ["show_bivariate_analysis(df=df)"]
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
@@ -148,7 +148,7 @@ def test_code_export_verbosity_low_with_subsections():
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
     expected_code = [
-        "bivariate_analysis(df=df, subsections=["
+        "show_bivariate_analysis(df=df, subsections=["
         "BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable, "
         "BivariateAnalysis.BivariateAnalysisSubsection.PairPlot])"
     ]
@@ -177,7 +177,7 @@ def test_generated_code_verbosity_low_columns():
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
     expected_code = [
-        f"bivariate_analysis(df=df, columns_x={columns_x}, "
+        f"show_bivariate_analysis(df=df, columns_x={columns_x}, "
         f"columns_y={columns_y}, columns_pairs={columns_pairs}, color_col='col3')"
     ]
     # Test code equivalence
@@ -287,23 +287,17 @@ def test_generated_code_verbosity_high():
         "\n\n".join((get_code(bivariate_analysis.PairPlot.plot_pairplot), "plot_pairplot(df=df)")),
         "\n\n".join(
             (
-                get_code(bivariate_analysis.CorrelationPlot.default_correlations),
-                get_code(bivariate_analysis.CorrelationPlot._get_columns_x_y),
-                get_code(bivariate_analysis.CorrelationPlot.plot_correlation).replace(
-                    "CorrelationPlot.", ""
-                ),
-                get_code(bivariate_analysis.CorrelationPlot.plot_correlations).replace(
-                    "CorrelationPlot.", ""
-                ),
+                get_code(bivariate_analysis.default_correlations),
+                get_code(bivariate_analysis._get_columns_x_y),
+                get_code(bivariate_analysis.plot_correlation),
+                get_code(bivariate_analysis.plot_correlations),
                 "plot_correlations(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(bivariate_analysis.ContingencyTable.contingency_tables).replace(
-                    "ContingencyTable.", ""
-                ),
-                get_code(bivariate_analysis.ContingencyTable.contingency_table),
+                get_code(bivariate_analysis.contingency_tables),
+                get_code(bivariate_analysis.contingency_table),
                 "contingency_tables(df=df)",
             )
         ),
@@ -332,7 +326,7 @@ def test_verbosity_low_different_subsection_verbosities():
     exported_code = [cell["source"] for cell in bivariate_cells if cell["cell_type"] == "code"]
 
     expected_code = [
-        "bivariate_analysis(df=df, "
+        "show_bivariate_analysis(df=df, "
         "subsections=[BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable])",
         get_code(bivariate_analysis.PairPlot.plot_pairplot) + "\n\n" + "plot_pairplot(df=df)",
         get_code(bivariate_analysis.PairPlot.plot_pairplot) + "\n\n" + "plot_pairplot(df=df)",
@@ -349,8 +343,7 @@ def test_imports_verbosity_low():
 
     exported_imports = bivariate_section.required_imports()
     expected_imports = [
-        "from edvart.report_sections.bivariate_analysis import BivariateAnalysis\n"
-        "bivariate_analysis = BivariateAnalysis.bivariate_analysis"
+        "from edvart.report_sections.bivariate_analysis import show_bivariate_analysis"
     ]
 
     assert isinstance(exported_imports, list)
@@ -403,8 +396,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     exported_imports = bivariate_section.required_imports()
 
     expected_imports = {
-        "from edvart.report_sections.bivariate_analysis import BivariateAnalysis\n"
-        "bivariate_analysis = BivariateAnalysis.bivariate_analysis"
+        "from edvart.report_sections.bivariate_analysis import show_bivariate_analysis"
     }
     for s in bivariate_section.subsections:
         if s.verbosity > Verbosity.LOW:

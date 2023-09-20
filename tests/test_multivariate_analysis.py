@@ -9,7 +9,7 @@ import pytest
 pio.renderers.default = "json"
 
 from edvart import utils
-from edvart.report_sections import multivariate_analysis
+from edvart.report_sections import multivariate_analysis, umap
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.multivariate_analysis import UMAP_AVAILABLE, MultivariateAnalysis
 from edvart.report_sections.section_base import Verbosity
@@ -134,7 +134,7 @@ def test_code_export_verbosity_low():
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
-    expected_code = ["multivariate_analysis(df=df)"]
+    expected_code = ["show_multivariate_analysis(df=df)"]
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
@@ -158,7 +158,7 @@ def test_code_export_verbosity_low_with_subsections():
     if UMAP_AVAILABLE:
         # Define expected code
         expected_code = [
-            "multivariate_analysis(df=df, subsections=["
+            "show_multivariate_analysis(df=df, subsections=["
             "MultivariateAnalysis.MultivariateAnalysisSubsection.ParallelCategories, "
             "MultivariateAnalysis.MultivariateAnalysisSubsection.PCA, "
             "MultivariateAnalysis.MultivariateAnalysisSubsection.ParallelCoordinates, "
@@ -167,7 +167,7 @@ def test_code_export_verbosity_low_with_subsections():
         ]
     else:
         expected_code = [
-            "multivariate_analysis(df=df, subsections=["
+            "show_multivariate_analysis(df=df, subsections=["
             "MultivariateAnalysis.MultivariateAnalysisSubsection.ParallelCategories, "
             "MultivariateAnalysis.MultivariateAnalysisSubsection.PCA, "
             "MultivariateAnalysis.MultivariateAnalysisSubsection.ParallelCoordinates, "
@@ -251,27 +251,27 @@ def test_generated_code_verbosity_2():
         get_code(select_numeric_columns),
         "\n\n".join(
             (
-                get_code(multivariate_analysis.PCA.pca_first_vs_second),
+                get_code(multivariate_analysis.pca_first_vs_second),
                 "pca_first_vs_second(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(multivariate_analysis.PCA.pca_explained_variance),
+                get_code(multivariate_analysis.pca_explained_variance),
                 "pca_explained_variance(df=df)",
             )
         ),
         "\n\n".join(
             (
                 get_code(utils.discrete_colorscale),
-                get_code(multivariate_analysis.ParallelCoordinates.parallel_coordinates),
+                get_code(multivariate_analysis.parallel_coordinates),
                 "parallel_coordinates(df=df)",
             )
         ),
         "\n\n".join(
             (
                 get_code(utils.discrete_colorscale),
-                get_code(multivariate_analysis.ParallelCategories.parallel_categories),
+                get_code(multivariate_analysis.parallel_categories),
                 "parallel_categories(df=df)",
             )
         ),
@@ -282,7 +282,7 @@ def test_generated_code_verbosity_2():
             (
                 get_code(select_numeric_columns)
                 + "\n\n"
-                + get_code(multivariate_analysis.UMAP.plot_umap)
+                + get_code(umap.plot_umap)
                 + "\n\n"
                 + code_dedent(
                     """
@@ -349,12 +349,12 @@ def test_verbosity_low_different_subsection_verbosities():
         expected_subsections.append("MultivariateAnalysis.MultivariateAnalysisSubsection.UMAP")
     expected_subsections_str = ", ".join(expected_subsections)
     expected_code = [
-        "multivariate_analysis(df=df, " f"subsections=[{expected_subsections_str}])",
+        "show_multivariate_analysis(df=df, " f"subsections=[{expected_subsections_str}])",
         "parallel_categories(df=df)",
         "\n\n".join(
             (
                 get_code(utils.discrete_colorscale),
-                get_code(multivariate_analysis.ParallelCoordinates.parallel_coordinates),
+                get_code(multivariate_analysis.parallel_coordinates),
                 "parallel_coordinates(df=df)",
             )
         ),
@@ -370,8 +370,7 @@ def test_imports_verbosity_low():
 
     exported_imports = multivariate_section.required_imports()
     expected_imports = [
-        "from edvart.report_sections.multivariate_analysis import MultivariateAnalysis\n"
-        "multivariate_analysis = MultivariateAnalysis.multivariate_analysis"
+        "from edvart.report_sections.multivariate_analysis import show_multivariate_analysis"
     ]
 
     assert isinstance(exported_imports, list)
@@ -427,8 +426,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     exported_imports = multivariate_section.required_imports()
 
     expected_imports = {
-        "from edvart.report_sections.multivariate_analysis import MultivariateAnalysis\n"
-        "multivariate_analysis = MultivariateAnalysis.multivariate_analysis"
+        "from edvart.report_sections.multivariate_analysis import show_multivariate_analysis"
     }
     for s in multivariate_section.subsections:
         if s.verbosity > Verbosity.LOW:

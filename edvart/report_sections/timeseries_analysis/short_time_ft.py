@@ -51,101 +51,6 @@ class ShortTimeFT(Section):
     def name(self) -> str:
         return "Short-time Fourier Transform"
 
-    @staticmethod
-    @check_index_time_ascending
-    def short_time_ft(
-        df: pd.DataFrame,
-        sampling_rate: int,
-        window_size: int,
-        columns: Optional[List[str]] = None,
-        overlap: Optional[int] = None,
-        log: bool = True,
-        window: Union[str, Tuple, "array-like"] = "hamming",
-        scaling: str = "spectrum",
-        figsize: Tuple[float, float] = (20, 7),
-        colormap: Any = "viridis",
-        freq_min: Optional[float] = None,
-        freq_max: Optional[float] = None,
-    ) -> None:
-        """Generates Short-time discrete Fourier transform spectrogram plot.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Data to analyze.
-        sampling_rate : int
-            The time series will be considered as samples from a lower-frequency at this rate, i.e.
-            frequencies in multiples of (1 / sampling rate) will be analyzed.
-        window_size : int
-            Size of window to perform DFT on to obtain Short-time Fourier transform.
-        columns : List[str], optional
-            List of columns to analyze. Only numeric column can be analyzed.
-            All numeric columns are analyzed by default.
-        overlap : int, optional
-            How many samples adjacent windows overlap by. Default `window_size // 8`.
-        log : bool (default = True)
-            Whether to color plot according by linear-scale amplitude or log-scale (in decibel).
-        window : str (default = "hann")
-            Type of weighting of individual samples in a window. If string or tuple, it is passed
-            to `scipy.signal.get_window`. If array-like, each term is weight for the corresponding
-            sample within the windows
-        scaling : str (default = "density")
-            Selects between computing the power spectral density ("density") with units of V**2/Hz
-            and computing the power spectrum ("spectrum") with units of V**2,
-            if input values are measured in V and sampling_rate is measured in Hz.
-        figsize : Tuple[float, float] (default = (20, 7))
-            Size of generated spectral plot figure.
-        colormap : Any
-            Any seaborn-compatible colormap.
-        freq_min : float, optional
-            Lowest frequency to show in the plot. All computed frequencies are shown by default.
-        freq_max : float, optional
-            Highest frequency to show in the plot. All computed frequencies are shown by default.
-
-        Raises
-        ------
-        ValueError
-            If the input data is not indexed by time in ascending order.
-        """
-        if sampling_rate <= 0:
-            raise ValueError(f"Sampling rate has to be a positive integer, not {sampling_rate}")
-        if window_size <= 0:
-            raise ValueError(f"window_size has to a positive integer, not {window_size}")
-        if columns is None:
-            columns = [col for col in df.columns if is_numeric(df[col])]
-        else:
-            for col in columns:
-                if not is_numeric(df[col]):
-                    raise ValueError(f"Cannot perform STFT for non-numeric column {col}")
-        index_freq = pd.infer_freq(df.index) or ""
-        for col in columns:
-            display(Markdown(f"---\n### {col}"))
-            freqs, times, sx = signal.spectrogram(  # pylint: disable=invalid-name
-                # interpolate to get samples at regular time intervals
-                df[col].interpolate(method="time"),
-                fs=sampling_rate,
-                window=window,
-                nperseg=window_size,
-                # Overlap defaults to window_size // 8
-                noverlap=overlap,
-                scaling=scaling,
-            )
-
-            # Add small positive value to avoid 0 in log
-            y = 10 * np.log10(sx + 1e-12) if log else sx
-
-            _fig, ax = plt.subplots(figsize=figsize)
-            ax.pcolormesh(times, freqs, y, cmap=colormap)
-
-            ax.set_ylabel(f"Frequency [1/({sampling_rate}{index_freq})]")
-            ax.set_xlabel("Time")
-            ax.set_ylim(freq_min, freq_max)
-            # Show times from index in xticks
-            ax.set_xticklabels(
-                df.index[list(map(lambda time: int(time * sampling_rate), ax.get_xticks()[:-1]))]
-            )
-            plt.show()
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -196,7 +101,7 @@ class ShortTimeFT(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
-            code = get_code(ShortTimeFT.short_time_ft) + "\n\n" + default_call
+            code = get_code(short_time_ft) + "\n\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -209,9 +114,104 @@ class ShortTimeFT(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        ShortTimeFT.short_time_ft(
+        short_time_ft(
             df=df,
             sampling_rate=self.sampling_rate,
             window_size=self.window_size,
             columns=self.columns,
         )
+
+
+@check_index_time_ascending
+def short_time_ft(
+    df: pd.DataFrame,
+    sampling_rate: int,
+    window_size: int,
+    columns: Optional[List[str]] = None,
+    overlap: Optional[int] = None,
+    log: bool = True,
+    window: Union[str, Tuple, "array-like"] = "hamming",
+    scaling: str = "spectrum",
+    figsize: Tuple[float, float] = (20, 7),
+    colormap: Any = "viridis",
+    freq_min: Optional[float] = None,
+    freq_max: Optional[float] = None,
+) -> None:
+    """Generates Short-time discrete Fourier transform spectrogram plot.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to analyze.
+    sampling_rate : int
+        The time series will be considered as samples from a lower-frequency at this rate, i.e.
+        frequencies in multiples of (1 / sampling rate) will be analyzed.
+    window_size : int
+        Size of window to perform DFT on to obtain Short-time Fourier transform.
+    columns : List[str], optional
+        List of columns to analyze. Only numeric column can be analyzed.
+        All numeric columns are analyzed by default.
+    overlap : int, optional
+        How many samples adjacent windows overlap by. Default `window_size // 8`.
+    log : bool (default = True)
+        Whether to color plot according by linear-scale amplitude or log-scale (in decibel).
+    window : str (default = "hann")
+        Type of weighting of individual samples in a window. If string or tuple, it is passed
+        to `scipy.signal.get_window`. If array-like, each term is weight for the corresponding
+        sample within the windows
+    scaling : str (default = "density")
+        Selects between computing the power spectral density ("density") with units of V**2/Hz
+        and computing the power spectrum ("spectrum") with units of V**2,
+        if input values are measured in V and sampling_rate is measured in Hz.
+    figsize : Tuple[float, float] (default = (20, 7))
+        Size of generated spectral plot figure.
+    colormap : Any
+        Any seaborn-compatible colormap.
+    freq_min : float, optional
+        Lowest frequency to show in the plot. All computed frequencies are shown by default.
+    freq_max : float, optional
+        Highest frequency to show in the plot. All computed frequencies are shown by default.
+
+    Raises
+    ------
+    ValueError
+        If the input data is not indexed by time in ascending order.
+    """
+    if sampling_rate <= 0:
+        raise ValueError(f"Sampling rate has to be a positive integer, not {sampling_rate}")
+    if window_size <= 0:
+        raise ValueError(f"window_size has to a positive integer, not {window_size}")
+    if columns is None:
+        columns = [col for col in df.columns if is_numeric(df[col])]
+    else:
+        for col in columns:
+            if not is_numeric(df[col]):
+                raise ValueError(f"Cannot perform STFT for non-numeric column {col}")
+    index_freq = pd.infer_freq(df.index) or ""
+    for col in columns:
+        display(Markdown(f"---\n### {col}"))
+        freqs, times, sx = signal.spectrogram(  # pylint: disable=invalid-name
+            # interpolate to get samples at regular time intervals
+            df[col].interpolate(method="time"),
+            fs=sampling_rate,
+            window=window,
+            nperseg=window_size,
+            # Overlap defaults to window_size // 8
+            noverlap=overlap,
+            scaling=scaling,
+        )
+
+        # Add small positive value to avoid 0 in log
+        y = 10 * np.log10(sx + 1e-12) if log else sx
+
+        _fig, ax = plt.subplots(figsize=figsize)
+        ax.pcolormesh(times, freqs, y, cmap=colormap)
+
+        ax.set_ylabel(f"Frequency [1/({sampling_rate}{index_freq})]")
+        ax.set_xlabel("Time")
+        ax.set_ylim(freq_min, freq_max)
+        # Show times from index in xticks
+        ax.set_xticklabels(
+            df.index[list(map(lambda time: int(time * sampling_rate), ax.get_xticks()[:-1]))]
+        )
+        plt.show()

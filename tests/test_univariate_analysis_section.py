@@ -32,7 +32,7 @@ def test_code_export_verbosity_low():
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
-    expected_code = ["univariate_analysis(df=df)"]
+    expected_code = ["show_univariate_analysis(df=df)"]
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
@@ -74,18 +74,16 @@ def test_code_export_verbosity_high():
         "\n\n".join(
             (
                 "# Default statistics dictionaries",
-                get_code(univariate_analysis.UnivariateAnalysis.default_descriptive_statistics),
-                get_code(univariate_analysis.UnivariateAnalysis.default_quantile_statistics),
+                get_code(univariate_analysis.default_descriptive_statistics),
+                get_code(univariate_analysis.default_quantile_statistics),
             )
         ),
         "\n\n".join(
             (
-                get_code(univariate_analysis.UnivariateAnalysis.top_most_frequent),
-                get_code(univariate_analysis.UnivariateAnalysis.bar_plot),
-                get_code(univariate_analysis.UnivariateAnalysis.numeric_statistics).replace(
-                    "UnivariateAnalysis.", ""
-                ),
-                get_code(univariate_analysis.UnivariateAnalysis.histogram),
+                get_code(univariate_analysis.top_most_frequent),
+                get_code(univariate_analysis.bar_plot),
+                get_code(univariate_analysis.numeric_statistics),
+                get_code(univariate_analysis.histogram),
             )
         ),
         "\n\n".join(

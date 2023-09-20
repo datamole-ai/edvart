@@ -54,66 +54,6 @@ class SeasonalDecomposition(Section):
     def name(self) -> str:
         return "Seasonal decomposition"
 
-    @staticmethod
-    @check_index_time_ascending
-    def seasonal_decomposition(
-        df: pd.DataFrame,
-        columns: Optional[List[str]] = None,
-        period: Optional[int] = None,
-        model: str = "additive",
-        figsize: Tuple[float, float] = (20, 10),
-    ) -> None:
-        """Generate the seasonal decomposition plot.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Data to analyze.
-        columns : List[str], optional
-            List of columns to analyze. Only numeric column can be analyzed.
-            All numeric columns are analyzed by default.
-        period : int, optional
-            Period to use when modelling seasonal component. If None, period is inferred from
-            frequency of df.index, provided `pd.infer_freq` is able to infer the frequency.
-            Otherwise, this parameter has to be set manually.
-        model : str (default = "additive")
-            Can be either "multiplicative" or "additive".
-            If "additive", series is modelled as series = trend + seasonal + noise
-            If "multiplicative", series is modelled as series = trend * seasonal * noise
-        figsize : Tuple[float, float] (default = (20, 10))
-            Size of the whole figure for one column (i.e. includes plots of all components).
-
-        Raises
-        ------
-        ValueError
-            If the input data is not indexed by time in ascending order.
-        """
-        df = df.interpolate(method="time")
-        if pd.infer_freq(df.index) is None and period is None:
-            display(
-                Markdown(
-                    "<div class='alert alert-block alert-warning'>"
-                    "Period could not be inferred, please set the `period` parameter"
-                    " to a suitable value. Not plotting seasonal decomposition."
-                    "</div>"
-                )
-            )
-            return
-        if columns is None:
-            columns = [col for col in df.columns if is_numeric(df[col])]
-
-        for col in columns:
-            if not is_numeric(df[col]):
-                raise ValueError(f"Cannot plot decomposition for non-numeric column {col}")
-            display(Markdown(f"---\n### {col}"))
-            decomposition = sm.tsa.seasonal_decompose(df[col], period=period, model=model)
-            fig = decomposition.plot()
-            fig.set_size_inches(*figsize)
-            fig.axes[0].set_title(None)
-            fig.axes[0].set_ylabel("Original")
-            fig.axes[-1].set_ylabel("Residual")
-            plt.show()
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -163,7 +103,7 @@ class SeasonalDecomposition(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
-            code = get_code(SeasonalDecomposition.seasonal_decomposition) + "\n\n" + default_call
+            code = get_code(seasonal_decomposition) + "\n\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -176,6 +116,64 @@ class SeasonalDecomposition(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        SeasonalDecomposition.seasonal_decomposition(
-            df=df, columns=self.columns, model=self.model, period=self.period
+        seasonal_decomposition(df=df, columns=self.columns, model=self.model, period=self.period)
+
+
+@check_index_time_ascending
+def seasonal_decomposition(
+    df: pd.DataFrame,
+    columns: Optional[List[str]] = None,
+    period: Optional[int] = None,
+    model: str = "additive",
+    figsize: Tuple[float, float] = (20, 10),
+) -> None:
+    """Generate the seasonal decomposition plot.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to analyze.
+    columns : List[str], optional
+        List of columns to analyze. Only numeric column can be analyzed.
+        All numeric columns are analyzed by default.
+    period : int, optional
+        Period to use when modelling seasonal component. If None, period is inferred from
+        frequency of df.index, provided `pd.infer_freq` is able to infer the frequency.
+        Otherwise, this parameter has to be set manually.
+    model : str (default = "additive")
+        Can be either "multiplicative" or "additive".
+        If "additive", series is modelled as series = trend + seasonal + noise
+        If "multiplicative", series is modelled as series = trend * seasonal * noise
+    figsize : Tuple[float, float] (default = (20, 10))
+        Size of the whole figure for one column (i.e. includes plots of all components).
+
+    Raises
+    ------
+    ValueError
+        If the input data is not indexed by time in ascending order.
+    """
+    df = df.interpolate(method="time")
+    if pd.infer_freq(df.index) is None and period is None:
+        display(
+            Markdown(
+                "<div class='alert alert-block alert-warning'>"
+                "Period could not be inferred, please set the `period` parameter"
+                " to a suitable value. Not plotting seasonal decomposition."
+                "</div>"
+            )
         )
+        return
+    if columns is None:
+        columns = [col for col in df.columns if is_numeric(df[col])]
+
+    for col in columns:
+        if not is_numeric(df[col]):
+            raise ValueError(f"Cannot plot decomposition for non-numeric column {col}")
+        display(Markdown(f"---\n### {col}"))
+        decomposition = sm.tsa.seasonal_decompose(df[col], period=period, model=model)
+        fig = decomposition.plot()
+        fig.set_size_inches(*figsize)
+        fig.axes[0].set_title(None)
+        fig.axes[0].set_ylabel("Original")
+        fig.axes[-1].set_ylabel("Residual")
+        plt.show()
