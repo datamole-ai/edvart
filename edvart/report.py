@@ -145,7 +145,7 @@ class ReportBase(ABC):
         if self._table_of_contents is not None:
             self._table_of_contents.add_cells(self.sections, nb["cells"])
         for section in self.sections:
-            section.add_cells(nb["cells"])
+            section.add_cells(cells=nb["cells"], df=self.df)
 
         return nb
 

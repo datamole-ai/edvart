@@ -126,7 +126,7 @@ def test_code_export_verbosity_low():
     overview_section = Overview(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
-    overview_section.add_cells(exported_cells)
+    overview_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -145,7 +145,7 @@ def test_code_export_verbosity_low_with_subsections():
     )
     # Export code
     exported_cells = []
-    overview_section.add_cells(exported_cells)
+    overview_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -173,7 +173,7 @@ def test_code_export_verbosity_medium():
     )
     # Export code
     exported_cells = []
-    overview_section.add_cells(exported_cells)
+    overview_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -207,7 +207,7 @@ def test_code_export_verbosity_high():
     )
     # Export code
     exported_cells = []
-    overview_section.add_cells(exported_cells)
+    overview_section.add_cells(exported_cells, df=pd.DataFrame())
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -275,7 +275,7 @@ def test_verbosity_low_different_subsection_verbosities():
     )
 
     overview_cells = []
-    overview_section.add_cells(overview_cells)
+    overview_section.add_cells(overview_cells, df=pd.DataFrame())
     exported_code = [cell["source"] for cell in overview_cells if cell["cell_type"] == "code"]
 
     expected_code = [
