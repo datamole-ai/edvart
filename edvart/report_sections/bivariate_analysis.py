@@ -607,62 +607,6 @@ class PairPlot(Section):
     def name(self) -> str:
         return "Pairplot"
 
-    @staticmethod
-    def plot_pairplot(
-        df: pd.DataFrame,
-        columns: Optional[List[str]] = None,
-        columns_x: Optional[List[str]] = None,
-        columns_y: Optional[List[str]] = None,
-        allow_categorical: bool = False,
-        color_col: Optional[str] = None,
-    ) -> None:
-        """Plot a pairplot for each pair of columns.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Data frame for which to plot pairplot.
-        columns : Union[List[Tuple[str, str]] or List[str]], optional
-            Which columns to plot pairplot for.
-            All columns that are not categorical and are not boolean are used by default.
-        columns_x : List[str], optional
-            If specified, correlation is plotted
-            on the cartesian product of `columns_x` and `columns_y`.
-            If `columns_x` is specified, then `columns_y` must also be specified.
-        columns_y : List[str], optional
-            If specified, correlation is plotted
-            on the cartesian product of `columns_x` and `columns_y`.
-            If `columns_y` is specified, then `columns_x` must also be specified.
-        allow_categorical : bool (default = False)
-            Whether to allow plotting of categorical columns. If False (default), then even
-            explicitly specified columns will be excluded. If True, categorical columns are still
-            excluded by default, unless explicitly specified via columns/columns_x/columns_y.
-        color_col : str, optional
-            Name of column according to use for coloring of points and histogram in the pairplot.
-
-        Raises
-        ------
-        ValueError
-            If exactly one of `columns_x`, `columns_y` is specified.
-        """
-
-        def include_column(col: str) -> bool:
-            return not is_categorical(df[col]) and not is_boolean(df[col])
-
-        if (columns_x is None) != (columns_y is None):
-            raise ValueError("Either both or neither of columns_x, columns_y must be specified.")
-        if columns_x is None:
-            if columns is None:
-                columns = list(filter(include_column, df.columns))
-            columns_x = columns
-            columns_y = columns
-        if not allow_categorical:
-            columns_x = list(filter(include_column, columns_x))
-            columns_y = list(filter(include_column, columns_y))
-        sns.pairplot(df, x_vars=columns_x, y_vars=columns_y, hue=color_col)
-        plt.tight_layout()
-        plt.show()
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -706,7 +650,7 @@ class PairPlot(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
-            code = get_code(PairPlot.plot_pairplot) + "\n\n" + default_call
+            code = get_code(plot_pairplot) + "\n\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -719,13 +663,69 @@ class PairPlot(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        PairPlot.plot_pairplot(
+        plot_pairplot(
             df=df,
             columns=self.columns,
             columns_x=self.columns_x,
             columns_y=self.columns_y,
             color_col=self.color_col,
         )
+
+
+def plot_pairplot(
+    df: pd.DataFrame,
+    columns: Optional[List[str]] = None,
+    columns_x: Optional[List[str]] = None,
+    columns_y: Optional[List[str]] = None,
+    allow_categorical: bool = False,
+    color_col: Optional[str] = None,
+) -> None:
+    """Plot a pairplot for each pair of columns.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data frame for which to plot pairplot.
+    columns : Union[List[Tuple[str, str]] or List[str]], optional
+        Which columns to plot pairplot for.
+        All columns that are not categorical and are not boolean are used by default.
+    columns_x : List[str], optional
+        If specified, correlation is plotted
+        on the cartesian product of `columns_x` and `columns_y`.
+        If `columns_x` is specified, then `columns_y` must also be specified.
+    columns_y : List[str], optional
+        If specified, correlation is plotted
+        on the cartesian product of `columns_x` and `columns_y`.
+        If `columns_y` is specified, then `columns_x` must also be specified.
+    allow_categorical : bool (default = False)
+        Whether to allow plotting of categorical columns. If False (default), then even
+        explicitly specified columns will be excluded. If True, categorical columns are still
+        excluded by default, unless explicitly specified via columns/columns_x/columns_y.
+    color_col : str, optional
+        Name of column according to use for coloring of points and histogram in the pairplot.
+
+    Raises
+    ------
+    ValueError
+        If exactly one of `columns_x`, `columns_y` is specified.
+    """
+
+    def include_column(col: str) -> bool:
+        return not is_categorical(df[col]) and not is_boolean(df[col])
+
+    if (columns_x is None) != (columns_y is None):
+        raise ValueError("Either both or neither of columns_x, columns_y must be specified.")
+    if columns_x is None:
+        if columns is None:
+            columns = list(filter(include_column, df.columns))
+        columns_x = columns
+        columns_y = columns
+    if not allow_categorical:
+        columns_x = list(filter(include_column, columns_x))
+        columns_y = list(filter(include_column, columns_y))
+    sns.pairplot(df, x_vars=columns_x, y_vars=columns_y, hue=color_col)
+    plt.tight_layout()
+    plt.show()
 
 
 class ContingencyTable(Section):

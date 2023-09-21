@@ -58,12 +58,10 @@ class UnivariateAnalysis(Section):
                 code_dedent(
                     """
                     from edvart.report_sections.univariate_analysis import (
-                        UnivariateAnalysis,
                         bar_plot,
                         histogram
                         numeric_statistics,
                         top_most_frequent,
-                        show_univariate_analysis
                     )"""
                 ),
                 "from edvart import utils",

@@ -17,7 +17,7 @@ from edvart.data_types import (
     is_unique,
 )
 from edvart.pandas_formatting import hide_index, render_dictionary, series_to_frame
-from edvart.report_sections.code_string_formatting import code_dedent, get_code
+from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import ReportSection, Section, Verbosity
 
 
@@ -869,14 +869,7 @@ class RowsWithMissingValue(Section):
             e.g. ['import pandas as pd', 'import numpy as np']
         """
         if self.verbosity <= Verbosity.MEDIUM:
-            return [
-                code_dedent(
-                    """
-                    from edvart.report_sections.dataset_overview import (
-                        RowsWithMissingValue, missing_value_row_count
-                    )"""
-                )
-            ]
+            return ["from edvart.report_sections.dataset_overview import missing_value_row_count"]
         return ["from IPython.display import display"]
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
@@ -980,12 +973,7 @@ class DuplicateRows(Section):
             e.g. ['import pandas as pd', 'import numpy as np']
         """
         if self.verbosity <= Verbosity.MEDIUM:
-            code_dedent(
-                """
-                from edvart.report_sections.dataset_overview import (
-                    DuplicateRows, duplicate_row_count
-                )"""
-            )
+            return ["from edvart.report_sections.dataset_overview import duplicate_row_count"]
         return ["from IPython.display import display"]
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:

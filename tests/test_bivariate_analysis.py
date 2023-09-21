@@ -284,7 +284,7 @@ def test_generated_code_verbosity_high():
     exported_code = [cell["source"] for cell in pairplot_cells if cell["cell_type"] == "code"]
 
     expected_code = [
-        "\n\n".join((get_code(bivariate_analysis.PairPlot.plot_pairplot), "plot_pairplot(df=df)")),
+        "\n\n".join((get_code(bivariate_analysis.plot_pairplot), "plot_pairplot(df=df)")),
         "\n\n".join(
             (
                 get_code(bivariate_analysis.default_correlations),
@@ -328,8 +328,8 @@ def test_verbosity_low_different_subsection_verbosities():
     expected_code = [
         "show_bivariate_analysis(df=df, "
         "subsections=[BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable])",
-        get_code(bivariate_analysis.PairPlot.plot_pairplot) + "\n\n" + "plot_pairplot(df=df)",
-        get_code(bivariate_analysis.PairPlot.plot_pairplot) + "\n\n" + "plot_pairplot(df=df)",
+        get_code(bivariate_analysis.plot_pairplot) + "\n\n" + "plot_pairplot(df=df)",
+        get_code(bivariate_analysis.plot_pairplot) + "\n\n" + "plot_pairplot(df=df)",
         "plot_correlations(df=df)",
     ]
 

@@ -81,7 +81,7 @@ class UMAP(Section):
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
         if self.verbosity <= Verbosity.MEDIUM:
-            return ["from edvart.report_sections.multivariate_analysis import plot_umap"]
+            return ["from edvart.report_sections.umap import plot_umap"]
         return [
             "from edvart.plots import scatter_plot_2d",
             "from edvart import utils",
