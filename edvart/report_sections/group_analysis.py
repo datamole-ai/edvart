@@ -80,8 +80,7 @@ class GroupAnalysis(Section):
         if self.verbosity == Verbosity.MEDIUM:
             return [
                 code_dedent(
-                    """
-                    from edvart.report_sections.group_analysis import (
+                    """from edvart.report_sections.group_analysis import (
                         default_group_descriptive_stats,
                         default_group_quantile_stats,
                         show_group_analysis,

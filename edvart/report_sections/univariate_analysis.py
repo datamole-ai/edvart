@@ -52,8 +52,7 @@ class UnivariateAnalysis(Section):
         if self.verbosity == Verbosity.MEDIUM:
             return [
                 code_dedent(
-                    """
-                    from edvart.report_sections.univariate_analysis import (
+                    """from edvart.report_sections.univariate_analysis import (
                         bar_plot,
                         histogram,
                         numeric_statistics,
