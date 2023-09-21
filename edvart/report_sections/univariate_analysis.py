@@ -19,8 +19,6 @@ class UnivariateAnalysis(Section):
 
     Parameters
     -----------
-    df : pd.DataFrame
-        Dataframe to be analyzed
     verbosity : Verbosity
         The verbosity of the code generated in the exported notebook.
     columns : List[str], optional
@@ -30,11 +28,9 @@ class UnivariateAnalysis(Section):
 
     def __init__(
         self,
-        df: pd.DataFrame,
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
     ):
-        self.df = df
         super().__init__(verbosity, columns)
 
     @property
@@ -87,7 +83,7 @@ class UnivariateAnalysis(Section):
             Data for which to add the cells.
         """
         if self.columns is not None:
-            self.df = self.df[self.columns]
+            df = df[self.columns]
 
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
@@ -133,8 +129,8 @@ class UnivariateAnalysis(Section):
             code_cell = nbfv4.new_code_cell(code)
             cells.append(code_cell)
         else:
-            for col in self.df.columns:
-                data_type = infer_data_type(self.df[col])
+            for col in df.columns:
+                data_type = infer_data_type(df[col])
                 data_type_name = str(data_type)
                 column_header = nbfv4.new_markdown_cell(f"## *{col} - {data_type_name}*")
                 cells.append(column_header)

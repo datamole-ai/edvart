@@ -36,24 +36,18 @@ def get_test_df():
 
 
 def test_default_config_verbosity():
-    group_section = GroupAnalysis(df=pd.DataFrame(), groupby=[])
+    group_section = GroupAnalysis(groupby=[])
     assert group_section.verbosity == Verbosity.LOW, "Verbosity should be Verbosity.LOW"
 
 
 def test_invalid_verbosities():
     with pytest.raises(ValueError):
-        GroupAnalysis(df=pd.DataFrame(), groupby=[], verbosity=4)
+        GroupAnalysis(groupby=[], verbosity=4)
     with pytest.raises(ValueError):
-        GroupAnalysis(df=pd.DataFrame(), groupby=[], verbosity=-1)
+        GroupAnalysis(groupby=[], verbosity=-1)
 
 
 def test_groupby_nonexistent_col():
-    with pytest.raises(ValueError):
-        GroupAnalysis(df=pd.DataFrame(), groupby="non-existent")
-    with pytest.raises(ValueError):
-        GroupAnalysis(df=get_test_df(), groupby="non-existent")
-    with pytest.raises(ValueError):
-        GroupAnalysis(df=get_test_df(), groupby=["A", "non-existent"])
     with pytest.raises(ValueError):
         show_group_analysis(df=get_test_df(), groupby=["non-existent"])
     with pytest.raises(ValueError):
@@ -88,7 +82,7 @@ def test_static_methods():
 
 def test_code_export_verbosity_low():
     df = get_test_df()
-    group_section = GroupAnalysis(df=df, groupby="B", verbosity=Verbosity.LOW)
+    group_section = GroupAnalysis(groupby="B", verbosity=Verbosity.LOW)
 
     # Export code
     exported_cells = []
@@ -104,7 +98,7 @@ def test_code_export_verbosity_low():
 
 def test_code_export_verbosity_medium():
     df = get_test_df()
-    group_section = GroupAnalysis(df=df, groupby="A", verbosity=Verbosity.MEDIUM)
+    group_section = GroupAnalysis(groupby="A", verbosity=Verbosity.MEDIUM)
 
     # Export code
     exported_cells = []
@@ -130,7 +124,7 @@ def test_code_export_verbosity_medium():
 
 def test_code_export_verbosity_high():
     df = get_test_df()
-    group_section = GroupAnalysis(df=df, groupby="A", verbosity=Verbosity.HIGH)
+    group_section = GroupAnalysis(groupby="A", verbosity=Verbosity.HIGH)
 
     # Export code
     exported_cells = []
@@ -184,11 +178,11 @@ def test_code_export_verbosity_high():
 
 def test_columns_parameter():
     df = get_test_df()
-    ga = GroupAnalysis(df=df, groupby="A", columns=["B"])
+    ga = GroupAnalysis(groupby="A", columns=["B"])
     assert ga.groupby == ["A"]
     assert ga.columns == ["B"]
 
-    ga = GroupAnalysis(df=df, groupby="A")
+    ga = GroupAnalysis(groupby="A")
     assert ga.groupby == ["A"]
     assert ga.columns is None
     ga.show(df)
@@ -200,13 +194,13 @@ def test_columns_parameter():
 def test_column_list_not_modified():
     df = get_test_df()
     columns = ["C"]
-    GroupAnalysis(df=df, groupby=["A"], columns=columns)
+    GroupAnalysis(groupby=["A"], columns=columns)
     assert columns == ["C"], "Column list modified"
 
 
 def test_show():
     df = get_test_df()
-    group_section = GroupAnalysis(df=df, groupby="A")
+    group_section = GroupAnalysis(groupby="A")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):

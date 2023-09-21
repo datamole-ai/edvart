@@ -23,8 +23,6 @@ class GroupAnalysis(Section):
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Data for which to perform analysis.
     groupby : Union[str, List[str]]
         Name of column or list of columns names to group by.
     verbosity : Verbosity (default = Verbosity.LOW)
@@ -47,7 +45,6 @@ class GroupAnalysis(Section):
 
     def __init__(
         self,
-        df: pd.DataFrame,
         groupby: Union[str, List[str]],
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
@@ -57,10 +54,7 @@ class GroupAnalysis(Section):
     ):
         if isinstance(groupby, str):
             groupby = [groupby]
-        if not set(groupby) <= set(df.columns):
-            raise ValueError("Grouping by a column which is not in columns of df.")
         self.columns = columns
-        self.df = df
         self.groupby = groupby
         self.show_statistics = show_within_group_statistics
         self.show_missing_vals = show_group_missing_values
@@ -200,6 +194,8 @@ class GroupAnalysis(Section):
         df: pd.DataFrame
             Data for which to add the cells.
         """
+        if not set(self.groupby) <= set(df.columns):
+            raise ValueError("Grouping by a column which is not in columns of df.")
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
         cells.append(section_header)
 
@@ -225,7 +221,7 @@ class GroupAnalysis(Section):
                 )
             cells.append(nbfv4.new_code_cell(code))
 
-        columns = self.columns if self.columns is not None else self.df.columns
+        columns = self.columns if self.columns is not None else df.columns
 
         if not self.show_statistics and not self.show_dist:
             return
@@ -233,7 +229,7 @@ class GroupAnalysis(Section):
             if col in self.groupby:
                 continue
             cells.append(nbfv4.new_markdown_cell(f"## *{col}*"))
-            datatype = infer_data_type(self.df[col])
+            datatype = infer_data_type(df[col])
             if datatype == DataType.NUMERIC:
                 self._add_cells_numeric_col(cells, col)
             else:
