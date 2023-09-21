@@ -6,6 +6,7 @@ import pickle
 from abc import ABC
 from typing import List, Optional, Tuple, Union
 
+import isort
 import nbconvert
 import nbformat as nbf
 import nbformat.v4 as nbf4
@@ -131,10 +132,11 @@ class ReportBase(ABC):
             imports_set.update(extra_imports)
         for section in self.sections:
             imports_set.update(section.required_imports())
-        imports = sorted(list(imports_set))
 
-        if len(imports) > 0:
-            nb["cells"].append(nbf4.new_code_cell("\n".join(imports)))
+        imports_code = "\n".join(imports_set)
+        imports_code = isort.code(
+            imports_code, config=isort.Config(profile="black", line_length=100)
+        )
 
         # Add load data cell
         if show_load_data:
