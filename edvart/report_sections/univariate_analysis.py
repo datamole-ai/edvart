@@ -55,7 +55,7 @@ class UnivariateAnalysis(Section):
                     """
                     from edvart.report_sections.univariate_analysis import (
                         bar_plot,
-                        histogram
+                        histogram,
                         numeric_statistics,
                         top_most_frequent,
                     )"""
