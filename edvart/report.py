@@ -292,6 +292,14 @@ class ReportBase(ABC):
         with open(notebook_filepath, "w") as notebook_file:
             nbf.write(nb, notebook_file)
 
+    def add_section(
+        self,
+        section: Section,
+    ) -> "ReportBase":
+        self.sections.append(section)
+
+        return self
+
     def add_overview(
         self,
         columns: Optional[List[str]] = None,
