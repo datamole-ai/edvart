@@ -915,7 +915,7 @@ def contingency_tables(
             ]
 
     for column1, column2 in columns_pairs:
-        ContingencyTable.contingency_table(df, column1, column2)
+        contingency_table(df, column1, column2)
 
 
 def contingency_table(
