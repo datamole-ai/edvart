@@ -5,6 +5,7 @@ on: workflow_dispatch
 env:
   POETRY_VERSION: 1.6.1
   CONVCO_VERSION: v0.4.2
+  GITCLIFF_VERSION: 1.3.0
   CHANGELOG_FILE: CHANGELOG.md
   FULL_CHANGELOG_FILE: FULL_CHANGELOG.md
 
@@ -29,6 +30,9 @@ jobs:
         run: |
           curl -sSfL "https://github.com/convco/convco/releases/download/${{ env.CONVCO_VERSION }}/convco-ubuntu.zip" | zcat > /usr/local/bin/convco
           chmod +x /usr/local/bin/convco
+      - name: Install git-cliff
+        run: |
+          wget "https://github.com/orhun/git-cliff/releases/download/v${{ env.CONVCO_VERSION }}/git-cliff-${{ env.CONVCO_VERSION }}-x86_64-unknown-linux-gnu.tar.gz" | zcat > usr/local/bin/git-cliff
       - name: Set variables
         id: set-vars
         run: |
@@ -58,13 +62,8 @@ jobs:
           ########################################
           # Generate changelogs
           ########################################
-          base_changelog_command="
-            convco
-            changelog
-            --unreleased=${{ env.NEW_VERSION }}
-          "
-          $base_changelog_command --max-versions=1 > ${{ env.CHANGELOG_FILE }}
-          $base_changelog_command > ${{ env.FULL_CHANGELOG_FILE }}
+          git cliff --tag=${{ env.NEW_TAG }} --unreleased > ${{ env.CHANGELOG_FILE }}
+          git cliff --tag=${{ env.NEW_TAG }} > ${{ env.FULL_CHANGELOG_FILE }}
           ########################################
           # Create GitHub Release
           ########################################
