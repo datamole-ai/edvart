@@ -7,7 +7,18 @@ import plotly.io
 import pytest
 
 from edvart.report_sections.code_string_formatting import code_dedent, get_code, total_dedent
-from edvart.report_sections.group_analysis import GroupAnalysis
+from edvart.report_sections.group_analysis import (
+    GroupAnalysis,
+    default_group_descriptive_stats,
+    default_group_quantile_stats,
+    group_barplot,
+    group_missing_values,
+    overlaid_histograms,
+    show_group_analysis,
+    within_group_descriptive_stats,
+    within_group_quantile_stats,
+    within_group_stats,
+)
 from edvart.report_sections.section_base import Verbosity
 
 # Workaround to prevent multiple browser tabs opening with figures
@@ -38,35 +49,35 @@ def test_invalid_verbosities():
 
 def test_groupby_nonexistent_col():
     with pytest.raises(ValueError):
-        GroupAnalysis.group_analysis(df=get_test_df(), groupby=["non-existent"])
+        show_group_analysis(df=get_test_df(), groupby=["non-existent"])
     with pytest.raises(ValueError):
-        GroupAnalysis.group_missing_values(df=get_test_df(), groupby=["non-existent"])
+        group_missing_values(df=get_test_df(), groupby=["non-existent"])
 
 
 def test_static_methods():
     df = get_test_df()
     with redirect_stdout(None):
-        GroupAnalysis.group_analysis(df=df, groupby="C")
-        GroupAnalysis.group_analysis(df=df, groupby=["C"], columns=["A"])
-        GroupAnalysis.group_analysis(df=df, groupby=["C"], columns=["A", "B"])
-        GroupAnalysis.group_analysis(df=df, groupby="C", columns=["A", "B", "C"])
-        GroupAnalysis.group_analysis(df=df, groupby="C", columns=["C"])
+        show_group_analysis(df=df, groupby="C")
+        show_group_analysis(df=df, groupby=["C"], columns=["A"])
+        show_group_analysis(df=df, groupby=["C"], columns=["A", "B"])
+        show_group_analysis(df=df, groupby="C", columns=["A", "B", "C"])
+        show_group_analysis(df=df, groupby="C", columns=["C"])
 
-        GroupAnalysis.group_barplot(df, groupby=["A"], column="B")
-        GroupAnalysis.group_barplot(df, groupby=["A"], column="A")
-        GroupAnalysis.group_barplot(df, groupby=["A", "C"], column="B")
-        GroupAnalysis.group_barplot(df, groupby=["A"], column="C")
-        GroupAnalysis.group_barplot(df, groupby=["A"], column="C")
+        group_barplot(df, groupby=["A"], column="B")
+        group_barplot(df, groupby=["A"], column="A")
+        group_barplot(df, groupby=["A", "C"], column="B")
+        group_barplot(df, groupby=["A"], column="C")
+        group_barplot(df, groupby=["A"], column="C")
 
-        GroupAnalysis.group_missing_values(df, groupby=["C"])
-        GroupAnalysis.group_missing_values(df, groupby=["C"], columns=["A", "B"])
-        GroupAnalysis.group_missing_values(df, groupby=["C"], columns=["A", "B", "C"])
-        GroupAnalysis.group_missing_values(df, groupby=["C"], columns=["C"])
+        group_missing_values(df, groupby=["C"])
+        group_missing_values(df, groupby=["C"], columns=["A", "B"])
+        group_missing_values(df, groupby=["C"], columns=["A", "B", "C"])
+        group_missing_values(df, groupby=["C"], columns=["C"])
 
-        GroupAnalysis.overlaid_histograms(df, groupby=["A"], column="B")
-        GroupAnalysis.overlaid_histograms(df, groupby=["A", "C"], column="B")
-        GroupAnalysis.overlaid_histograms(df, groupby=["A", "C"], column="B")
-        GroupAnalysis.overlaid_histograms(df, groupby=["B"], column="B")
+        overlaid_histograms(df, groupby=["A"], column="B")
+        overlaid_histograms(df, groupby=["A", "C"], column="B")
+        overlaid_histograms(df, groupby=["A", "C"], column="B")
+        overlaid_histograms(df, groupby=["B"], column="B")
 
 
 def test_code_export_verbosity_low():
@@ -79,7 +90,7 @@ def test_code_export_verbosity_low():
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
-    expected_code = ["group_analysis(df=df, groupby=['B'])"]
+    expected_code = ["show_group_analysis(df=df, groupby=['B'])"]
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
@@ -124,16 +135,14 @@ def test_code_export_verbosity_high():
     expected_code = [
         "\n\n".join(
             (
-                get_code(GroupAnalysis.default_group_quantile_stats),
-                get_code(GroupAnalysis.default_group_descriptive_stats),
-                get_code(GroupAnalysis.within_group_descriptive_stats).replace(
-                    "GroupAnalysis.", ""
-                ),
-                get_code(GroupAnalysis.within_group_quantile_stats).replace("GroupAnalysis.", ""),
-                get_code(GroupAnalysis.within_group_stats).replace("GroupAnalysis.", ""),
-                get_code(GroupAnalysis.group_barplot),
-                get_code(GroupAnalysis.overlaid_histograms),
-                get_code(GroupAnalysis.group_missing_values),
+                get_code(default_group_quantile_stats),
+                get_code(default_group_descriptive_stats),
+                get_code(within_group_descriptive_stats),
+                get_code(within_group_quantile_stats),
+                get_code(within_group_stats),
+                get_code(group_barplot),
+                get_code(overlaid_histograms),
+                get_code(group_missing_values),
             )
         )
     ]

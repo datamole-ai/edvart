@@ -175,7 +175,7 @@ def test_code_export_verbosity_low():
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
-    expected_code = ["timeseries_analysis(df=df)"]
+    expected_code = ["show_timeseries_analysis(df=df)"]
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
@@ -196,7 +196,7 @@ def test_code_export_verbosity_low_with_subsections():
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
     expected_code = [
-        "timeseries_analysis(df=df, subsections=["
+        "show_timeseries_analysis(df=df, subsections=["
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests])"
     ]
@@ -222,7 +222,7 @@ def test_code_export_verbosity_low_with_fft_stft():
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
     expected_code = [
-        "timeseries_analysis(df=df, subsections=["
+        "show_timeseries_analysis(df=df, subsections=["
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT], "
         "sampling_rate=1, stft_window_size=1)"
@@ -264,64 +264,54 @@ def test_generated_code_verbosity_high():
     expected_code = [
         "\n\n".join(
             (
-                get_code(timeseries_analysis.TimeSeriesLinePlot.time_series_line_plot).replace(
-                    "TimeSeriesLinePlot.", ""
-                ),
-                get_code(timeseries_analysis.TimeSeriesLinePlot._time_series_line_plot_colored),
+                get_code(timeseries_analysis.time_series_line_plot.time_series_line_plot),
+                get_code(timeseries_analysis.time_series_line_plot._time_series_line_plot_colored),
                 "time_series_line_plot(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.RollingStatistics.rolling_statistics),
+                get_code(timeseries_analysis.rolling_statistics.rolling_statistics),
                 "rolling_statistics(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.BoxplotsOverTime.default_grouping_functions),
-                get_code(timeseries_analysis.BoxplotsOverTime.get_default_grouping_func).replace(
-                    "BoxplotsOverTime.", ""
-                ),
-                get_code(timeseries_analysis.BoxplotsOverTime.boxplots_over_time).replace(
-                    "BoxplotsOverTime.", ""
-                ),
+                get_code(timeseries_analysis.boxplots_over_time.default_grouping_functions),
+                get_code(timeseries_analysis.boxplots_over_time.get_default_grouping_func),
+                get_code(timeseries_analysis.boxplots_over_time.boxplots_over_time),
                 "boxplots_over_time(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.SeasonalDecomposition.seasonal_decomposition),
+                get_code(timeseries_analysis.seasonal_decomposition.seasonal_decomposition),
                 "seasonal_decomposition(df=df, model='additive')",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.StationarityTests.default_stationarity_tests),
-                get_code(timeseries_analysis.StationarityTests.stationarity_tests).replace(
-                    "StationarityTests.", ""
-                ),
+                get_code(timeseries_analysis.stationarity_tests.default_stationarity_tests),
+                get_code(timeseries_analysis.stationarity_tests.stationarity_tests),
                 "stationarity_tests(df=df)",
             )
         ),
-        get_code(timeseries_analysis.Autocorrelation.plot_acf) + "\n\n" + "plot_acf(df=df)",
+        get_code(timeseries_analysis.autocorrelation.plot_acf) + "\n\n" + "plot_acf(df=df)",
         "\n\n".join(
             (
-                get_code(timeseries_analysis.Autocorrelation.plot_pacf).replace(
-                    "Autocorrelation.", ""
-                ),
+                get_code(timeseries_analysis.autocorrelation.plot_pacf),
                 "plot_pacf(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.FourierTransform.fourier_transform),
+                get_code(timeseries_analysis.fourier_transform.fourier_transform),
                 "fourier_transform(df=df, sampling_rate=1)",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.ShortTimeFT.short_time_ft),
+                get_code(timeseries_analysis.short_time_ft.short_time_ft),
                 "short_time_ft(df=df, sampling_rate=1, window_size=1)",
             )
         ),
@@ -355,14 +345,14 @@ def test_verbosity_low_different_subsection_verbosities():
     exported_code = [cell["source"] for cell in ts_cells if cell["cell_type"] == "code"]
 
     expected_code = [
-        "timeseries_analysis(df=df, "
+        "show_timeseries_analysis(df=df, "
         "subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime])",
         "fourier_transform(df=df, sampling_rate=1)",
         "rolling_statistics(df=df)",
         (
-            get_code(timeseries_analysis.ShortTimeFT.short_time_ft)
+            get_code(timeseries_analysis.short_time_ft.short_time_ft)
             + "\n\n"
             + "short_time_ft(df=df, sampling_rate=1, window_size=2)"
         ),
@@ -420,8 +410,7 @@ def test_imports_verbosity_low():
 
     exported_imports = ts_section.required_imports()
     expected_imports = [
-        "from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis\n"
-        "timeseries_analysis = TimeseriesAnalysis.timeseries_analysis"
+        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import show_timeseries_analysis"
     ]
 
     assert isinstance(exported_imports, list)
@@ -474,8 +463,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     exported_imports = ts_section.required_imports()
 
     expected_imports = {
-        "from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis\n"
-        "timeseries_analysis = TimeseriesAnalysis.timeseries_analysis"
+        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import show_timeseries_analysis",
     }
     for s in ts_section.subsections:
         if s.verbosity > Verbosity.LOW:

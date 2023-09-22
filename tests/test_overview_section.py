@@ -132,7 +132,7 @@ def test_code_export_verbosity_low():
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
-    expected_code = ["overview_analysis(df=df)"]
+    expected_code = ["show_overview(df=df)"]
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
@@ -152,7 +152,7 @@ def test_code_export_verbosity_low_with_subsections():
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
     expected_code = [
-        "overview_analysis(df=df, subsections=[Overview.OverviewSubsection.QuickInfo, "
+        "show_overview(df=df, subsections=[Overview.OverviewSubsection.QuickInfo, "
         "Overview.OverviewSubsection.MissingValues])"
     ]
     # Test code equivalence
@@ -217,7 +217,7 @@ def test_code_export_verbosity_high():
         "\n\n".join(
             (
                 get_code(render_dictionary),
-                get_code(dataset_overview.QuickInfo.quick_info),
+                get_code(dataset_overview.quick_info),
                 "quick_info(df=df)",
             )
         ),
@@ -232,36 +232,36 @@ def test_code_export_verbosity_high():
                 get_code(is_boolean),
                 get_code(is_date),
                 get_code(infer_data_type),
-                get_code(dataset_overview.DataTypes.data_types),
+                get_code(dataset_overview.data_types),
                 "data_types(df=df)",
             )
         ),
-        get_code(dataset_overview.DataPreview.data_preview) + "\n\n" + "data_preview(df=df)",
+        get_code(dataset_overview.data_preview) + "\n\n" + "data_preview(df=df)",
         "\n\n".join(
             (
                 get_code(series_to_frame),
-                get_code(dataset_overview.MissingValues.missing_values),
+                get_code(dataset_overview.missing_values),
                 "missing_values(df=df)",
             )
         ),
         "\n\n".join(
             (
                 get_code(render_dictionary),
-                get_code(dataset_overview.RowsWithMissingValue.missing_value_row_count),
+                get_code(dataset_overview.missing_value_row_count),
                 "missing_value_row_count(df=df)",
             )
         ),
         "\n\n".join(
             (
                 get_code(series_to_frame),
-                get_code(dataset_overview.ConstantOccurrence.constant_occurrence),
+                get_code(dataset_overview.constant_occurrence),
                 "constant_occurrence(df=df)",
             )
         ),
         "\n\n".join(
             (
                 get_code(render_dictionary),
-                get_code(dataset_overview.DuplicateRows.duplicate_row_count),
+                get_code(dataset_overview.duplicate_row_count),
                 "duplicate_row_count(df=df)",
             )
         ),
@@ -283,7 +283,7 @@ def test_verbosity_low_different_subsection_verbosities():
     exported_code = [cell["source"] for cell in overview_cells if cell["cell_type"] == "code"]
 
     expected_code = [
-        "overview_analysis(df=df, "
+        "show_overview(df=df, "
         "subsections=[Overview.OverviewSubsection.DataTypes, "
         "Overview.OverviewSubsection.DataPreview, "
         "Overview.OverviewSubsection.MissingValues, "
@@ -293,7 +293,7 @@ def test_verbosity_low_different_subsection_verbosities():
         (
             get_code(render_dictionary)
             + 2 * "\n"
-            + get_code(dataset_overview.DuplicateRows.duplicate_row_count)
+            + get_code(dataset_overview.duplicate_row_count)
             + 2 * "\n"
             + "duplicate_row_count(df=df)"
         ),
@@ -308,10 +308,7 @@ def test_imports_verbosity_low():
     overview_section = Overview(verbosity=Verbosity.LOW)
 
     exported_imports = overview_section.required_imports()
-    expected_imports = [
-        "from edvart.report_sections.dataset_overview import Overview\n"
-        "overview_analysis = Overview.overview_analysis"
-    ]
+    expected_imports = ["from edvart.report_sections.dataset_overview import show_overview"]
 
     assert isinstance(exported_imports, list)
     assert len(expected_imports) == len(exported_imports)
@@ -356,10 +353,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
     exported_imports = overview_section.required_imports()
 
-    expected_imports = {
-        "from edvart.report_sections.dataset_overview import Overview\n"
-        "overview_analysis = Overview.overview_analysis"
-    }
+    expected_imports = {"from edvart.report_sections.dataset_overview import show_overview"}
     for s in overview_section.subsections:
         if s.verbosity > Verbosity.LOW:
             expected_imports.update(s.required_imports())

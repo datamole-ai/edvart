@@ -173,54 +173,6 @@ class TimeseriesAnalysis(ReportSection):
     def name(self) -> str:
         return "Timeseries analysis"
 
-    @staticmethod
-    @check_index_time_ascending
-    def timeseries_analysis(
-        df: pd.DataFrame,
-        subsections: Optional[List[TimeseriesAnalysisSubsection]] = None,
-        columns: Optional[List[str]] = None,
-        sampling_rate: Optional[int] = None,
-        stft_window_size: Optional[int] = None,
-    ) -> None:
-        """Generate timeseries analysis for df.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Data to be analyzed.
-        subsections : List[TimeseriesAnalysisSubsection], optional
-            Subsections to include in the analysis. All subsections are included by default.
-        columns : List[str], optional
-            Subset of columns of df to consider in timeseries analysis.
-            All columns are used by default.
-        sampling_rate : int, optional
-            Sampling rate of the time-series, i.e., how many samples form one period. For example,
-            if your timeseries contains hourly data and you want to investigate daily frequencies,
-            use 24.
-            If not set, Fourier transform and Short-time Fourier transform will not be included.
-        stft_window_size : int, optional
-            Window size for Short-time Fourier transform. Short-time Fourier transform will not be
-            included if this parameter is not set.
-
-        Raises
-        ------
-        ValueError
-            If the input data is not indexed by time in ascending order.
-        """
-        if columns is not None:
-            df = df[columns]
-
-        timeseries_analysis = TimeseriesAnalysis(
-            subsections=subsections,
-            verbosity=Verbosity.LOW,
-            columns=columns,
-            sampling_rate=sampling_rate,
-            stft_window_size=stft_window_size,
-        )
-
-        for sub in timeseries_analysis.subsections:
-            sub.show(df)
-
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Add cells to the list of cells.
 
@@ -238,7 +190,7 @@ class TimeseriesAnalysis(ReportSection):
 
         if self.verbosity == Verbosity.LOW:
             subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
-            code = "timeseries_analysis(df=df"
+            code = "show_timeseries_analysis(df=df"
             subsections_to_show_with_low_verbosity = [
                 sub
                 for sub in self.subsections_to_show
@@ -281,8 +233,8 @@ class TimeseriesAnalysis(ReportSection):
         """
         if self.verbosity == Verbosity.LOW:
             imports = {
-                "from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis\n"
-                "timeseries_analysis = TimeseriesAnalysis.timeseries_analysis"
+                "from edvart.report_sections.timeseries_analysis.timeseries_analysis"
+                " import show_timeseries_analysis"
             }
             for sub in self.subsections:
                 if sub.verbosity > Verbosity.LOW:
@@ -301,3 +253,51 @@ class TimeseriesAnalysis(ReportSection):
         """
         display(Markdown(self.get_title(section_level=1)))
         super().show(df)
+
+
+@check_index_time_ascending
+def show_timeseries_analysis(
+    df: pd.DataFrame,
+    subsections: Optional[List[TimeseriesAnalysis.TimeseriesAnalysisSubsection]] = None,
+    columns: Optional[List[str]] = None,
+    sampling_rate: Optional[int] = None,
+    stft_window_size: Optional[int] = None,
+) -> None:
+    """Generate timeseries analysis for df.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to be analyzed.
+    subsections : List[TimeseriesAnalysisSubsection], optional
+        Subsections to include in the analysis. All subsections are included by default.
+    columns : List[str], optional
+        Subset of columns of df to consider in timeseries analysis.
+        All columns are used by default.
+    sampling_rate : int, optional
+        Sampling rate of the time-series, i.e., how many samples form one period. For example,
+        if your timeseries contains hourly data and you want to investigate daily frequencies,
+        use 24.
+        If not set, Fourier transform and Short-time Fourier transform will not be included.
+    stft_window_size : int, optional
+        Window size for Short-time Fourier transform. Short-time Fourier transform will not be
+        included if this parameter is not set.
+
+    Raises
+    ------
+    ValueError
+        If the input data is not indexed by time in ascending order.
+    """
+    if columns is not None:
+        df = df[columns]
+
+    timeseries_analysis = TimeseriesAnalysis(
+        subsections=subsections,
+        verbosity=Verbosity.LOW,
+        columns=columns,
+        sampling_rate=sampling_rate,
+        stft_window_size=stft_window_size,
+    )
+
+    for sub in timeseries_analysis.subsections:
+        sub.show(df)

@@ -17,7 +17,7 @@ from edvart.data_types import (
     is_unique,
 )
 from edvart.pandas_formatting import hide_index, render_dictionary, series_to_frame
-from edvart.report_sections.code_string_formatting import get_code, total_dedent
+from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import ReportSection, Section, Verbosity
 
 
@@ -135,29 +135,6 @@ class Overview(ReportSection):
     def name(self) -> str:
         return "Overview"
 
-    @staticmethod
-    def overview_analysis(
-        df: pd.DataFrame,
-        subsections: Optional[List[OverviewSubsection]] = None,
-        columns: Optional[List[str]] = None,
-    ) -> None:
-        """Generates overview analysis for df.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Data to be analyzed
-        subsections : List[OverviewSubsection], optional
-            Subsections to include into the overview
-        columns : List[str], optional
-            Subset of columns of df to consider in overview, by default all columns are used.
-        """
-        if columns is not None:
-            df = df[columns]
-        overview = Overview(subsections=subsections, verbosity=Verbosity.LOW, columns=columns)
-        for sub in overview.subsections:
-            sub.show(df)
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -168,10 +145,7 @@ class Overview(ReportSection):
             e.g. ['import pandas as pd', 'import numpy as np']
         """
         if self.verbosity == Verbosity.LOW:
-            imports = {
-                "from edvart.report_sections.dataset_overview import Overview\n"
-                "overview_analysis = Overview.overview_analysis"
-            }
+            imports = {"from edvart.report_sections.dataset_overview import show_overview"}
             for subsec in self.subsections:
                 if subsec.verbosity > Verbosity.LOW:
                     imports.update(subsec.required_imports())
@@ -195,7 +169,7 @@ class Overview(ReportSection):
         cells.append(section_header)
 
         if self.verbosity == Verbosity.LOW:
-            code = "overview_analysis(df=df"
+            code = "show_overview(df=df"
             subsections_to_show_with_low_verbosity = [
                 sub
                 for sub in self.subsections_to_show
@@ -229,6 +203,29 @@ class Overview(ReportSection):
         super().show(df)
 
 
+def show_overview(
+    df: pd.DataFrame,
+    subsections: Optional[List[Overview.OverviewSubsection]] = None,
+    columns: Optional[List[str]] = None,
+) -> None:
+    """Generates overview analysis for df.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to be analyzed
+    subsections : List[OverviewSubsection], optional
+        Subsections to include into the overview
+    columns : List[str], optional
+        Subset of columns of df to consider in overview, by default all columns are used.
+    """
+    if columns is not None:
+        df = df[columns]
+    overview = Overview(subsections=subsections, verbosity=Verbosity.LOW, columns=columns)
+    for sub in overview.subsections:
+        sub.show(df)
+
+
 class QuickInfo(Section):
     """Generates the Quick info subsection.
 
@@ -245,47 +242,6 @@ class QuickInfo(Section):
     def name(self) -> str:
         return "Quick Info"
 
-    @staticmethod
-    def quick_info(
-        df: pd.DataFrame,
-        columns: Optional[List[str]] = None,
-        additional_rows: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        """Renders a quick info table about df in the calling notebook.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Data which to analyze.
-        columns : List[str], optional
-            List of columns of df to analyze. All columns of df are used by default.
-        additional_rows : Dict[str, Any], optional
-            Additional custom rows to add to the table.
-        """
-        if columns is not None:
-            df = df[columns]
-        missing_cells = df.isna().sum().sum()
-        missing_cells_percent = 100 * missing_cells / (df.shape[0] * df.shape[1])
-
-        zeros = (df == 0).sum().sum()
-        zeros_percent = 100 * zeros / (df.shape[0] * df.shape[1])
-
-        duplicate_rows = df.duplicated().sum()
-        duplicate_rows_percent = 100 * duplicate_rows / len(df)
-
-        df_info_rows = {
-            "Rows": df.shape[0],
-            "Columns": df.shape[1],
-            "Missing cells": f"{missing_cells} ({missing_cells_percent:,.02f} %)",
-            "Zeros": f"{zeros} ({zeros_percent:.02f} %)",
-            "Duplicate rows": f"{duplicate_rows} ({duplicate_rows_percent:,.02f} %)",
-        }
-
-        if additional_rows is not None:
-            df_info_rows = {**df_info_rows, **additional_rows}
-
-        render_dictionary(df_info_rows)
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -296,14 +252,7 @@ class QuickInfo(Section):
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
         if self.verbosity <= Verbosity.MEDIUM:
-            return [
-                total_dedent(
-                    """
-                    from edvart.report_sections.dataset_overview import QuickInfo
-                    quick_info = QuickInfo.quick_info
-                    """
-                )
-            ]
+            return ["from edvart.report_sections.dataset_overview import quick_info"]
         return []
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
@@ -330,7 +279,7 @@ class QuickInfo(Section):
             code = (
                 get_code(render_dictionary)
                 + 2 * "\n"
-                + get_code(QuickInfo.quick_info)
+                + get_code(quick_info)
                 + 2 * "\n"
                 + default_call
             )
@@ -346,7 +295,48 @@ class QuickInfo(Section):
             Data which to use for the table.
         """
         display(Markdown(self.get_title(section_level=2)))
-        QuickInfo.quick_info(df, columns=self.columns)
+        quick_info(df, columns=self.columns)
+
+
+def quick_info(
+    df: pd.DataFrame,
+    columns: Optional[List[str]] = None,
+    additional_rows: Optional[Dict[str, Any]] = None,
+) -> None:
+    """Renders a quick info table about df in the calling notebook.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data which to analyze.
+    columns : List[str], optional
+        List of columns of df to analyze. All columns of df are used by default.
+    additional_rows : Dict[str, Any], optional
+        Additional custom rows to add to the table.
+    """
+    if columns is not None:
+        df = df[columns]
+    missing_cells = df.isna().sum().sum()
+    missing_cells_percent = 100 * missing_cells / (df.shape[0] * df.shape[1])
+
+    zeros = (df == 0).sum().sum()
+    zeros_percent = 100 * zeros / (df.shape[0] * df.shape[1])
+
+    duplicate_rows = df.duplicated().sum()
+    duplicate_rows_percent = 100 * duplicate_rows / len(df)
+
+    df_info_rows = {
+        "Rows": df.shape[0],
+        "Columns": df.shape[1],
+        "Missing cells": f"{missing_cells} ({missing_cells_percent:,.02f} %)",
+        "Zeros": f"{zeros} ({zeros_percent:.02f} %)",
+        "Duplicate rows": f"{duplicate_rows} ({duplicate_rows_percent:,.02f} %)",
+    }
+
+    if additional_rows is not None:
+        df_info_rows = {**df_info_rows, **additional_rows}
+
+    render_dictionary(df_info_rows)
 
 
 class DataTypes(Section):
@@ -365,32 +355,6 @@ class DataTypes(Section):
     def name(self) -> str:
         return "Data Types"
 
-    @staticmethod
-    def data_types(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
-        """Renders a table with inferred data types in the calling notebook.
-
-        Parameters
-        ----------
-        df : pd.DataFrame:
-            Data for which to infer data types
-        columns : List[str], optional
-            List of columns for which to infer data type. All columns of df are used by default.
-        """
-        if columns is not None:
-            df = df[columns]
-        dtypes = df.apply(
-            func=lambda x_: str(infer_data_type(x_)),
-            axis=0,
-            result_type="expand",
-        )
-
-        # Convert result to frame for viewing
-        dtypes_frame = series_to_frame(
-            series=dtypes, index_name="Column Name", column_name="edvart Data Type"
-        )
-
-        display(hide_index(dtypes_frame))
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -402,14 +366,7 @@ class DataTypes(Section):
         """
         base_imports = ["from edvart.pandas_formatting import hide_index"]
         if self.verbosity <= Verbosity.MEDIUM:
-            return base_imports + [
-                total_dedent(
-                    """
-                    from edvart.report_sections.dataset_overview import DataTypes
-                    data_types = DataTypes.data_types
-                    """
-                )
-            ]
+            return base_imports + ["from edvart.report_sections.dataset_overview import data_types"]
         return base_imports + [
             "from enum import IntEnum",
             "import numpy as np",
@@ -451,7 +408,7 @@ class DataTypes(Section):
                             is_boolean,
                             is_date,
                             infer_data_type,
-                            DataTypes.data_types,
+                            data_types,
                         )
                     ),
                     default_call,
@@ -469,7 +426,33 @@ class DataTypes(Section):
             Data for which to infer data types.
         """
         display(Markdown(self.get_title(section_level=2)))
-        DataTypes.data_types(df=df, columns=self.columns)
+        data_types(df=df, columns=self.columns)
+
+
+def data_types(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
+    """Renders a table with inferred data types in the calling notebook.
+
+    Parameters
+    ----------
+    df : pd.DataFrame:
+        Data for which to infer data types
+    columns : List[str], optional
+        List of columns for which to infer data type. All columns of df are used by default.
+    """
+    if columns is not None:
+        df = df[columns]
+    dtypes = df.apply(
+        func=lambda x_: str(infer_data_type(x_)),
+        axis=0,
+        result_type="expand",
+    )
+
+    # Convert result to frame for viewing
+    dtypes_frame = series_to_frame(
+        series=dtypes, index_name="Column Name", column_name="edvart Data Type"
+    )
+
+    display(hide_index(dtypes_frame))
 
 
 class DataPreview(Section):
@@ -488,41 +471,6 @@ class DataPreview(Section):
     def name(self) -> str:
         return "Data Preview"
 
-    @staticmethod
-    def data_preview(
-        df: pd.DataFrame,
-        columns: Optional[List[str]] = None,
-        n_head: int = 5,
-        n_tail: int = 5,
-        n_sample: int = 5,
-    ) -> None:
-        """Renders data preview tables in the calling notebook.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Data which to preview.
-        columns : List[str], optional
-            Columns of df to preview. All columns of df are used by default.
-        n_head : int
-            Number of first n rows of df to render, if None no preview is rendered.
-        n_tail : int
-            Number of last n rows of df to render, if None no preview is rendered.
-        n_sample : int
-            Size of random sample of df to render, if None no preview is rendered.
-        """
-        if columns is not None:
-            df = df[columns]
-        if n_head is not None:
-            display(Markdown("### First rows"))
-            display(df.head(n_head))
-        if n_tail is not None:
-            display(Markdown("### Last rows"))
-            display(df.tail(n_tail))
-        if n_sample is not None:
-            display(Markdown("### Sample"))
-            display(df.sample(min(n_sample, len(df))))
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -533,14 +481,7 @@ class DataPreview(Section):
             e.g. ['import pandas as pd', 'import numpy as np'].
         """
         if self.verbosity <= Verbosity.MEDIUM:
-            return [
-                total_dedent(
-                    """
-                    from edvart.report_sections.dataset_overview import DataPreview
-                    data_preview = DataPreview.data_preview
-                    """
-                )
-            ]
+            return ["from edvart.report_sections.dataset_overview import data_preview"]
         return [
             "from IPython.display import display",
             "from IPython.display import Markdown",
@@ -567,7 +508,7 @@ class DataPreview(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         elif self.verbosity == Verbosity.HIGH:
-            code = get_code(DataPreview.data_preview) + 2 * "\n" + default_call
+            code = get_code(data_preview) + 2 * "\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -580,7 +521,42 @@ class DataPreview(Section):
             Data which to preview
         """
         display(Markdown(self.get_title(section_level=2)))
-        DataPreview.data_preview(df=df, columns=self.columns)
+        data_preview(df=df, columns=self.columns)
+
+
+def data_preview(
+    df: pd.DataFrame,
+    columns: Optional[List[str]] = None,
+    n_head: int = 5,
+    n_tail: int = 5,
+    n_sample: int = 5,
+) -> None:
+    """Renders data preview tables in the calling notebook.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data which to preview.
+    columns : List[str], optional
+        Columns of df to preview. All columns of df are used by default.
+    n_head : int
+        Number of first n rows of df to render, if None no preview is rendered.
+    n_tail : int
+        Number of last n rows of df to render, if None no preview is rendered.
+    n_sample : int
+        Size of random sample of df to render, if None no preview is rendered.
+    """
+    if columns is not None:
+        df = df[columns]
+    if n_head is not None:
+        display(Markdown("### First rows"))
+        display(df.head(n_head))
+    if n_tail is not None:
+        display(Markdown("### Last rows"))
+        display(df.tail(n_tail))
+    if n_sample is not None:
+        display(Markdown("### Sample"))
+        display(df.sample(min(n_sample, len(df))))
 
 
 class MissingValues(Section):
@@ -598,86 +574,6 @@ class MissingValues(Section):
     def name(self) -> str:
         return "Missing Values"
 
-    @staticmethod
-    def missing_values(
-        df: pd.DataFrame,
-        columns: Optional[List[str]] = None,
-        bar_plot: bool = True,
-        bar_plot_figsize: Tuple[int, int] = (15, 6),
-        bar_plot_title: str = "Missing Values Percentage of Each Column",
-        bar_plot_ylim: float = 0,
-        bar_plot_color: str = "#FFA07A",
-        **bar_plot_args: Dict[str, Any],
-    ) -> None:
-        """Displays a table of missing values percentages for each column of df and a bar plot
-        of the percentages.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Dataframe for which to calculate missing values.
-        columns : Optional[List[str]], optional
-            Subset of columns for which to calculate missing values percentage.
-            If None, all columns of df are used.
-        bar_plot : bool
-            Whether to also display a bar plot visualizing missing values percentages for each
-            column.
-        bar_plot_figsize : Tuple[int, int]
-            Width and height of the bar plot.
-        bar_plot_title : str
-            Title of the bar plot.
-        bar_plot_ylim : float
-            Bar plot y axis bottom limit.
-        bar_plot_color : str
-            Color of bars in the bar plot in hex format.
-        bar_plot_args : Dict[str, Any]
-            Additional kwargs passed to pandas.Series.bar.
-        """
-        if columns is not None:
-            df = df[columns]
-
-        # Count null values
-        null_count = df.isna().sum()
-        null_percentage = 100 * null_count / len(df)
-
-        if null_count.sum() == 0:
-            print("There are no missing values")
-            return
-
-        # Convert series to frames
-        null_count_frame = series_to_frame(
-            series=null_count, index_name="Column Name", column_name="Null Count"
-        )
-        null_percentage_frame = series_to_frame(
-            series=null_percentage, index_name="Column Name", column_name="Null %"
-        )
-        # Merge null count and percentage into one frame
-        null_stats_frame = null_count_frame.merge(
-            null_percentage_frame, on="Column Name"
-        ).sort_values("Null Count", ascending=False)
-
-        display(
-            hide_index(null_stats_frame)
-            .bar(color="#FFA07A", subset=["Null %"], vmax=100)
-            .format({"Null %": "{:.03f}"})
-        )
-
-        # Display bar plot of missing value percentages
-        if bar_plot:
-            (
-                null_percentage_frame.sort_values("Null %", ascending=False)
-                .plot.bar(
-                    x="Column Name",
-                    figsize=bar_plot_figsize,
-                    title=bar_plot_title,
-                    ylim=bar_plot_ylim,
-                    color=bar_plot_color,
-                    **bar_plot_args,
-                )
-                .set_ylabel("Missing Values [%]")
-            )
-            plt.show()
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -690,12 +586,7 @@ class MissingValues(Section):
         base_imports = ["from edvart.pandas_formatting import hide_index"]
         if self.verbosity <= Verbosity.MEDIUM:
             return base_imports + [
-                total_dedent(
-                    """
-                    from edvart.report_sections.dataset_overview import MissingValues
-                    missing_values = MissingValues.missing_values
-                    """
-                )
+                "from edvart.report_sections.dataset_overview import missing_values"
             ]
         return base_imports + [
             "from IPython.display import display",
@@ -726,7 +617,7 @@ class MissingValues(Section):
             code = (
                 get_code(series_to_frame)
                 + 2 * "\n"
-                + get_code(MissingValues.missing_values)
+                + get_code(missing_values)
                 + 2 * "\n"
                 + default_call
             )
@@ -742,7 +633,87 @@ class MissingValues(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        MissingValues.missing_values(df=df, columns=self.columns)
+        missing_values(df=df, columns=self.columns)
+
+
+def missing_values(
+    df: pd.DataFrame,
+    columns: Optional[List[str]] = None,
+    bar_plot: bool = True,
+    bar_plot_figsize: Tuple[int, int] = (15, 6),
+    bar_plot_title: str = "Missing Values Percentage of Each Column",
+    bar_plot_ylim: float = 0,
+    bar_plot_color: str = "#FFA07A",
+    **bar_plot_args: Dict[str, Any],
+) -> None:
+    """Displays a table of missing values percentages for each column of df and a bar plot
+    of the percentages.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Dataframe for which to calculate missing values.
+    columns : Optional[List[str]], optional
+        Subset of columns for which to calculate missing values percentage.
+        If None, all columns of df are used.
+    bar_plot : bool
+        Whether to also display a bar plot visualizing missing values percentages for each
+        column.
+    bar_plot_figsize : Tuple[int, int]
+        Width and height of the bar plot.
+    bar_plot_title : str
+        Title of the bar plot.
+    bar_plot_ylim : float
+        Bar plot y axis bottom limit.
+    bar_plot_color : str
+        Color of bars in the bar plot in hex format.
+    bar_plot_args : Dict[str, Any]
+        Additional kwargs passed to pandas.Series.bar.
+    """
+    if columns is not None:
+        df = df[columns]
+
+    # Count null values
+    null_count = df.isna().sum()
+    null_percentage = 100 * null_count / len(df)
+
+    if null_count.sum() == 0:
+        print("There are no missing values")
+        return
+
+    # Convert series to frames
+    null_count_frame = series_to_frame(
+        series=null_count, index_name="Column Name", column_name="Null Count"
+    )
+    null_percentage_frame = series_to_frame(
+        series=null_percentage, index_name="Column Name", column_name="Null %"
+    )
+    # Merge null count and percentage into one frame
+    null_stats_frame = null_count_frame.merge(null_percentage_frame, on="Column Name").sort_values(
+        "Null Count", ascending=False
+    )
+
+    display(
+        hide_index(null_stats_frame)
+        .bar(color="#FFA07A", subset=["Null %"], vmax=100)
+        .format({"Null %": "{:.03f}"})
+    )
+
+    # Display bar plot of missing value percentages
+    if bar_plot:
+        (
+            null_percentage_frame.sort_values("Null %", ascending=False)
+            .plot.bar(
+                x="Column Name",
+                figsize=bar_plot_figsize,
+                title=bar_plot_title,
+                ylim=bar_plot_ylim,
+                color=bar_plot_color,
+                **bar_plot_args,
+            )
+            .set_ylabel("Missing Values [%]")
+        )
+        plt.show()
 
 
 class ConstantOccurrence(Section):
@@ -760,60 +731,6 @@ class ConstantOccurrence(Section):
     def name(self) -> str:
         return "Constant Occurrence"
 
-    @staticmethod
-    def constant_occurrence(
-        df: pd.DataFrame, columns: Optional[List[str]] = None, constant: Any = 0
-    ) -> None:
-        """Displays a table with occurrence of a constant in each column.
-
-        By default, check for 0 occurrence.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Dataframe for which to calculate constant values occurrence.
-        columns : Optional[List[str]], optional
-            Subset of columns for which to calculate constant values occurrence.
-            If None, all columns of df are used.
-        constant : Any
-            Constant for which to check occurrence in df, by default 0.
-        """
-        if columns is not None:
-            df = df[columns]
-
-        # Count constant counts
-        constant_count = (df == constant).sum()
-        constant_percentage = 100 * constant_count / len(df)
-
-        constant_formatted = f"<i>{constant!r}</i>"
-        constant_count_name = f"{constant_formatted} Count"
-        constant_perc_name = f"{constant_formatted} %"
-
-        # Convert series to frames
-        constant_count_frame = series_to_frame(
-            series=constant_count,
-            index_name="Column Name",
-            column_name=constant_count_name,
-        )
-
-        constant_percentage_frame = series_to_frame(
-            series=constant_percentage,
-            index_name="Column Name",
-            column_name=constant_perc_name,
-        )
-
-        # Merge absolute and relative counts
-        constant_stats_frame = constant_count_frame.merge(
-            constant_percentage_frame, on="Column Name"
-        ).sort_values(constant_perc_name, ascending=False)
-
-        # Display table
-        display(
-            hide_index(constant_stats_frame)
-            .bar(color="#FFA07A", subset=[constant_perc_name], vmax=100)
-            .format({constant_perc_name: "{:.03f}"})
-        )
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -826,12 +743,7 @@ class ConstantOccurrence(Section):
         base_imports = ["from edvart.pandas_formatting import hide_index"]
         if self.verbosity <= Verbosity.MEDIUM:
             return base_imports + [
-                total_dedent(
-                    """
-                    from edvart.report_sections.dataset_overview import Constantoccurrence
-                    constant_occurrence = Constantoccurrence.constant_occurrence
-                    """
-                )
+                "from edvart.report_sections.dataset_overview import constant_occurrence"
             ]
         return base_imports + ["from IPython.display import display"]
 
@@ -859,7 +771,7 @@ class ConstantOccurrence(Section):
             code = (
                 get_code(series_to_frame)
                 + 2 * "\n"
-                + get_code(ConstantOccurrence.constant_occurrence)
+                + get_code(constant_occurrence)
                 + 2 * "\n"
                 + default_call
             )
@@ -875,7 +787,61 @@ class ConstantOccurrence(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        ConstantOccurrence.constant_occurrence(df=df, columns=self.columns)
+        constant_occurrence(df=df, columns=self.columns)
+
+
+def constant_occurrence(
+    df: pd.DataFrame, columns: Optional[List[str]] = None, constant: Any = 0
+) -> None:
+    """Displays a table with occurrence of a constant in each column.
+
+    By default, check for 0 occurrence.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Dataframe for which to calculate constant values occurrence.
+    columns : Optional[List[str]], optional
+        Subset of columns for which to calculate constant values occurrence.
+        If None, all columns of df are used.
+    constant : Any
+        Constant for which to check occurrence in df, by default 0.
+    """
+    if columns is not None:
+        df = df[columns]
+
+    # Count constant counts
+    constant_count = (df == constant).sum()
+    constant_percentage = 100 * constant_count / len(df)
+
+    constant_formatted = f"<i>{constant!r}</i>"
+    constant_count_name = f"{constant_formatted} Count"
+    constant_perc_name = f"{constant_formatted} %"
+
+    # Convert series to frames
+    constant_count_frame = series_to_frame(
+        series=constant_count,
+        index_name="Column Name",
+        column_name=constant_count_name,
+    )
+
+    constant_percentage_frame = series_to_frame(
+        series=constant_percentage,
+        index_name="Column Name",
+        column_name=constant_perc_name,
+    )
+
+    # Merge absolute and relative counts
+    constant_stats_frame = constant_count_frame.merge(
+        constant_percentage_frame, on="Column Name"
+    ).sort_values(constant_perc_name, ascending=False)
+
+    # Display table
+    display(
+        hide_index(constant_stats_frame)
+        .bar(color="#FFA07A", subset=[constant_perc_name], vmax=100)
+        .format({constant_perc_name: "{:.03f}"})
+    )
 
 
 class RowsWithMissingValue(Section):
@@ -893,39 +859,6 @@ class RowsWithMissingValue(Section):
     def name(self) -> str:
         return "Rows With Missing Value"
 
-    @staticmethod
-    def missing_value_row_count(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
-        """Displays a table with missing value row count and percentage.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Dataframe for which to counnt missing value rows.
-        columns : Optional[List[str]], optional
-            List of columns to consider when counting. If None, all columns are used.
-        """
-        if columns is not None:
-            df = df[columns]
-
-        # Count rows with at least one value missing
-        num_rows_missing_value = df.isna().any(axis=1).sum()
-
-        if num_rows_missing_value == 0:
-            print("There are no missing values")
-            return
-
-        # Relative count
-        percentage_rows_missing_value = 100 * num_rows_missing_value / len(df)
-
-        missing_value_rows_info = {
-            "Missing value column subset": "all columns" if columns is None else columns,
-            "Missing value row count": num_rows_missing_value,
-            "Missing value row percentage": f"{percentage_rows_missing_value:.02f} %",
-        }
-
-        # Display table
-        render_dictionary(missing_value_rows_info)
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -936,14 +869,7 @@ class RowsWithMissingValue(Section):
             e.g. ['import pandas as pd', 'import numpy as np']
         """
         if self.verbosity <= Verbosity.MEDIUM:
-            return [
-                total_dedent(
-                    """
-                    from edvart.report_sections.dataset_overview import RowsWithMissingValue
-                    missing_value_row_count = RowsWithMissingValue.missing_value_row_count
-                    """
-                )
-            ]
+            return ["from edvart.report_sections.dataset_overview import missing_value_row_count"]
         return ["from IPython.display import display"]
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
@@ -970,7 +896,7 @@ class RowsWithMissingValue(Section):
             code = (
                 get_code(render_dictionary)
                 + 2 * "\n"
-                + get_code(RowsWithMissingValue.missing_value_row_count)
+                + get_code(missing_value_row_count)
                 + 2 * "\n"
                 + default_call
             )
@@ -986,7 +912,40 @@ class RowsWithMissingValue(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        RowsWithMissingValue.missing_value_row_count(df=df, columns=self.columns)
+        missing_value_row_count(df=df, columns=self.columns)
+
+
+def missing_value_row_count(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
+    """Displays a table with missing value row count and percentage.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Dataframe for which to counnt missing value rows.
+    columns : Optional[List[str]], optional
+        List of columns to consider when counting. If None, all columns are used.
+    """
+    if columns is not None:
+        df = df[columns]
+
+    # Count rows with at least one value missing
+    num_rows_missing_value = df.isna().any(axis=1).sum()
+
+    if num_rows_missing_value == 0:
+        print("There are no missing values")
+        return
+
+    # Relative count
+    percentage_rows_missing_value = 100 * num_rows_missing_value / len(df)
+
+    missing_value_rows_info = {
+        "Missing value column subset": "all columns" if columns is None else columns,
+        "Missing value row count": num_rows_missing_value,
+        "Missing value row percentage": f"{percentage_rows_missing_value:.02f} %",
+    }
+
+    # Display table
+    render_dictionary(missing_value_rows_info)
 
 
 class DuplicateRows(Section):
@@ -1004,39 +963,6 @@ class DuplicateRows(Section):
     def name(self) -> str:
         return "Duplicate Rows"
 
-    @staticmethod
-    def duplicate_row_count(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
-        """Displays a table with duplicated row count and percentage.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Dataframe for which to counnt missing value rows.
-        columns : Optional[List[str]], optional
-            List of columns to consider when counting. If None, all columns are used.
-        """
-        if columns is not None:
-            df = df[columns]
-
-        # Count duplicated rows
-        num_duplicated_rows = df.duplicated().sum()
-
-        if num_duplicated_rows == 0:
-            print("There are no duplicated rows")
-            return
-
-        # Relative count
-        percentage_duplicated_rows = 100 * num_duplicated_rows / len(df)
-
-        duplicate_rows_info = {
-            "Duplicate rows column subset": "all columns" if columns is None else columns,
-            "Duplicate row count": num_duplicated_rows,
-            "Duplicate row percentage": f"{percentage_duplicated_rows:.02f} %",
-        }
-
-        # Display table
-        render_dictionary(duplicate_rows_info)
-
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
 
@@ -1047,14 +973,7 @@ class DuplicateRows(Section):
             e.g. ['import pandas as pd', 'import numpy as np']
         """
         if self.verbosity <= Verbosity.MEDIUM:
-            return [
-                total_dedent(
-                    """
-                    from edvart.report_sections.dataset_overview import DuplicateRows
-                    duplicate_row_count = DuplicateRows.duplicate_row_count
-                    """
-                )
-            ]
+            return ["from edvart.report_sections.dataset_overview import duplicate_row_count"]
         return ["from IPython.display import display"]
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
@@ -1081,7 +1000,7 @@ class DuplicateRows(Section):
             code = (
                 get_code(render_dictionary)
                 + 2 * "\n"
-                + get_code(DuplicateRows.duplicate_row_count)
+                + get_code(duplicate_row_count)
                 + 2 * "\n"
                 + default_call
             )
@@ -1097,4 +1016,37 @@ class DuplicateRows(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        DuplicateRows.duplicate_row_count(df=df, columns=self.columns)
+        duplicate_row_count(df=df, columns=self.columns)
+
+
+def duplicate_row_count(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
+    """Displays a table with duplicated row count and percentage.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Dataframe for which to counnt missing value rows.
+    columns : Optional[List[str]], optional
+        List of columns to consider when counting. If None, all columns are used.
+    """
+    if columns is not None:
+        df = df[columns]
+
+    # Count duplicated rows
+    num_duplicated_rows = df.duplicated().sum()
+
+    if num_duplicated_rows == 0:
+        print("There are no duplicated rows")
+        return
+
+    # Relative count
+    percentage_duplicated_rows = 100 * num_duplicated_rows / len(df)
+
+    duplicate_rows_info = {
+        "Duplicate rows column subset": "all columns" if columns is None else columns,
+        "Duplicate row count": num_duplicated_rows,
+        "Duplicate row percentage": f"{percentage_duplicated_rows:.02f} %",
+    }
+
+    # Display table
+    render_dictionary(duplicate_rows_info)
