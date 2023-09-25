@@ -296,6 +296,19 @@ class ReportBase(ABC):
         self,
         section: Section,
     ) -> "ReportBase":
+        """
+        Add a section to the report. See `edvart.report_sections` for available sections.
+
+        Parameters
+        ----------
+        section : Section
+            Section to add to the report.
+
+        Returns
+        -------
+        ReportBase
+            Returns self.
+        """
         self.sections.append(section)
 
         return self
