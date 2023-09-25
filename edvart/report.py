@@ -6,6 +6,7 @@ import pickle
 from abc import ABC
 from typing import List, Optional, Tuple, Union
 
+import isort
 import nbconvert
 import nbformat as nbf
 import nbformat.v4 as nbf4
@@ -123,18 +124,20 @@ class ReportBase(ABC):
             "import os",
             "from typing import Any, Callable, Dict, List, Optional, Tuple, Union",
             "import plotly.offline as py",
-            "py.init_notebook_mode()",
             "import plotly.io as pio",
-            "pio.renderers.default = 'plotly_mimetype+notebook'",
         }
         if extra_imports is not None:
             imports_set.update(extra_imports)
         for section in self.sections:
             imports_set.update(section.required_imports())
-        imports = sorted(list(imports_set))
 
-        if len(imports) > 0:
-            nb["cells"].append(nbf4.new_code_cell("\n".join(imports)))
+        imports_code = "\n".join(imports_set)
+        imports_code = isort.code(
+            imports_code, config=isort.Config(profile="black", line_length=100)
+        )
+        imports_code += "\n\npio.renderers.default = 'plotly_mimetype+notebook'"
+        imports_code += "\npy.init_notebook_mode()"
+        nb["cells"].append(nbf4.new_code_cell(imports_code))
 
         # Add load data cell
         if show_load_data:
