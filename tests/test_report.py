@@ -5,7 +5,9 @@ import numpy as np
 import pandas as pd
 
 from edvart.report import DefaultReport, Report
+from edvart.report_sections.bivariate_analysis import BivariateAnalysis
 from edvart.report_sections.section_base import Verbosity
+from edvart.report_sections.univariate_analysis import UnivariateAnalysis
 
 
 def _get_test_df() -> pd.DataFrame:
@@ -29,6 +31,18 @@ def test_report():
     assert report.sections[0].columns is None, "Default column selection should be None"
 
     assert report.sections[1].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
+
+
+def test_add_section():
+    bivariate_analysis_section = BivariateAnalysis()
+    univariate_analysis_section = UnivariateAnalysis()
+    report = (
+        Report(dataframe=_get_test_df())
+        .add_section(bivariate_analysis_section)
+        .add_section(univariate_analysis_section)
+    )
+
+    assert report.sections == [bivariate_analysis_section, univariate_analysis_section]
 
 
 def test_default_report():

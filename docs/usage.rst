@@ -89,7 +89,8 @@ With an instance of :py:class:`~edvart.report.Report` you can:
 
 Selection of Sections
 ~~~~~~~~~~~~~~~~~~~~~
-You can add sections using methods ``add_*`` (e.g. :py:meth:`edvart.report.ReportBase.add_overview`) of the :py:class:`~edvart.report.Report` class.
+You can add sections using section-specific methods ``add_*`` (e.g. :py:meth:`edvart.report.ReportBase.add_overview`)
+or the general method `edvart.report.ReportBase.add_section` of the :py:class:`~edvart.report.Report` class.
 
 .. code-block:: python
 
@@ -115,13 +116,15 @@ For example you can define which columns should be used or omitted.
 .. code-block:: python
 
     import edvart
+    from edvart.report_sections.dataset_overview import Overview
+    from edvart.report_sections.add_univariate_analysis import UnivariateAnalysis
 
 
     df = edvart.example_datasets.dataset_titanic()
     report = (
         edvart.Report(df)
-        .add_overview(columns=["PassengerId"])
-        .add_univariate_analysis(columns=["Name", "Sex", "Age"])
+        .add_section(Overview(columns=["PassengerId"]))
+        .add_section(UnivariateAnalysis(columns=["Name", "Sex", "Age"]))
     )
 
 
