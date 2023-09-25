@@ -1,13 +1,12 @@
-"""Table of contents analysis package."""
 from typing import Any, Dict, List
 
 import nbformat.v4 as nbfv4
 from IPython.display import Markdown, display
 
-from edvart.report_sections.section_base import ReportSection, Section, Verbosity
+from edvart.report_sections.section_base import ReportSection, Section
 
 
-class TableOfContents(Section):
+class TableOfContents:
     """Generates the Table of Contents section of the report.
 
     Parameters
@@ -20,14 +19,10 @@ class TableOfContents(Section):
 
     def __init__(self, include_subsections: bool):
         self._include_subsections = include_subsections
-        super().__init__(verbosity=Verbosity.LOW, columns=None)
-
-    def required_imports(self) -> List[str]:
-        return []
 
     @property
-    def name(self) -> str:
-        return "Table of Contents"
+    def _title(self) -> str:
+        return "# Table of Contents\n---"
 
     @staticmethod
     def _get_section_link(section: Section, section_level: int) -> str:
@@ -71,7 +66,6 @@ class TableOfContents(Section):
             for subsection in section.subsections:
                 self._add_section_lines(subsection, section_level + 1, lines, True)
 
-    # pylint: disable=arguments-renamed
     def add_cells(self, sections: List[Section], cells: List[Dict[str, Any]]) -> None:
         """Adds table of contents cells to the list of cells. The subsections won't be included.
 
@@ -82,7 +76,7 @@ class TableOfContents(Section):
         cells : List[Dict[str, Any]]
             List of generated notebook cells which are represented as dictionaries.
         """
-        section_header = nbfv4.new_markdown_cell(self.get_title(section_level=1))
+        section_header = nbfv4.new_markdown_cell(self._title)
         cells.append(section_header)
 
         lines: List[str] = []
@@ -90,7 +84,6 @@ class TableOfContents(Section):
             lines.append(TableOfContents._get_section_link(section, 1))
         cells.append(nbfv4.new_markdown_cell("\n".join(lines)))
 
-    # pylint: disable=arguments-renamed
     def show(self, sections: List[Section]) -> None:
         """Generates table of contents' cell output in the calling notebook.
 
@@ -99,7 +92,7 @@ class TableOfContents(Section):
         sections: List[Section]
             List of sections that should be included in the table of contents.
         """
-        display(Markdown(self.get_title(section_level=1)))
+        display(Markdown(self._title))
 
         lines = []
         for section in sections:
