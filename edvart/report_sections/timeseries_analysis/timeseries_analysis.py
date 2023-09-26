@@ -163,6 +163,12 @@ class TimeseriesAnalysis(ReportSection):
         else:
             self.subsections_to_show = subsections
 
+        self.subsections_to_show_with_low_verbosity = [
+            sub
+            for sub in self.subsections_to_show
+            if self.subsection_verbosities[sub] == Verbosity.LOW
+        ]
+
         subsections_implementations = [
             enum_to_implementation[sub] for sub in self.subsections_to_show
         ]
@@ -191,20 +197,16 @@ class TimeseriesAnalysis(ReportSection):
         if self.verbosity == Verbosity.LOW:
             subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
             code = "show_timeseries_analysis(df=df"
-            subsections_to_show_with_low_verbosity = [
-                sub
-                for sub in self.subsections_to_show
-                if self.subsection_verbosities[sub] == Verbosity.LOW
-            ]
-            if subsections_to_show_with_low_verbosity != self.default_subsections_to_show:
+            if self.subsections_to_show_with_low_verbosity != self.default_subsections_to_show:
                 arg_subsections_names = [
                     f"TimeseriesAnalysis.TimeseriesAnalysisSubsection.{str(sub)}"
-                    for sub in subsections_to_show_with_low_verbosity
+                    for sub in self.subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
-            stft_included = subsec.ShortTimeFT in subsections_to_show_with_low_verbosity
+            stft_included = subsec.ShortTimeFT in self.subsections_to_show_with_low_verbosity
             include_sampling_rate = self.sampling_rate is not None and (
-                stft_included or subsec.FourierTransform in subsections_to_show_with_low_verbosity
+                stft_included
+                or subsec.FourierTransform in self.subsections_to_show_with_low_verbosity
             )
             if include_sampling_rate:
                 code += f", sampling_rate={self.sampling_rate}"
@@ -236,6 +238,11 @@ class TimeseriesAnalysis(ReportSection):
                 "from edvart.report_sections.timeseries_analysis.timeseries_analysis"
                 " import show_timeseries_analysis"
             }
+            if self.subsections_to_show_with_low_verbosity != self.default_subsections_to_show:
+                imports.add(
+                    "from edvart.report_sections.timeseries_analysis.timeseries_analysis"
+                    " import TimeseriesAnalysis"
+                )
             for sub in self.subsections:
                 if sub.verbosity > Verbosity.LOW:
                     imports.update(sub.required_imports())

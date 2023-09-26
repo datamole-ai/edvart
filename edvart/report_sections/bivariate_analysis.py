@@ -113,6 +113,11 @@ class BivariateAnalysis(ReportSection):
             self.subsections_to_show = self._DEFAULT_SUBSECTIONS_TO_SHOW
         else:
             self.subsections_to_show = subsections
+        self.subsections_to_show_with_low_verbosity = [
+            sub
+            for sub in self.subsections_to_show
+            if self.subsection_verbosities[sub] == Verbosity.LOW
+        ]
 
         if (columns_x is None) != (columns_y is None):
             raise ValueError("Either both or neither of columns_x, columns_y must be specified.")
@@ -170,15 +175,10 @@ class BivariateAnalysis(ReportSection):
         cells.append(section_header)
         if self.verbosity == Verbosity.LOW:
             code = "show_bivariate_analysis(df=df"
-            subsections_to_show_with_low_verbosity = [
-                sub
-                for sub in self.subsections_to_show
-                if self.subsection_verbosities[sub] == Verbosity.LOW
-            ]
-            if subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
+            if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
                     f"BivariateAnalysis.BivariateAnalysisSubsection.{str(sub)}"
-                    for sub in subsections_to_show_with_low_verbosity
+                    for sub in self.subsections_to_show_with_low_verbosity
                 ]
 
                 code += f", subsections={arg_subsections_names}".replace("'", "")
@@ -212,6 +212,8 @@ class BivariateAnalysis(ReportSection):
             return super().required_imports()
 
         imports = {"from edvart.report_sections.bivariate_analysis import show_bivariate_analysis"}
+        if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
+            imports.add("from edvart.report_sections.bivariate_analysis import BivariateAnalysis")
         for subsec in self.subsections:
             if subsec.verbosity > Verbosity.LOW:
                 imports.update(subsec.required_imports())

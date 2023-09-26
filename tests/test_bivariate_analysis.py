@@ -396,7 +396,8 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     exported_imports = bivariate_section.required_imports()
 
     expected_imports = {
-        "from edvart.report_sections.bivariate_analysis import show_bivariate_analysis"
+        "from edvart.report_sections.bivariate_analysis import show_bivariate_analysis",
+        "from edvart.report_sections.bivariate_analysis import BivariateAnalysis",
     }
     for s in bivariate_section.subsections:
         if s.verbosity > Verbosity.LOW:
