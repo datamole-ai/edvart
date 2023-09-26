@@ -58,7 +58,7 @@ class FourierTransform(Section):
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
-        default_call = f"fourier_transform(df=df, sampling_rate={self.sampling_rate}"
+        default_call = f"show_fourier_transform(df=df, sampling_rate={self.sampling_rate}"
         if self.columns is not None:
             default_call += f", columns={self.columns}"
         default_call += ")"
@@ -66,7 +66,7 @@ class FourierTransform(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
-            code = get_code(fourier_transform) + "\n\n" + default_call
+            code = get_code(show_fourier_transform) + "\n\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -79,7 +79,7 @@ class FourierTransform(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        fourier_transform(df=df, sampling_rate=self.sampling_rate, columns=self.columns)
+        show_fourier_transform(df=df, sampling_rate=self.sampling_rate, columns=self.columns)
 
     def required_imports(self) -> List[str]:
         """Returns a list of imports to be put at the top of a generated notebook.
@@ -104,7 +104,7 @@ class FourierTransform(Section):
 
 
 @check_index_time_ascending
-def fourier_transform(
+def show_fourier_transform(
     df: pd.DataFrame,
     sampling_rate: int,
     columns: Optional[List[str]] = None,

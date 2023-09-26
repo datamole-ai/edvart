@@ -10,7 +10,7 @@ from IPython.display import Markdown, display
 
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
-from edvart.report_sections.code_string_formatting import get_code, total_dedent
+from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Section, Verbosity
 
 
@@ -65,12 +65,8 @@ class SeasonalDecomposition(Section):
         """
         if self.verbosity <= Verbosity.MEDIUM:
             return [
-                total_dedent(
-                    """
-                    from edvart.report_sections.timeseries_analysis import SeasonalDecomposition
-                    seasonal_decomposition = SeasonalDecomposition.seasonal_decomposition
-                    """
-                )
+                "from edvart.report_sections.timeseries_analysis.seasonal_decomposition"
+                " import show_seasonal_decomposition"
             ]
         return [
             "from IPython.display import display, Markdown",
@@ -93,7 +89,7 @@ class SeasonalDecomposition(Section):
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
-        default_call = "seasonal_decomposition(df=df"
+        default_call = "show_seasonal_decomposition(df=df"
         if self.columns is not None:
             default_call += f", columns={self.columns}"
         if self.period is not None:
@@ -103,7 +99,7 @@ class SeasonalDecomposition(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
-            code = get_code(seasonal_decomposition) + "\n\n" + default_call
+            code = get_code(show_seasonal_decomposition) + "\n\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -116,11 +112,13 @@ class SeasonalDecomposition(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        seasonal_decomposition(df=df, columns=self.columns, model=self.model, period=self.period)
+        show_seasonal_decomposition(
+            df=df, columns=self.columns, model=self.model, period=self.period
+        )
 
 
 @check_index_time_ascending
-def seasonal_decomposition(
+def show_seasonal_decomposition(
     df: pd.DataFrame,
     columns: Optional[List[str]] = None,
     period: Optional[int] = None,

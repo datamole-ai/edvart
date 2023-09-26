@@ -52,9 +52,8 @@ class RollingStatistics(Section):
         """
         if self.verbosity <= Verbosity.MEDIUM:
             return [
-                """from edvart.report_sections.timeseries_analysis import (
-                    RollingStatistics, rolling_statistics
-                )"""
+                "from edvart.report_sections.timeseries_analysis.rolling_statistics"
+                " import show_rolling_statistics"
             ]
         return [
             "from IPython.display import display, Markdown",
@@ -79,7 +78,7 @@ class RollingStatistics(Section):
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
 
-        default_call = "rolling_statistics(df=df"
+        default_call = "show_rolling_statistics(df=df"
         if self.columns is not None:
             default_call += f", columns={self.columns}"
         default_call += ")"
@@ -87,7 +86,7 @@ class RollingStatistics(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
-            code = get_code(rolling_statistics) + "\n\n" + default_call
+            code = get_code(show_rolling_statistics) + "\n\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -100,12 +99,12 @@ class RollingStatistics(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        rolling_statistics(df=df, columns=self.columns, window_size=self.window_size)
+        show_rolling_statistics(df=df, columns=self.columns, window_size=self.window_size)
 
 
 # pylint: disable=too-many-locals
 @check_index_time_ascending
-def rolling_statistics(
+def show_rolling_statistics(
     df: pd.DataFrame,
     columns: Optional[List[str]] = None,
     window_size: int = 20,

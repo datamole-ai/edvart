@@ -91,7 +91,7 @@ class ShortTimeFT(Section):
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
         default_call = (
-            f"short_time_ft(df=df, sampling_rate={self.sampling_rate}"
+            f"show_short_time_ft(df=df, sampling_rate={self.sampling_rate}"
             f", window_size={self.window_size}"
         )
         if self.columns is not None:
@@ -101,7 +101,7 @@ class ShortTimeFT(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             code = default_call
         else:
-            code = get_code(short_time_ft) + "\n\n" + default_call
+            code = get_code(show_short_time_ft) + "\n\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -114,7 +114,7 @@ class ShortTimeFT(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        short_time_ft(
+        show_short_time_ft(
             df=df,
             sampling_rate=self.sampling_rate,
             window_size=self.window_size,
@@ -123,7 +123,7 @@ class ShortTimeFT(Section):
 
 
 @check_index_time_ascending
-def short_time_ft(
+def show_short_time_ft(
     df: pd.DataFrame,
     sampling_rate: int,
     window_size: int,

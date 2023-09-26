@@ -11,7 +11,7 @@ from statsmodels.graphics import tsaplots
 
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
-from edvart.report_sections.code_string_formatting import get_code, total_dedent
+from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Section, Verbosity
 
 
@@ -42,21 +42,13 @@ class Autocorrelation(Section):
         """
         if self.verbosity == Verbosity.LOW:
             return [
-                """
-                from edvart.report_sections.timeseries_analysis.autocorrelation import (
-                    Autocorrelation,
-                    autocorrelation
-                )"""
+                "from edvart.report_sections.timeseries_analysis.autocorrelation"
+                " import show_autocorrelation"
             ]
         if self.verbosity == Verbosity.MEDIUM:
             return [
-                total_dedent(
-                    """
-                    from edvart.report_sections.timeseries_analysis import Autocorrelation
-                    plot_acf = Autocorrelation.plot_acf
-                    plot_pacf = Autocorrelation.plot_pacf
-                    """
-                )
+                "from edvart.report_sections.timeseries_analysis.autocorrelation"
+                " import plot_acf, plot_pacf"
             ]
         # Verbosity.HIGH
         return [
@@ -81,7 +73,7 @@ class Autocorrelation(Section):
         """
         if self.verbosity == Verbosity.LOW:
             section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
-            default_call = "autocorrelation(df=df"
+            default_call = "show_autocorrelation(df=df"
             if self.columns is not None:
                 default_call += f", columns={self.columns}"
             default_call += ")"
@@ -122,11 +114,11 @@ class Autocorrelation(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        autocorrelation(df=df, columns=self.columns)
+        show_autocorrelation(df=df, columns=self.columns)
 
 
 @check_index_time_ascending
-def autocorrelation(
+def show_autocorrelation(
     df: pd.DataFrame,
     columns: Optional[List[str]] = None,
     lags: Optional[List[int]] = None,

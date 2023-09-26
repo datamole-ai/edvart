@@ -58,15 +58,12 @@ class TimeSeriesLinePlot(Section):
         """
         if self.verbosity <= Verbosity.MEDIUM:
             return [
-                """from edvart.report_sections.timeseries_analysis import (
-                    TimeSeriesLinePlot, time_series_line_plot
-                )"""
+                "from edvart.report_sections.timeseries_analysis.time_series_line_plot"
+                " import show_time_series_line_plot"
             ]
         return [
             "from IPython.display import display, Markdown",
-            "import plotly",
             "import plotly.graph_objects as go",
-            "plotly.offline.init_notebook_mode()",
             "from edvart.data_types import is_numeric",
         ]
 
@@ -85,7 +82,7 @@ class TimeSeriesLinePlot(Section):
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
 
-        default_call = "time_series_line_plot(df=df"
+        default_call = "show_time_series_line_plot(df=df"
         if self.columns is not None:
             default_call += f", columns={self.columns}"
         if self.color_col is not None:
@@ -98,7 +95,7 @@ class TimeSeriesLinePlot(Section):
             code = default_call
         else:
             code = (
-                get_code(time_series_line_plot)
+                get_code(show_time_series_line_plot)
                 + "\n\n"
                 + get_code(_time_series_line_plot_colored)
                 + "\n\n"
@@ -116,7 +113,7 @@ class TimeSeriesLinePlot(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        time_series_line_plot(
+        show_time_series_line_plot(
             df=df,
             columns=self.columns,
             color_col=self.color_col,
@@ -125,7 +122,7 @@ class TimeSeriesLinePlot(Section):
 
 
 @check_index_time_ascending
-def time_series_line_plot(
+def show_time_series_line_plot(
     df,
     columns: Optional[List[str]] = None,
     separate_plots: bool = False,

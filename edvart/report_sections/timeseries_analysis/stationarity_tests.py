@@ -43,9 +43,8 @@ class StationarityTests(Section):
         """
         if self.verbosity <= Verbosity.MEDIUM:
             return [
-                """from edvart.report_sections.timeseries_analysis.stationarity_tests import (
-                    StationarityTests, stationarity_tests
-                )"""
+                "from edvart.report_sections.timeseries_analysis.stationarity_tests"
+                " import show_stationarity_tests"
             ]
         return [
             "from IPython.display import display, Markdown",
@@ -69,7 +68,7 @@ class StationarityTests(Section):
         """
         section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
         cells.append(section_header)
-        default_call = "stationarity_tests(df=df"
+        default_call = "show_stationarity_tests(df=df"
         if self.columns is not None:
             default_call += f", columns={self.columns}"
         default_call += ")"
@@ -80,7 +79,7 @@ class StationarityTests(Section):
             code = (
                 get_code(default_stationarity_tests)
                 + "\n\n"
-                + get_code(stationarity_tests)
+                + get_code(show_stationarity_tests)
                 + "\n\n"
                 + default_call
             )
@@ -96,7 +95,7 @@ class StationarityTests(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        stationarity_tests(df=df, columns=self.columns)
+        show_stationarity_tests(df=df, columns=self.columns)
 
 
 def default_stationarity_tests() -> Dict[pd.Series, Callable[[pd.Series], "test_result"]]:
@@ -128,7 +127,7 @@ def default_stationarity_tests() -> Dict[pd.Series, Callable[[pd.Series], "test_
 
 
 @check_index_time_ascending
-def stationarity_tests(
+def show_stationarity_tests(
     df: pd.DataFrame,
     columns: Optional[List[str]] = None,
     kpss_const: bool = True,

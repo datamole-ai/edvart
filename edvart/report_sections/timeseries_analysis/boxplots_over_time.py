@@ -72,9 +72,8 @@ class BoxplotsOverTime(Section):
         """
         if self.verbosity <= Verbosity.MEDIUM:
             return [
-                """from edvart.report_sections.timeseries_analysis import (
-                    BoxplotsOverTime, boxplots_over_time
-                )"""
+                "from edvart.report_sections.timeseries_analysis.boxplots_over_time"
+                " import show_boxplots_over_time"
             ]
         return [
             "from datetime import datetime",
@@ -112,7 +111,7 @@ class BoxplotsOverTime(Section):
                     )
                 )
             cells.append(nbfv4.new_code_cell(grouping_func_code))
-        default_call = "boxplots_over_time(df=df"
+        default_call = "show_boxplots_over_time(df=df"
         if self.columns is not None:
             default_call += f", columns={self.columns}"
         if self.grouping_function is not None:
@@ -134,7 +133,7 @@ class BoxplotsOverTime(Section):
             else:
                 code = ""
 
-            code += get_code(boxplots_over_time) + "\n\n" + default_call
+            code += get_code(show_boxplots_over_time) + "\n\n" + default_call
 
         cells.append(nbfv4.new_code_cell(code))
 
@@ -147,7 +146,7 @@ class BoxplotsOverTime(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        boxplots_over_time(
+        show_boxplots_over_time(
             df=df,
             columns=self.columns,
             grouping_function=self.grouping_function,
@@ -209,7 +208,7 @@ def get_default_grouping_func(df: pd.DataFrame, nunique_max: int = 80) -> Tuple[
 
 
 @check_index_time_ascending
-def boxplots_over_time(
+def show_boxplots_over_time(
     df: pd.DataFrame,
     columns: Optional[List[str]] = None,
     grouping_function: Callable[[Any], str] = None,
