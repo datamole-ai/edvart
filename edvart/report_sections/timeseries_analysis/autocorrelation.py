@@ -11,7 +11,7 @@ from statsmodels.graphics import tsaplots
 
 from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
-from edvart.report_sections.code_string_formatting import get_code, total_dedent
+from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Section, Verbosity
 
 
@@ -50,13 +50,8 @@ class Autocorrelation(Section):
             ]
         if self.verbosity == Verbosity.MEDIUM:
             return [
-                total_dedent(
-                    """
-                    from edvart.report_sections.timeseries_analysis import Autocorrelation
-                    plot_acf = Autocorrelation.plot_acf
-                    plot_pacf = Autocorrelation.plot_pacf
-                    """
-                )
+                "from edvart.report_sections.timeseries_analysis.autocorrelation"
+                " import plot_acf, plot_pacf"
             ]
         # Verbosity.HIGH
         return [
