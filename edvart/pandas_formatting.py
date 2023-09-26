@@ -29,7 +29,7 @@ def series_to_frame(series: pd.Series, index_name: str, column_name: str) -> pd.
     return series.rename_axis(index=index_name).to_frame(name=column_name).reset_index()
 
 
-def render_dictionary(dictionary: Dict["str", Any]) -> None:
+def render_dictionary(dictionary: Dict[str, Any]) -> None:
     """
     Converts a dictionary to a dataframe and renders that dataframe in the report notebook.
 
@@ -43,7 +43,7 @@ def render_dictionary(dictionary: Dict["str", Any]) -> None:
     display(pd.DataFrame.from_dict(dictionary, orient="index", columns=[""]))
 
 
-def dict_to_html(dictionary: Dict["str", Any]) -> str:
+def dict_to_html(dictionary: Dict[str, Any]) -> str:
     """Converts a dictionary to a dataframe in HTML string form.
 
     Parameters
