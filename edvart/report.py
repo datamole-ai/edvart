@@ -37,6 +37,14 @@ class ReportBase(ABC):
         The default verbosity for the exported code of the entire report, by default Verbosity.LOW.
     """
 
+    _DEFAULT_IMPORTS = {
+        "import pandas as pd",
+        "import os",
+        "from typing import Any, Callable, Dict, List, Optional, Tuple, Union",
+        "import plotly.offline as py",
+        "import plotly.io as pio",
+    }
+
     def __init__(
         self,
         dataframe: pd.DataFrame,
@@ -119,13 +127,7 @@ class ReportBase(ABC):
         )
 
         # Add imports cell
-        imports_set = {
-            "import pandas as pd",
-            "import os",
-            "from typing import Any, Callable, Dict, List, Optional, Tuple, Union",
-            "import plotly.offline as py",
-            "import plotly.io as pio",
-        }
+        imports_set = self._DEFAULT_IMPORTS
         if extra_imports is not None:
             imports_set.update(extra_imports)
         for section in self.sections:
