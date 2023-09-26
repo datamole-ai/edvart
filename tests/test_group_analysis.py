@@ -21,6 +21,8 @@ from edvart.report_sections.group_analysis import (
 )
 from edvart.report_sections.section_base import Verbosity
 
+from .execution_utils import check_section_executes
+
 # Workaround to prevent multiple browser tabs opening with figures
 plotly.io.renderers.default = "json"
 
@@ -95,6 +97,8 @@ def test_code_export_verbosity_low():
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(group_section, df)
+
 
 def test_code_export_verbosity_medium():
     df = get_test_df()
@@ -120,6 +124,7 @@ def test_code_export_verbosity_medium():
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+    check_section_executes(group_section, df)
 
 
 def test_code_export_verbosity_high():
@@ -174,6 +179,7 @@ def test_code_export_verbosity_high():
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+    check_section_executes(group_section, df)
 
 
 def test_columns_parameter():

@@ -9,6 +9,8 @@ from edvart.report_sections import univariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.section_base import Verbosity
 
+from .execution_utils import check_section_executes
+
 
 def test_invalid_verbosity():
     with pytest.raises(ValueError):
@@ -35,6 +37,8 @@ def test_code_export_verbosity_low():
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(univariate_section, test_df)
+
 
 def test_code_export_verbosity_medium():
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
@@ -53,6 +57,8 @@ def test_code_export_verbosity_medium():
     # Test code equivalence
     for i in range(len(exported_code)):
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
+
+    check_section_executes(univariate_section, test_df)
 
 
 def test_code_export_verbosity_high():
@@ -103,6 +109,8 @@ def test_code_export_verbosity_high():
     # Test code equivalence
     for i in range(len(exported_code)):
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
+
+    check_section_executes(univariate_section, test_df)
 
 
 def test_show():

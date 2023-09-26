@@ -1,6 +1,7 @@
 import warnings
 from contextlib import redirect_stdout
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -8,6 +9,8 @@ from edvart.report_sections import bivariate_analysis
 from edvart.report_sections.bivariate_analysis import BivariateAnalysis, BivariateAnalysisSubsection
 from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Verbosity
+
+from .execution_utils import check_section_executes
 
 
 def get_test_df() -> pd.DataFrame:
@@ -131,6 +134,7 @@ def test_code_export_verbosity_low():
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
+    check_section_executes(bivariate_section, df=get_test_df())
 
 
 def test_code_export_verbosity_low_with_subsections():
@@ -155,6 +159,7 @@ def test_code_export_verbosity_low_with_subsections():
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
+    check_section_executes(bivariate_section, df=get_test_df())
 
 
 def test_generated_code_verbosity_low_columns():
@@ -162,6 +167,18 @@ def test_generated_code_verbosity_low_columns():
     columns_x = [f"col_x{i}" for i in range(6)]
     columns_y = [f"col_y{i}" for i in range(4)]
     columns_pairs = [(f"first{i}", f"second{i}") for i in range(8)]
+    columns_all = (
+        columns
+        + columns_x
+        + columns_y
+        + [col_pair[0] for col_pair in columns_pairs]
+        + [col_pair[1] for col_pair in columns_pairs]
+    )
+    test_df = pd.DataFrame(
+        data=np.random.rand(4, len(columns_all)),
+        columns=columns_all,
+    )
+
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         columns=columns,
         columns_x=columns_x,
@@ -183,6 +200,8 @@ def test_generated_code_verbosity_low_columns():
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
+    check_section_executes(bivariate_section, df=test_df)
 
 
 def test_generated_code_verbosity_medium():
@@ -209,6 +228,8 @@ def test_generated_code_verbosity_medium():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
+    check_section_executes(bivariate_section, df=get_test_df())
+
 
 def test_generated_code_verbosity_medium_columns_x_y():
     columns_x = ["a", "b"]
@@ -223,6 +244,10 @@ def test_generated_code_verbosity_medium_columns_x_y():
             BivariateAnalysisSubsection.ContingencyTable,
         ],
         color_col="b",
+    )
+    test_df = pd.DataFrame(
+        columns=columns_x + columns_y,
+        data=np.random.rand(10, 4),
     )
 
     exported_cells = []
@@ -239,6 +264,8 @@ def test_generated_code_verbosity_medium_columns_x_y():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
+    check_section_executes(bivariate_section, df=test_df)
+
 
 def test_generated_code_verbosity_medium_columns_pairs():
     columns_pairs = [("a", "b"), ("c", "d")]
@@ -252,6 +279,10 @@ def test_generated_code_verbosity_medium_columns_pairs():
             BivariateAnalysisSubsection.CorrelationPlot,
             BivariateAnalysisSubsection.ContingencyTable,
         ],
+    )
+    test_df = pd.DataFrame(
+        columns=columns_x_correct + columns_y_correct,
+        data=np.random.rand(10, 4),
     )
 
     exported_cells = []
@@ -267,6 +298,8 @@ def test_generated_code_verbosity_medium_columns_pairs():
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(bivariate_section, df=test_df)
 
 
 def test_generated_code_verbosity_high():
@@ -307,6 +340,8 @@ def test_generated_code_verbosity_high():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
+    check_section_executes(bivariate_section, df=get_test_df())
+
 
 def test_verbosity_low_different_subsection_verbosities():
     bivariate_section = BivariateAnalysis(
@@ -336,6 +371,8 @@ def test_verbosity_low_different_subsection_verbosities():
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(bivariate_section, df=get_test_df())
 
 
 def test_imports_verbosity_low():

@@ -20,6 +20,8 @@ from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.dataset_overview import Overview, OverviewSubsection
 from edvart.report_sections.section_base import Verbosity
 
+from .execution_utils import check_section_executes
+
 
 def get_test_df() -> pd.DataFrame:
     test_df = pd.DataFrame(data=[[1.1, "a"], [2.2, "b"], [3.3, "c"]], columns=["A", "B"])
@@ -136,6 +138,8 @@ def test_code_export_verbosity_low():
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(overview_section, df=get_test_df())
+
 
 def test_code_export_verbosity_low_with_subsections():
     overview_section = Overview(
@@ -157,6 +161,8 @@ def test_code_export_verbosity_low_with_subsections():
     ]
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
+    check_section_executes(overview_section, df=get_test_df())
 
 
 def test_code_export_verbosity_medium():
@@ -191,6 +197,8 @@ def test_code_export_verbosity_medium():
     # Test code equivalence
     for i in range(len(exported_code)):
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
+
+    check_section_executes(overview_section, df=get_test_df())
 
 
 def test_code_export_verbosity_high():
@@ -270,6 +278,8 @@ def test_code_export_verbosity_high():
     for i in range(len(exported_code)):
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
 
+    check_section_executes(overview_section, df=get_test_df())
+
 
 def test_verbosity_low_different_subsection_verbosities():
     overview_section = Overview(
@@ -302,6 +312,8 @@ def test_verbosity_low_different_subsection_verbosities():
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(overview_section, df=get_test_df())
 
 
 def test_imports_verbosity_low():

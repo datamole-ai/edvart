@@ -19,6 +19,8 @@ from edvart.report_sections.multivariate_analysis import (
 from edvart.report_sections.section_base import Verbosity
 from edvart.utils import select_numeric_columns
 
+from .execution_utils import check_section_executes
+
 
 def get_test_df() -> pd.DataFrame:
     test_df = pd.DataFrame(
@@ -143,6 +145,8 @@ def test_code_export_verbosity_low():
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(multivariate_section, df)
+
 
 def test_code_export_verbosity_low_with_subsections():
     subsec = MultivariateAnalysisSubsection
@@ -181,6 +185,8 @@ def test_code_export_verbosity_low_with_subsections():
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(multivariate_section, df)
+
 
 def test_code_export_verbosity_medium_all_cols_valid():
     all_numeric_df = pd.DataFrame(
@@ -208,6 +214,8 @@ def test_code_export_verbosity_medium_all_cols_valid():
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(multivariate_section, all_numeric_df)
 
 
 def test_generated_code_verbosity_1():
@@ -244,6 +252,8 @@ def test_generated_code_verbosity_1():
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(multivariate_section, df)
 
 
 def test_generated_code_verbosity_2():
@@ -306,6 +316,8 @@ def test_generated_code_verbosity_2():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
+    check_section_executes(multivariate_section, df)
+
 
 def test_verbosity_medium_non_categorical_col():
     random_array = np.random.randint(low=1, high=40, size=(100, 3))
@@ -325,6 +337,8 @@ def test_verbosity_medium_non_categorical_col():
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(multivariate_section, random_df)
 
 
 def test_verbosity_low_different_subsection_verbosities():
@@ -369,6 +383,8 @@ def test_verbosity_low_different_subsection_verbosities():
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(multivariate_section, df)
 
 
 def test_imports_verbosity_low():
