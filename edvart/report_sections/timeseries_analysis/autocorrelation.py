@@ -202,7 +202,9 @@ def plot_acf(
         max_lags = min(15, len(df) // 2)
         lags = list(range(max_lags))
     plot_func = (
-        functools.partial(tsaplots.plot_pacf, method="ywm", lags=lags) if partial else tsaplots.plot_acf
+        functools.partial(tsaplots.plot_pacf, method="ywm", lags=lags)
+        if partial
+        else tsaplots.plot_acf
     )
     for col in columns:
         display(Markdown(f"---\n### {col}"))
