@@ -198,12 +198,15 @@ def plot_acf(
         for col in columns:
             if not is_numeric(df[col]):
                 raise ValueError(f"Cannot plot autocorrelation for non-numeric column `{col}`")
+    if lags is None:
+        max_lags = min(15, len(df) // 2)
+        lags = list(range(max_lags))
     plot_func = (
-        functools.partial(tsaplots.plot_pacf, method="ywm") if partial else tsaplots.plot_acf
+        functools.partial(tsaplots.plot_pacf, method="ywm", lags=lags) if partial else tsaplots.plot_acf
     )
     for col in columns:
         display(Markdown(f"---\n### {col}"))
-        fig = plot_func(df[col].dropna(), lags=lags)
+        fig = plot_func(df[col].dropna())
         ax = fig.axes[0]
         ax.set_title("")
         ax.set_xlabel("Lag")
