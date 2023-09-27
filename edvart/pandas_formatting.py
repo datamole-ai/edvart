@@ -149,11 +149,6 @@ def hide_index(df: pd.DataFrame) -> Styler:
     """
     Hides the index of a DataFrame.
 
-    The method hide_index is deprecated since 1.4.0, but the method the replaces it
-    is only available since 1.4.0, therefore we need to conditionally call one or the other
-    to support both versions and avoid warnings (otherwise we would need to require
-    python ^3.8, which is required by pandas 1.4.0.)
-
     Parameters
     ----------
     df : pd.DataFrame
@@ -164,6 +159,4 @@ def hide_index(df: pd.DataFrame) -> Styler:
     Styler
         Styler object with the index hidden.
     """
-    if pd.__version__ < "1.4.0":
-        return df.style.hide_index()
     return df.style.hide(axis="index")
