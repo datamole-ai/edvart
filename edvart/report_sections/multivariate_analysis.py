@@ -527,7 +527,7 @@ class ParallelCoordinates(Section):
             "from typing import Iterable",
             "import plotly",
             "import plotly.graph_objects as go",
-            "plotly.offline.init_notebook_mode()",
+            "from edvart.data_types import is_boolean, is_categorical, is_numeric",
         ]
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
@@ -705,9 +705,7 @@ class ParallelCategories(Section):
             return ["from edvart.report_sections.multivariate_analysis import parallel_categories"]
         return [
             "from edvart.utils import discrete_colorscale",
-            "import plotly",
             "import plotly.graph_objects as go",
-            "plotly.offline.init_notebook_mode()",
         ]
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
