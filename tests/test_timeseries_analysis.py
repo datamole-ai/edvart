@@ -464,6 +464,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
     expected_imports = {
         "from edvart.report_sections.timeseries_analysis.timeseries_analysis import show_timeseries_analysis",
+        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import TimeseriesAnalysis",
     }
     for s in ts_section.subsections:
         if s.verbosity > Verbosity.LOW:

@@ -113,6 +113,12 @@ class Overview(ReportSection):
         else:
             self.subsections_to_show = subsections
 
+        self.subsections_to_show_with_low_verbosity = [
+            sub
+            for sub in self.subsections_to_show
+            if self.subsection_verbosities[sub] == Verbosity.LOW
+        ]
+
         # Construct objects that implement subsections
         enum_to_implementation = {
             subsec.QuickInfo: QuickInfo(verbosity_quick_info, columns),
@@ -146,6 +152,9 @@ class Overview(ReportSection):
         """
         if self.verbosity == Verbosity.LOW:
             imports = {"from edvart.report_sections.dataset_overview import show_overview"}
+            if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
+                imports.add("from edvart.report_sections.dataset_overview import Overview")
+
             for subsec in self.subsections:
                 if subsec.verbosity > Verbosity.LOW:
                     imports.update(subsec.required_imports())
@@ -170,15 +179,10 @@ class Overview(ReportSection):
 
         if self.verbosity == Verbosity.LOW:
             code = "show_overview(df=df"
-            subsections_to_show_with_low_verbosity = [
-                sub
-                for sub in self.subsections_to_show
-                if self.subsection_verbosities[sub] == Verbosity.LOW
-            ]
-            if subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
+            if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
                     f"Overview.OverviewSubsection.{str(sub)}"
-                    for sub in subsections_to_show_with_low_verbosity
+                    for sub in self.subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
             if self.columns is not None:

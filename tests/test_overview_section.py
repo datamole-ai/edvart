@@ -353,7 +353,10 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
     exported_imports = overview_section.required_imports()
 
-    expected_imports = {"from edvart.report_sections.dataset_overview import show_overview"}
+    expected_imports = {
+        "from edvart.report_sections.dataset_overview import show_overview",
+        "from edvart.report_sections.dataset_overview import Overview",
+    }
     for s in overview_section.subsections:
         if s.verbosity > Verbosity.LOW:
             expected_imports.update(s.required_imports())

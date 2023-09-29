@@ -109,6 +109,12 @@ class MultivariateAnalysis(ReportSection):
         else:
             self.subsections_to_show = subsections
 
+        self.subsections_to_show_with_low_verbosity = [
+            sub
+            for sub in self.subsections_to_show
+            if self.subsection_verbosities[sub] == Verbosity.LOW
+        ]
+
         enum_to_implementation = {
             subsec.PCA: PCA(verbosity_pca, columns, color_col=color_col),
             subsec.ParallelCoordinates: ParallelCoordinates(
@@ -146,6 +152,10 @@ class MultivariateAnalysis(ReportSection):
                 "from edvart.report_sections.multivariate_analysis import"
                 " show_multivariate_analysis"
             }
+            if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
+                imports.add(
+                    "from edvart.report_sections.multivariate_analysis import MultivariateAnalysis"
+                )
             for subsec in self.subsections:
                 if subsec.verbosity > Verbosity.LOW:
                     imports.update(subsec.required_imports())
@@ -169,15 +179,10 @@ class MultivariateAnalysis(ReportSection):
         cells.append(section_header)
         if self.verbosity == Verbosity.LOW:
             code = "show_multivariate_analysis(df=df"
-            subsections_to_show_with_low_verbosity = [
-                sub
-                for sub in self.subsections_to_show
-                if self.subsection_verbosities[sub] == Verbosity.LOW
-            ]
-            if subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
+            if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
                     f"MultivariateAnalysis.MultivariateAnalysisSubsection.{str(sub)}"
-                    for sub in subsections_to_show_with_low_verbosity
+                    for sub in self.subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
             if self.columns is not None:
