@@ -4,6 +4,7 @@ import base64
 import logging
 import pickle
 from abc import ABC
+from copy import copy
 from typing import List, Optional, Tuple, Union
 
 import isort
@@ -127,7 +128,7 @@ class ReportBase(ABC):
         )
 
         # Add imports cell
-        imports_set = self._DEFAULT_IMPORTS
+        imports_set = copy(self._DEFAULT_IMPORTS)
         if extra_imports is not None:
             imports_set.update(extra_imports)
         for section in self.sections:
