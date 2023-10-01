@@ -4,6 +4,7 @@ import base64
 import logging
 import pickle
 from abc import ABC
+from copy import copy
 from typing import List, Optional, Tuple, Union
 
 import isort
@@ -36,6 +37,14 @@ class ReportBase(ABC):
     verbosity : Verbosity (default = Verbosity.LOW)
         The default verbosity for the exported code of the entire report, by default Verbosity.LOW.
     """
+
+    _DEFAULT_IMPORTS = {
+        "import pandas as pd",
+        "import os",
+        "from typing import Any, Callable, Dict, List, Optional, Tuple, Union",
+        "import plotly.offline as py",
+        "import plotly.io as pio",
+    }
 
     def __init__(
         self,
@@ -119,13 +128,7 @@ class ReportBase(ABC):
         )
 
         # Add imports cell
-        imports_set = {
-            "import pandas as pd",
-            "import os",
-            "from typing import Any, Callable, Dict, List, Optional, Tuple, Union",
-            "import plotly.offline as py",
-            "import plotly.io as pio",
-        }
+        imports_set = copy(self._DEFAULT_IMPORTS)
         if extra_imports is not None:
             imports_set.update(extra_imports)
         for section in self.sections:
