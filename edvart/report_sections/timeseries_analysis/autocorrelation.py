@@ -42,11 +42,8 @@ class Autocorrelation(Section):
         """
         if self.verbosity == Verbosity.LOW:
             return [
-                """
-                from edvart.report_sections.timeseries_analysis.autocorrelation import (
-                    Autocorrelation,
-                    autocorrelation
-                )"""
+                "from edvart.report_sections.timeseries_analysis.autocorrelation"
+                " import show_autocorrelation"
             ]
         if self.verbosity == Verbosity.MEDIUM:
             return [
@@ -76,7 +73,7 @@ class Autocorrelation(Section):
         """
         if self.verbosity == Verbosity.LOW:
             section_header = nbfv4.new_markdown_cell(self.get_title(section_level=2))
-            default_call = "autocorrelation(df=df"
+            default_call = "show_autocorrelation(df=df"
             if self.columns is not None:
                 default_call += f", columns={self.columns}"
             default_call += ")"
@@ -117,11 +114,11 @@ class Autocorrelation(Section):
             Data based on which to generate the cell output
         """
         display(Markdown(self.get_title(section_level=2)))
-        autocorrelation(df=df, columns=self.columns)
+        show_autocorrelation(df=df, columns=self.columns)
 
 
 @check_index_time_ascending
-def autocorrelation(
+def show_autocorrelation(
     df: pd.DataFrame,
     columns: Optional[List[str]] = None,
     lags: Optional[List[int]] = None,

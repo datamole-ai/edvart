@@ -240,11 +240,11 @@ def test_generated_code_verbosity_medium():
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
 
     expected_code = [
-        "time_series_line_plot(df=df)",
-        "rolling_statistics(df=df)",
-        "boxplots_over_time(df=df)",
-        "seasonal_decomposition(df=df, model='additive')",
-        "stationarity_tests(df=df)",
+        "show_time_series_line_plot(df=df)",
+        "show_rolling_statistics(df=df)",
+        "show_boxplots_over_time(df=df)",
+        "show_seasonal_decomposition(df=df, model='additive')",
+        "show_stationarity_tests(df=df)",
         "plot_acf(df=df)",
         "plot_pacf(df=df)",
     ]
@@ -264,36 +264,36 @@ def test_generated_code_verbosity_high():
     expected_code = [
         "\n\n".join(
             (
-                get_code(timeseries_analysis.time_series_line_plot.time_series_line_plot),
+                get_code(timeseries_analysis.time_series_line_plot.show_time_series_line_plot),
                 get_code(timeseries_analysis.time_series_line_plot._time_series_line_plot_colored),
-                "time_series_line_plot(df=df)",
+                "show_time_series_line_plot(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.rolling_statistics.rolling_statistics),
-                "rolling_statistics(df=df)",
+                get_code(timeseries_analysis.rolling_statistics.show_rolling_statistics),
+                "show_rolling_statistics(df=df)",
             )
         ),
         "\n\n".join(
             (
                 get_code(timeseries_analysis.boxplots_over_time.default_grouping_functions),
                 get_code(timeseries_analysis.boxplots_over_time.get_default_grouping_func),
-                get_code(timeseries_analysis.boxplots_over_time.boxplots_over_time),
-                "boxplots_over_time(df=df)",
+                get_code(timeseries_analysis.boxplots_over_time.show_boxplots_over_time),
+                "show_boxplots_over_time(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.seasonal_decomposition.seasonal_decomposition),
-                "seasonal_decomposition(df=df, model='additive')",
+                get_code(timeseries_analysis.seasonal_decomposition.show_seasonal_decomposition),
+                "show_seasonal_decomposition(df=df, model='additive')",
             )
         ),
         "\n\n".join(
             (
                 get_code(timeseries_analysis.stationarity_tests.default_stationarity_tests),
-                get_code(timeseries_analysis.stationarity_tests.stationarity_tests),
-                "stationarity_tests(df=df)",
+                get_code(timeseries_analysis.stationarity_tests.show_stationarity_tests),
+                "show_stationarity_tests(df=df)",
             )
         ),
         get_code(timeseries_analysis.autocorrelation.plot_acf) + "\n\n" + "plot_acf(df=df)",
@@ -305,14 +305,14 @@ def test_generated_code_verbosity_high():
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.fourier_transform.fourier_transform),
-                "fourier_transform(df=df, sampling_rate=1)",
+                get_code(timeseries_analysis.fourier_transform.show_fourier_transform),
+                "show_fourier_transform(df=df, sampling_rate=1)",
             )
         ),
         "\n\n".join(
             (
-                get_code(timeseries_analysis.short_time_ft.short_time_ft),
-                "short_time_ft(df=df, sampling_rate=1, window_size=1)",
+                get_code(timeseries_analysis.short_time_ft.show_short_time_ft),
+                "show_short_time_ft(df=df, sampling_rate=1, window_size=1)",
             )
         ),
     ]
@@ -349,12 +349,12 @@ def test_verbosity_low_different_subsection_verbosities():
         "subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests, "
         "TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime])",
-        "fourier_transform(df=df, sampling_rate=1)",
-        "rolling_statistics(df=df)",
+        "show_fourier_transform(df=df, sampling_rate=1)",
+        "show_rolling_statistics(df=df)",
         (
-            get_code(timeseries_analysis.short_time_ft.short_time_ft)
+            get_code(timeseries_analysis.short_time_ft.show_short_time_ft)
             + "\n\n"
-            + "short_time_ft(df=df, sampling_rate=1, window_size=2)"
+            + "show_short_time_ft(df=df, sampling_rate=1, window_size=2)"
         ),
     ]
 
@@ -376,7 +376,7 @@ def test_boxplots_over_time_def():
 
     expected_code = (
         get_code(month_func) + "\n\n",
-        "boxplots_over_time(df=df, grouping_function=month_func, grouping_name='Month')",
+        "show_boxplots_over_time(df=df, grouping_function=month_func, grouping_name='Month')",
     )
 
     assert len(expected_code) == len(exported_code)
@@ -397,7 +397,7 @@ def test_boxplots_over_time_lambda():
 
     expected_code = [
         get_code(month_lambda) + "\n\n",
-        "boxplots_over_time(df=df, grouping_function=month_lambda, grouping_name='Month')",
+        "show_boxplots_over_time(df=df, grouping_function=month_lambda, grouping_name='Month')",
     ]
 
     assert len(expected_code) == len(exported_code)
