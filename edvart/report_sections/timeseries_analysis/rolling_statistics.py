@@ -56,10 +56,9 @@ class RollingStatistics(Section):
                 " import show_rolling_statistics"
             ]
         return [
+            "import warnings",
             "from IPython.display import display, Markdown",
-            "import plotly",
             "import plotly.graph_objects as go",
-            "plotly.offline.init_notebook_mode()",
             "from edvart.data_types import is_numeric",
         ]
 
