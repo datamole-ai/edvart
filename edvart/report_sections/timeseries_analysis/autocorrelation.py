@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
+import numpy as np
 import pandas as pd
 from IPython.display import Markdown, display
 from statsmodels.graphics import tsaplots
@@ -193,6 +194,13 @@ def plot_acf(
     plot_func = (
         functools.partial(tsaplots.plot_pacf, method="ywm") if partial else tsaplots.plot_acf
     )
+    if partial and lags is None:
+        nobs = len(df)
+        # See https://github.com/statsmodels/statsmodels/blob/01b19d7d111b29c183f620ff0a949ef6391ff8ee/statsmodels/graphics/tsaplots.py#L20
+        default_lags_limit = int(np.ceil(10 * np.log10(nobs))) + 1
+        # Partial function can only be computed for lags up to nobs // 2 - 1
+        lags_limit = min(default_lags_limit, nobs // 2)
+        lags = list(range(lags_limit))
     for col in columns:
         display(Markdown(f"---\n### {col}"))
         fig = plot_func(df[col].dropna(), lags=lags)
