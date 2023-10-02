@@ -34,6 +34,8 @@ class BoxplotsOverTime(Section):
         function must be assigned an identifier.
         To pass a lambda, simply assign it to a variable and pass the variable.
         If None is passed, a default grouping will be selected (see `default_nunique_max`).
+    grouping_function_imports: List[str], optional
+        Additional imports required for the grouping function.
     grouping_name : str, optional
         Name of grouping, will be displayed as title of the horizontal axis.
     default_nunique_max : int (default = 80)
@@ -49,10 +51,12 @@ class BoxplotsOverTime(Section):
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
         grouping_function: Callable[[Any], str] = None,
+        grouping_function_imports: Optional[List[str]] = None,
         grouping_name: Optional[str] = None,
         default_nunique_max: int = 80,
     ):
         self.grouping_function = grouping_function
+        self.grouping_function_imports = grouping_function_imports
         self.grouping_name = grouping_name
         self.default_nunique_max = default_nunique_max
         super().__init__(verbosity, columns)
@@ -71,17 +75,21 @@ class BoxplotsOverTime(Section):
             e.g. ["import pandas as pd", "import numpy as np"].
         """
         if self.verbosity <= Verbosity.MEDIUM:
-            return [
+            imports = [
                 "from edvart.report_sections.timeseries_analysis.boxplots_over_time"
                 " import show_boxplots_over_time"
             ]
-        return [
-            "from datetime import datetime",
-            "import matplotlib.pyplot as plt",
-            "import seaborn as sns",
-            "from IPython.display import display, Markdown",
-            "from edvart.data_types import is_numeric",
-        ]
+        else:
+            imports = [
+                "from datetime import datetime",
+                "import matplotlib.pyplot as plt",
+                "import seaborn as sns",
+                "from IPython.display import display, Markdown",
+                "from edvart.data_types import is_numeric",
+            ]
+        if self.grouping_function_imports is not None:
+            imports.extend(self.grouping_function_imports)
+        return imports
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
         """Adds cells to the list of cells.
