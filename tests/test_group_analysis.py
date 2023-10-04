@@ -21,18 +21,23 @@ from edvart.report_sections.group_analysis import (
 )
 from edvart.report_sections.section_base import Verbosity
 
+from .pyarrow_utils import pyarrow_parameterize
+
 # Workaround to prevent multiple browser tabs opening with figures
 plotly.io.renderers.default = "json"
 
 
-def get_test_df():
-    return pd.DataFrame(
+def get_test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
+    test_df = pd.DataFrame(
         data=[
             ["P" if np.random.uniform() < 0.4 else "N", 1.5 * i, "X" if i % 2 == 0 else "Y"]
             for i in range(60)
         ],
         columns=["A", "B", "C"],
     )
+    if pyarrow_dtypes:
+        test_df = test_df.convert_dtypes(dtype_backend="pyarrow")
+    return test_df
 
 
 def test_default_config_verbosity():
@@ -47,15 +52,19 @@ def test_invalid_verbosities():
         GroupAnalysis(groupby=[], verbosity=-1)
 
 
-def test_groupby_nonexistent_col():
+@pyarrow_parameterize
+def test_groupby_nonexistent_col(pyarrow_dtypes: bool):
     with pytest.raises(ValueError):
-        show_group_analysis(df=get_test_df(), groupby=["non-existent"])
+        show_group_analysis(df=get_test_df(pyarrow_dtypes=pyarrow_dtypes), groupby=["non-existent"])
     with pytest.raises(ValueError):
-        group_missing_values(df=get_test_df(), groupby=["non-existent"])
+        group_missing_values(
+            df=get_test_df(pyarrow_dtypes=pyarrow_dtypes), groupby=["non-existent"]
+        )
 
 
-def test_static_methods():
-    df = get_test_df()
+@pyarrow_parameterize
+def test_static_methods(pyarrow_dtypes: bool):
+    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     with redirect_stdout(None):
         show_group_analysis(df=df, groupby="C")
         show_group_analysis(df=df, groupby=["C"], columns=["A"])
@@ -80,8 +89,9 @@ def test_static_methods():
         overlaid_histograms(df, groupby=["B"], column="B")
 
 
-def test_code_export_verbosity_low():
-    df = get_test_df()
+@pyarrow_parameterize
+def test_code_export_verbosity_low(pyarrow_dtypes: bool):
+    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     group_section = GroupAnalysis(groupby="B", verbosity=Verbosity.LOW)
 
     # Export code
@@ -96,8 +106,9 @@ def test_code_export_verbosity_low():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_medium():
-    df = get_test_df()
+@pyarrow_parameterize
+def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
+    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     group_section = GroupAnalysis(groupby="A", verbosity=Verbosity.MEDIUM)
 
     # Export code
@@ -122,8 +133,9 @@ def test_code_export_verbosity_medium():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_code_export_verbosity_high():
-    df = get_test_df()
+@pyarrow_parameterize
+def test_code_export_verbosity_high(pyarrow_dtypes: bool):
+    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     group_section = GroupAnalysis(groupby="A", verbosity=Verbosity.HIGH)
 
     # Export code
@@ -176,8 +188,9 @@ def test_code_export_verbosity_high():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_columns_parameter():
-    df = get_test_df()
+@pyarrow_parameterize
+def test_columns_parameter(pyarrow_dtypes: bool):
+    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     ga = GroupAnalysis(groupby="A", columns=["B"])
     assert ga.groupby == ["A"]
     assert ga.columns == ["B"]
@@ -192,14 +205,14 @@ def test_columns_parameter():
 
 
 def test_column_list_not_modified():
-    df = get_test_df()
     columns = ["C"]
     GroupAnalysis(groupby=["A"], columns=columns)
     assert columns == ["C"], "Column list modified"
 
 
-def test_show():
-    df = get_test_df()
+@pyarrow_parameterize
+def test_show(pyarrow_dtypes: bool):
+    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     group_section = GroupAnalysis(groupby="A")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)

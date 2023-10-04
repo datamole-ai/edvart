@@ -6,6 +6,7 @@ from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Tuple
 
 import pandas as pd
 import statsmodels.api as sm
+from scipy import stats
 
 from edvart.data_types import is_numeric
 
@@ -76,9 +77,7 @@ def reindex_to_datetime(
         Reindexed df.
     """
     df = df.copy()
-    new_index = pd.to_datetime(
-        df[datetime_column], unit=unit, origin=origin, infer_datetime_format=True
-    )
+    new_index = pd.to_datetime(df[datetime_column], unit=unit, origin=origin, format="mixed")
     if keep_index is not None:
         df[keep_index] = df.index
     df = df.drop(datetime_column, axis="columns")
@@ -213,6 +212,8 @@ def median_absolute_deviation(series: pd.Series) -> float:
     -------
     float
     """
+    if series.isnull().all():
+        return float("nan")
     return median((series - series.mean()).abs())
 
 
@@ -245,6 +246,8 @@ def minimum(series: pd.Series) -> float:
     -------
     float
     """
+    if series.isnull().all():
+        return float("nan")
     return series.min()
 
 
@@ -261,6 +264,8 @@ def maximum(series: pd.Series) -> float:
     -------
     float
     """
+    if series.isnull().all():
+        return float("nan")
     return series.max()
 
 
@@ -277,6 +282,8 @@ def quartile1(series: pd.Series) -> float:
     -------
     float
     """
+    if series.isnull().all():
+        return float("nan")
     return series.quantile(0.25)
 
 
@@ -293,6 +300,8 @@ def quartile3(series: pd.Series) -> float:
     -------
     float
     """
+    if series.isnull().all():
+        return float("nan")
     return series.quantile(0.75)
 
 
@@ -309,6 +318,8 @@ def mean(series: pd.Series) -> float:
     -------
     float
     """
+    if series.isnull().all():
+        return float("nan")
     return series.mean()
 
 
@@ -395,6 +406,8 @@ def std(series: pd.Series) -> float:
     -------
     float
     """
+    if series.isnull().all():
+        return float("nan")
     return series.std()
 
 
@@ -411,6 +424,8 @@ def mad(series: pd.Series) -> Any:
     -------
     float
     """
+    if series.isnull().all():
+        return float("nan")
     return (series - series.mean()).abs().mean()
 
 
@@ -427,7 +442,9 @@ def kurtosis(series: pd.Series) -> Any:
     -------
     float
     """
-    return series.kurtosis()
+    if series.isnull().all():
+        return float("nan")
+    return stats.kurtosis(series)
 
 
 def skewness(series: pd.Series) -> Any:
@@ -443,7 +460,9 @@ def skewness(series: pd.Series) -> Any:
     -------
     float
     """
-    return series.skew()
+    if series.isnull().all():
+        return float("nan")
+    return stats.skew(series)
 
 
 def sum_(series: pd.Series) -> float:

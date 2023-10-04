@@ -10,7 +10,9 @@ def test_inference():
         == data_types.DataType.NUMERIC
     ), "Should be numeric type"
     assert (
-        data_types.infer_data_type(pd.Series(["2014-01-01", "2014-01-02", "2014-12-03 14:05:02"]))
+        data_types.infer_data_type(
+            pd.Series(["2014-01-01 12:05:02", "2014-01-02 13:05:02", "2014-12-03 14:05:02"])
+        )
         == data_types.DataType.DATE
     ), "Should be date type"
     assert (
@@ -95,13 +97,13 @@ def test_boolean_series():
 
 def test_date_series():
     assert data_types.is_date(
-        pd.Series(["2014-01-01", "2014-01-02", "2014-12-03 14:05:02"])
+        pd.Series(["2014-01-01 12:05:02", "2014-01-02 13:05:02", "2014-12-03 14:05:02"])
     ), "Should be type date"
     assert data_types.is_date(
         pd.Series(["Mar 12 2018", "Dec 12 2018", "Jan 21 2020"])
     ), "Should be type date"
     assert not data_types.is_date(
-        pd.Series(["2014-01-01", "2014-01-02", "2014-12-03 14:05:02", "nan"])
+        pd.Series(["2014-01-01", "2014-01-02", "2014-12-03T14:05:02", "nan"])
     ), "Should not be type date"
     assert not data_types.is_date(
         pd.Series(["2014-01-01", "2014-01-02", "2014-12-03 14:05:02", 1, 2, 3])

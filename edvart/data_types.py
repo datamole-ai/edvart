@@ -5,6 +5,13 @@ from enum import IntEnum
 import numpy as np
 import pandas as pd
 
+try:
+    import pyarrow  # pylint: disable=unused-import
+except ImportError:
+    PYARROW_PANDAS_BACKEND_AVAILABLE = False
+else:
+    PYARROW_PANDAS_BACKEND_AVAILABLE = pd.__version__ >= "2.0"
+
 
 class DataType(IntEnum):
     """Class describe possible data types."""
@@ -85,13 +92,7 @@ def is_numeric(series: pd.Series) -> bool:
     """
     if is_missing(series):
         return False
-    # When an unkown dtype is encountered, `np.issubdtype(series.dtype, np.number)`
-    # raises a TypeError. This happens for example if `series` is `pd.Categorical`
-    # If the dtype is unknown, we treat it as non-numeric, therefore return False.
-    try:
-        return np.issubdtype(series.dtype, np.number)
-    except TypeError:
-        return False
+    return pd.api.types.is_numeric_dtype(series)
 
 
 def is_missing(series: pd.Series) -> bool:
@@ -179,7 +180,7 @@ def is_date(series: pd.Series) -> bool:
     if contains_numerics:
         return False
     try:
-        converted_series = pd.to_datetime(series, errors="coerce", infer_datetime_format=True)
+        converted_series = pd.to_datetime(series, errors="coerce", format="mixed")
     except ValueError:
         return False
     return converted_series.notna().all()
