@@ -77,7 +77,7 @@ def reindex_to_datetime(
         Reindexed df.
     """
     df = df.copy()
-    new_index = pd.to_datetime(df[datetime_column], unit=unit, origin=origin, format="mixed")
+    new_index = pd.to_datetime(df[datetime_column], unit=unit, origin=origin)
     if keep_index is not None:
         df[keep_index] = df.index
     df = df.drop(datetime_column, axis="columns")
