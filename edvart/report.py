@@ -14,14 +14,20 @@ import nbformat.v4 as nbf4
 import pandas as pd
 
 from edvart.data_types import is_date
-from edvart.report_sections.bivariate_analysis import BivariateAnalysis
+from edvart.report_sections.bivariate_analysis import BivariateAnalysis, BivariateAnalysisSubsection
 from edvart.report_sections.code_string_formatting import code_dedent
-from edvart.report_sections.dataset_overview import Overview
+from edvart.report_sections.dataset_overview import Overview, OverviewSubsection
 from edvart.report_sections.group_analysis import GroupAnalysis
-from edvart.report_sections.multivariate_analysis import MultivariateAnalysis
+from edvart.report_sections.multivariate_analysis import (
+    MultivariateAnalysis,
+    MultivariateAnalysisSubsection,
+)
 from edvart.report_sections.section_base import Section, Verbosity
 from edvart.report_sections.table_of_contents import TableOfContents
-from edvart.report_sections.timeseries_analysis import TimeseriesAnalysis
+from edvart.report_sections.timeseries_analysis import (
+    TimeseriesAnalysis,
+    TimeseriesAnalysisSubsection,
+)
 from edvart.report_sections.univariate_analysis import UnivariateAnalysis
 from edvart.utils import env_var
 
@@ -322,7 +328,7 @@ class ReportBase(ABC):
     def add_overview(
         self,
         columns: Optional[List[str]] = None,
-        subsections: Optional[List[Overview.OverviewSubsection]] = None,
+        subsections: Optional[List[OverviewSubsection]] = None,
         verbosity: Optional[Verbosity] = None,
         verbosity_quick_info: Optional[Verbosity] = None,
         verbosity_data_types: Optional[Verbosity] = None,
@@ -408,7 +414,7 @@ class ReportBase(ABC):
         columns_x: Optional[List[str]] = None,
         columns_y: Optional[List[str]] = None,
         columns_pairs: Optional[List[Tuple[str, str]]] = None,
-        subsections: Optional[List[BivariateAnalysis.BivariateAnalysisSubsection]] = None,
+        subsections: Optional[List[BivariateAnalysisSubsection]] = None,
         verbosity: Optional[Verbosity] = None,
         verbosity_correlations: Optional[Verbosity] = None,
         verbosity_pairplot: Optional[Verbosity] = None,
@@ -438,7 +444,7 @@ class ReportBase(ABC):
             `columns`, `columns_x`, `columns_y` is specified. In that case, the first elements
             of each pair are treated as `columns_x` and the second elements as `columns_y` in
             pairplots and correlations.
-        subsections : List[BivariateAnalysis.BivariateAnalysisSubsection], optional
+        subsections : List[BivariateAnalysisSubsection], optional
             List of sub-sections to include into the BivariateAnalysis section.
             If None, all subsections are added.
         verbosity : Verbosity, optional
@@ -473,7 +479,7 @@ class ReportBase(ABC):
     def add_multivariate_analysis(
         self,
         columns: Optional[List[str]] = None,
-        subsections: Optional[List[MultivariateAnalysis.MultivariateAnalysisSubsection]] = None,
+        subsections: Optional[List[MultivariateAnalysisSubsection]] = None,
         verbosity: Optional[Verbosity] = None,
         verbosity_pca: Optional[Verbosity] = None,
         verbosity_umap: Optional[Verbosity] = None,
@@ -488,7 +494,7 @@ class ReportBase(ABC):
         columns : List[str], optional
             Columns which to analyze.
             If None, all columns are used.
-        subsections : List[MultivariateAnalysis.MultivariateAnalysisSubsection], optional
+        subsections : List[MultivariateAnalysisSubsection], optional
             List of sub-sections to include into the BivariateAnalysis section.
             If None, all subsections are added.
         verbosity : Verbosity, optional
@@ -733,7 +739,7 @@ class TimeseriesReport(ReportBase):
     def add_timeseries_analysis(
         self,
         columns: Optional[List[str]] = None,
-        subsections: Optional[List[TimeseriesAnalysis.TimeseriesAnalysisSubsection]] = None,
+        subsections: Optional[List[TimeseriesAnalysisSubsection]] = None,
         verbosity: Optional[Verbosity] = None,
         verbosity_time_series_line_plot: Optional[Verbosity] = None,
         verbosity_rolling_statistics: Optional[Verbosity] = None,

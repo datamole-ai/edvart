@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 from edvart.report_sections import bivariate_analysis
-from edvart.report_sections.bivariate_analysis import BivariateAnalysis
+from edvart.report_sections.bivariate_analysis import BivariateAnalysis, BivariateAnalysisSubsection
 from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Verbosity
 
@@ -95,11 +95,11 @@ def test_negative_verbosities():
 def test_section_adding():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         subsections=[
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.CorrelationPlot,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.ContingencyTable,
         ]
     )
     assert isinstance(
@@ -136,8 +136,8 @@ def test_code_export_verbosity_low():
 def test_code_export_verbosity_low_with_subsections():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         subsections=[
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.ContingencyTable,
+            BivariateAnalysisSubsection.PairPlot,
         ],
         verbosity=Verbosity.LOW,
     )
@@ -149,8 +149,8 @@ def test_code_export_verbosity_low_with_subsections():
     # Define expected code
     expected_code = [
         "show_bivariate_analysis(df=df, subsections=["
-        "BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable, "
-        "BivariateAnalysis.BivariateAnalysisSubsection.PairPlot])"
+        "BivariateAnalysisSubsection.ContingencyTable, "
+        "BivariateAnalysisSubsection.PairPlot])"
     ]
     # Test code equivalence
     assert len(exported_code) == 1
@@ -189,9 +189,9 @@ def test_generated_code_verbosity_medium():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         verbosity=Verbosity.MEDIUM,
         subsections=[
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.CorrelationPlot,
+            BivariateAnalysisSubsection.ContingencyTable,
         ],
     )
 
@@ -218,9 +218,9 @@ def test_generated_code_verbosity_medium_columns_x_y():
         columns_x=columns_x,
         columns_y=columns_y,
         subsections=[
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.CorrelationPlot,
+            BivariateAnalysisSubsection.ContingencyTable,
         ],
         color_col="b",
     )
@@ -248,9 +248,9 @@ def test_generated_code_verbosity_medium_columns_pairs():
         verbosity=Verbosity.MEDIUM,
         columns_pairs=columns_pairs,
         subsections=[
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.CorrelationPlot,
+            BivariateAnalysisSubsection.ContingencyTable,
         ],
     )
 
@@ -273,9 +273,9 @@ def test_generated_code_verbosity_high():
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         verbosity=Verbosity.HIGH,
         subsections=[
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
-            bivariate_analysis.BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.CorrelationPlot,
+            BivariateAnalysisSubsection.ContingencyTable,
         ],
     )
 
@@ -312,10 +312,10 @@ def test_verbosity_low_different_subsection_verbosities():
     bivariate_section = BivariateAnalysis(
         verbosity=Verbosity.LOW,
         subsections=[
-            BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
-            BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.ContingencyTable,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.CorrelationPlot,
         ],
         verbosity_pairplot=Verbosity.HIGH,
         verbosity_correlations=Verbosity.MEDIUM,
@@ -327,7 +327,7 @@ def test_verbosity_low_different_subsection_verbosities():
 
     expected_code = [
         "show_bivariate_analysis(df=df, "
-        "subsections=[BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable])",
+        "subsections=[BivariateAnalysisSubsection.ContingencyTable])",
         get_code(bivariate_analysis.plot_pairplot) + "\n\n" + "plot_pairplot(df=df)",
         get_code(bivariate_analysis.plot_pairplot) + "\n\n" + "plot_pairplot(df=df)",
         "plot_correlations(df=df)",
@@ -384,10 +384,10 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     bivariate_section = BivariateAnalysis(
         verbosity=Verbosity.LOW,
         subsections=[
-            BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            BivariateAnalysis.BivariateAnalysisSubsection.ContingencyTable,
-            BivariateAnalysis.BivariateAnalysisSubsection.PairPlot,
-            BivariateAnalysis.BivariateAnalysisSubsection.CorrelationPlot,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.ContingencyTable,
+            BivariateAnalysisSubsection.PairPlot,
+            BivariateAnalysisSubsection.CorrelationPlot,
         ],
         verbosity_pairplot=Verbosity.HIGH,
         verbosity_correlations=Verbosity.MEDIUM,
@@ -397,7 +397,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
     expected_imports = {
         "from edvart.report_sections.bivariate_analysis import show_bivariate_analysis",
-        "from edvart.report_sections.bivariate_analysis import BivariateAnalysis",
+        "from edvart.report_sections.bivariate_analysis import BivariateAnalysisSubsection",
     }
     for s in bivariate_section.subsections:
         if s.verbosity > Verbosity.LOW:

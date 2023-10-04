@@ -8,4 +8,7 @@ from .seasonal_decomposition import SeasonalDecomposition
 from .short_time_ft import ShortTimeFT
 from .stationarity_tests import StationarityTests
 from .time_series_line_plot import TimeSeriesLinePlot
-from .timeseries_analysis import TimeseriesAnalysis  # pylint: disable=cyclic-import
+from .timeseries_analysis import (  # pylint: disable=cyclic-import
+    TimeseriesAnalysis,
+    TimeseriesAnalysisSubsection,
+)
