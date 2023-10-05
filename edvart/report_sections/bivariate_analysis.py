@@ -1,5 +1,3 @@
-"""Bivariate analysis section package."""
-
 import itertools
 from enum import IntEnum
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union

@@ -1,5 +1,3 @@
-"""Multivariate analysis package."""
-
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Tuple
 

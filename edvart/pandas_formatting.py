@@ -1,5 +1,3 @@
-"""Pandas formatting package."""
-
 from typing import Any, Dict, List, Union
 
 import pandas as pd

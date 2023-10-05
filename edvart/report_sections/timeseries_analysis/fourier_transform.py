@@ -1,5 +1,3 @@
-"""Fourier transform package."""
-
 from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -8,7 +6,7 @@ import numpy as np
 import pandas as pd
 from IPython.display import Markdown, display
 
-from edvart.data_types import is_numeric  # noqa:I100
+from edvart.data_types import is_numeric
 from edvart.decorators import check_index_time_ascending
 from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Section, Verbosity

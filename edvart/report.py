@@ -1,5 +1,3 @@
-"""Report package."""
-
 import base64
 import logging
 import pickle

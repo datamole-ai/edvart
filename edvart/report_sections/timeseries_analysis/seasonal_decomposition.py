@@ -1,5 +1,3 @@
-"""Seasonal decomposition package."""
-
 from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt

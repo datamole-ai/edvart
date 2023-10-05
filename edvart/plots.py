@@ -1,5 +1,3 @@
-"""Plots package."""
-
 from typing import Optional, Tuple, Union
 
 import matplotlib.pyplot as plt

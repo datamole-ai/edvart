@@ -1,5 +1,3 @@
-"""Time series analysis package."""
-
 from .autocorrelation import Autocorrelation
 from .boxplots_over_time import BoxplotsOverTime
 from .fourier_transform import FourierTransform

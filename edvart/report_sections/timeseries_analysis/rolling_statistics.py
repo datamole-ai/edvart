@@ -1,5 +1,3 @@
-"""Rolling statistics package."""
-
 import warnings
 from typing import Any, Dict, List, Optional
 
