@@ -624,7 +624,7 @@ def overlaid_histograms(
         if bins > 1000:
             # Use Sturges' rule if number of bins is too large
             bins = int(np.ceil(np.log2(bins) + 1))
-            bin_width =  data_range / bins
+            bin_width = data_range / bins
     else:
         bin_width = data_range / bins
     bin_config = go.histogram.XBins(
