@@ -135,7 +135,7 @@ def show_rolling_statistics(
         Multiple of standard deviation from mean to show bands at.
         Ignored if not showing bands.
     show_std_dev : bool (default = True)
-        Whether to plot rolling standard devation.
+        Whether to plot rolling standard deviation.
     color_mean : str (default = "#2040FF")
         Color of the line showing rolling mean.
     color_band : str (default = "#90E0FF")

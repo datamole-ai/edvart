@@ -29,7 +29,7 @@ class Overview(ReportSection):
     Parameters
     ----------
     subsections : List[OverviewSubsection], optional
-        List of subsections to inlcude into the Overview section.
+        List of subsections to include into the Overview section.
         All subsections in OverviewSubsection are used by default.
     verbosity : Verbosity
         Generated code verbosity global to the Overview sections
@@ -925,7 +925,7 @@ def missing_value_row_count(df: pd.DataFrame, columns: Optional[List[str]] = Non
     Parameters
     ----------
     df : pd.DataFrame
-        Dataframe for which to counnt missing value rows.
+        Dataframe for which to count missing value rows.
     columns : Optional[List[str]], optional
         List of columns to consider when counting. If None, all columns are used.
     """
@@ -1029,7 +1029,7 @@ def duplicate_row_count(df: pd.DataFrame, columns: Optional[List[str]] = None) -
     Parameters
     ----------
     df : pd.DataFrame
-        Dataframe for which to counnt missing value rows.
+        Dataframe for which to count missing value rows.
     columns : Optional[List[str]], optional
         List of columns to consider when counting. If None, all columns are used.
     """

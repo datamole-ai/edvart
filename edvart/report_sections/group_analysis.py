@@ -527,7 +527,7 @@ def group_barplot(
         Maximum number of unique values in column to plot. If the number of unique values
         is higher, a warning will be issued and plot will not be shown.
     conditional_probability : bool (default = True)
-        If True, conditional probability contitioned on group will be displayed,
+        If True, conditional probability conditioned on group will be displayed,
         otherwise conditional frequency will be displayed.
     xaxis_tickangle : float (default = 0)
         Rotation angle of ticks on the x axis.

@@ -105,7 +105,7 @@ class ReportBase(ABC):
         dataset_name : str (default = "[INSERT DATASET NAME]")
             Name of dataset to be used in the title of the report.
         dataset_description : str (default = "[INSERT DATASET DESCRIPTION]")
-            Descritpion of dataset to be used below the title of the report.
+            Description of dataset to be used below the title of the report.
         load_df : str (default = 'df = ...')
             Code string for loading a dataset to variable `df`.
         extra_imports : List[str], optional
@@ -617,7 +617,7 @@ class DefaultReport(Report):
         Verbosity of the overview section
     verbosity_univariate_analysis : Verbosity, optional
         Verbosity of the univariate analysis section
-    verbosity_bivariate_analysis : Verbosity, optiona
+    verbosity_bivariate_analysis : Verbosity, optional
         Verbosity of the bivariate analysis section.
     verbosity_multivariate_analysis: Verbosity, optional
         Verbosity of the multivariate analysis section
@@ -833,10 +833,10 @@ class DefaultTimeseriesReport(TimeseriesReport):
     sampling_rate : int, optional
         Sampling rate for Fourier transform and Short-time Fourier transform subsections. Determines
         frequency unit for analysis of frequencies, for example with monthly data and sampling rate
-        12, yearly frequncy spectrum is produced.
+        12, yearly frequency spectrum is produced.
         If not set, these two sections will not be included.
     stft_window_size : int, optional
-        Windows size for short-time Fourier transform subsection. If not set, STFT will be exluded.
+        Windows size for short-time Fourier transform subsection. If not set, STFT will be excluded.
     """
 
     def __init__(
