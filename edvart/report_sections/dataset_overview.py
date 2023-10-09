@@ -456,7 +456,7 @@ def data_types(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
 
     # Convert result to frame for viewing
     dtypes_frame = series_to_frame(
-        series=dtypes, index_name="Column Name", column_name="edvart Data Type"
+        series=dtypes, index_name="Column Name", column_name="Inferred Data Type"
     )
 
     display(hide_index(dtypes_frame))
