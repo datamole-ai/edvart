@@ -1,5 +1,3 @@
-"""Time series line plot package."""
-
 from typing import Any, Dict, List, Optional
 
 import nbformat.v4 as nbfv4

@@ -1,5 +1,3 @@
-"""Module defines data types and helper function for recognizing them."""
-
 from enum import IntEnum
 
 import numpy as np

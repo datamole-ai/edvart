@@ -1,5 +1,3 @@
-"""Utils package."""
-
 import os
 from contextlib import contextmanager
 from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Tuple, Union

@@ -1,5 +1,3 @@
-"""Group analysis module."""
-
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import colorlover as cl
