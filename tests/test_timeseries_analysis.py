@@ -9,7 +9,11 @@ import edvart
 from edvart.report_sections import timeseries_analysis
 from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Verbosity
-from edvart.report_sections.timeseries_analysis import BoxplotsOverTime, TimeseriesAnalysis
+from edvart.report_sections.timeseries_analysis import (
+    BoxplotsOverTime,
+    TimeseriesAnalysis,
+    TimeseriesAnalysisSubsection,
+)
 
 
 def test_default_config_verbosity():
@@ -89,11 +93,11 @@ def test_negative_verbosities():
 def test_section_adding():
     bivariate_section = TimeseriesAnalysis(
         subsections=[
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.SeasonalDecomposition,
+            TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysisSubsection.BoxplotsOverTime,
+            TimeseriesAnalysisSubsection.StationarityTests,
+            TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysisSubsection.SeasonalDecomposition,
         ]
     )
     assert isinstance(
@@ -148,21 +152,19 @@ def test_ft_stft_included():
 
 def test_ft_no_sampling_rate_error():
     with pytest.raises(ValueError):
-        ts = TimeseriesAnalysis(
-            subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform]
-        )
+        ts = TimeseriesAnalysis(subsections=[TimeseriesAnalysisSubsection.FourierTransform])
     with pytest.raises(ValueError):
         ts = TimeseriesAnalysis(
-            subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform],
+            subsections=[TimeseriesAnalysisSubsection.FourierTransform],
             stft_window_size=2,
         )
     with pytest.raises(ValueError):
         ts = TimeseriesAnalysis(
-            subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT],
+            subsections=[TimeseriesAnalysisSubsection.ShortTimeFT],
         )
     with pytest.raises(ValueError):
         ts = TimeseriesAnalysis(
-            subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT],
+            subsections=[TimeseriesAnalysisSubsection.ShortTimeFT],
             sampling_rate=1,
         )
 
@@ -184,8 +186,8 @@ def test_code_export_verbosity_low():
 def test_code_export_verbosity_low_with_subsections():
     ts_section = TimeseriesAnalysis(
         subsections=[
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
+            TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysisSubsection.StationarityTests,
         ],
         verbosity=Verbosity.LOW,
     )
@@ -197,8 +199,8 @@ def test_code_export_verbosity_low_with_subsections():
     # Define expected code
     expected_code = [
         "show_timeseries_analysis(df=df, subsections=["
-        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics, "
-        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests])"
+        "TimeseriesAnalysisSubsection.RollingStatistics, "
+        "TimeseriesAnalysisSubsection.StationarityTests])"
     ]
     # Test code equivalence
     assert len(exported_code) == 1
@@ -208,8 +210,8 @@ def test_code_export_verbosity_low_with_subsections():
 def test_code_export_verbosity_low_with_fft_stft():
     ts_section = TimeseriesAnalysis(
         subsections=[
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT,
+            TimeseriesAnalysisSubsection.FourierTransform,
+            TimeseriesAnalysisSubsection.ShortTimeFT,
         ],
         verbosity=Verbosity.LOW,
         sampling_rate=1,
@@ -223,8 +225,8 @@ def test_code_export_verbosity_low_with_fft_stft():
     # Define expected code
     expected_code = [
         "show_timeseries_analysis(df=df, subsections=["
-        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform, "
-        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT], "
+        "TimeseriesAnalysisSubsection.FourierTransform, "
+        "TimeseriesAnalysisSubsection.ShortTimeFT], "
         "sampling_rate=1, stft_window_size=1)"
     ]
     # Test code equivalence
@@ -326,12 +328,12 @@ def test_verbosity_low_different_subsection_verbosities():
     ts_section = TimeseriesAnalysis(
         verbosity=Verbosity.LOW,
         subsections=[
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT,
+            TimeseriesAnalysisSubsection.TimeSeriesLinePlot,
+            TimeseriesAnalysisSubsection.FourierTransform,
+            TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysisSubsection.StationarityTests,
+            TimeseriesAnalysisSubsection.BoxplotsOverTime,
+            TimeseriesAnalysisSubsection.ShortTimeFT,
         ],
         sampling_rate=1,
         stft_window_size=2,
@@ -346,9 +348,9 @@ def test_verbosity_low_different_subsection_verbosities():
 
     expected_code = [
         "show_timeseries_analysis(df=df, "
-        "subsections=[TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot, "
-        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests, "
-        "TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime])",
+        "subsections=[TimeseriesAnalysisSubsection.TimeSeriesLinePlot, "
+        "TimeseriesAnalysisSubsection.StationarityTests, "
+        "TimeseriesAnalysisSubsection.BoxplotsOverTime])",
         "show_fourier_transform(df=df, sampling_rate=1)",
         "show_rolling_statistics(df=df)",
         (
@@ -447,12 +449,12 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     ts_section = TimeseriesAnalysis(
         verbosity=Verbosity.LOW,
         subsections=[
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.TimeSeriesLinePlot,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.FourierTransform,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.RollingStatistics,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.StationarityTests,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.BoxplotsOverTime,
-            TimeseriesAnalysis.TimeseriesAnalysisSubsection.ShortTimeFT,
+            TimeseriesAnalysisSubsection.TimeSeriesLinePlot,
+            TimeseriesAnalysisSubsection.FourierTransform,
+            TimeseriesAnalysisSubsection.RollingStatistics,
+            TimeseriesAnalysisSubsection.StationarityTests,
+            TimeseriesAnalysisSubsection.BoxplotsOverTime,
+            TimeseriesAnalysisSubsection.ShortTimeFT,
         ],
         sampling_rate=1,
         stft_window_size=2,
@@ -464,7 +466,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
     expected_imports = {
         "from edvart.report_sections.timeseries_analysis.timeseries_analysis import show_timeseries_analysis",
-        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import TimeseriesAnalysis",
+        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import TimeseriesAnalysisSubsection",
     }
     for s in ts_section.subsections:
         if s.verbosity > Verbosity.LOW:

@@ -21,6 +21,24 @@ from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import ReportSection, Section, Verbosity
 
 
+# pylint: disable=invalid-name
+class OverviewSubsection(IntEnum):
+    """
+    Enum of possible subsections of the Overview section.
+    """
+
+    QuickInfo = 1
+    DataTypes = 2
+    DataPreview = 3
+    MissingValues = 4
+    RowsWithMissingValue = 5
+    ConstantOccurrence = 6
+    DuplicateRows = 7
+
+    def __str__(self):
+        return self.name
+
+
 class Overview(ReportSection):
     """Generates the Overview section of the report.
 
@@ -52,23 +70,6 @@ class Overview(ReportSection):
         Duplicate rows subsection code verbosity.
     """
 
-    # pylint: disable=invalid-name
-    class OverviewSubsection(IntEnum):
-        """
-        Enum of possible subsections of the Overview section.
-        """
-
-        QuickInfo = 1
-        DataTypes = 2
-        DataPreview = 3
-        MissingValues = 4
-        RowsWithMissingValue = 5
-        ConstantOccurrence = 6
-        DuplicateRows = 7
-
-        def __str__(self):
-            return self.name
-
     # By default use all subsections
     _DEFAULT_SUBSECTIONS_TO_SHOW = list(OverviewSubsection)
 
@@ -95,17 +96,15 @@ class Overview(ReportSection):
         verbosity_constant_occurrence = verbosity_constant_occurrence or verbosity
         verbosity_duplicate_rows = verbosity_duplicate_rows or verbosity
 
-        subsec = Overview.OverviewSubsection
-
         # Store subsection verbosities
         self.subsection_verbosities = {
-            subsec.QuickInfo: verbosity_quick_info,
-            subsec.DataTypes: verbosity_data_types,
-            subsec.DataPreview: verbosity_data_preview,
-            subsec.MissingValues: verbosity_missing_values,
-            subsec.RowsWithMissingValue: verbosity_rows_with_missing_value,
-            subsec.ConstantOccurrence: verbosity_constant_occurrence,
-            subsec.DuplicateRows: verbosity_duplicate_rows,
+            OverviewSubsection.QuickInfo: verbosity_quick_info,
+            OverviewSubsection.DataTypes: verbosity_data_types,
+            OverviewSubsection.DataPreview: verbosity_data_preview,
+            OverviewSubsection.MissingValues: verbosity_missing_values,
+            OverviewSubsection.RowsWithMissingValue: verbosity_rows_with_missing_value,
+            OverviewSubsection.ConstantOccurrence: verbosity_constant_occurrence,
+            OverviewSubsection.DuplicateRows: verbosity_duplicate_rows,
         }
 
         if subsections is None:
@@ -121,15 +120,17 @@ class Overview(ReportSection):
 
         # Construct objects that implement subsections
         enum_to_implementation = {
-            subsec.QuickInfo: QuickInfo(verbosity_quick_info, columns),
-            subsec.DataTypes: DataTypes(verbosity_data_types, columns),
-            subsec.DataPreview: DataPreview(verbosity_data_preview, columns),
-            subsec.MissingValues: MissingValues(verbosity_missing_values, columns),
-            subsec.RowsWithMissingValue: RowsWithMissingValue(
+            OverviewSubsection.QuickInfo: QuickInfo(verbosity_quick_info, columns),
+            OverviewSubsection.DataTypes: DataTypes(verbosity_data_types, columns),
+            OverviewSubsection.DataPreview: DataPreview(verbosity_data_preview, columns),
+            OverviewSubsection.MissingValues: MissingValues(verbosity_missing_values, columns),
+            OverviewSubsection.RowsWithMissingValue: RowsWithMissingValue(
                 verbosity_rows_with_missing_value, columns
             ),
-            subsec.ConstantOccurrence: ConstantOccurrence(verbosity_constant_occurrence, columns),
-            subsec.DuplicateRows: DuplicateRows(verbosity_duplicate_rows, columns),
+            OverviewSubsection.ConstantOccurrence: ConstantOccurrence(
+                verbosity_constant_occurrence, columns
+            ),
+            OverviewSubsection.DuplicateRows: DuplicateRows(verbosity_duplicate_rows, columns),
         }
 
         subsections_implementations = [
@@ -153,7 +154,9 @@ class Overview(ReportSection):
         if self.verbosity == Verbosity.LOW:
             imports = {"from edvart.report_sections.dataset_overview import show_overview"}
             if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
-                imports.add("from edvart.report_sections.dataset_overview import Overview")
+                imports.add(
+                    "from edvart.report_sections.dataset_overview import OverviewSubsection"
+                )
 
             for subsec in self.subsections:
                 if subsec.verbosity > Verbosity.LOW:
@@ -181,7 +184,7 @@ class Overview(ReportSection):
             code = "show_overview(df=df"
             if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
-                    f"Overview.OverviewSubsection.{str(sub)}"
+                    f"OverviewSubsection.{str(sub)}"
                     for sub in self.subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
@@ -209,7 +212,7 @@ class Overview(ReportSection):
 
 def show_overview(
     df: pd.DataFrame,
-    subsections: Optional[List[Overview.OverviewSubsection]] = None,
+    subsections: Optional[List[OverviewSubsection]] = None,
     columns: Optional[List[str]] = None,
 ) -> None:
     """Generates overview analysis for df.
