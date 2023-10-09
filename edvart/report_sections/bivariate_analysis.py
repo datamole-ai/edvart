@@ -993,7 +993,7 @@ def contingency_table(
     ax.set_xlabel(ax.get_xlabel(), fontsize=fontsize)
     ax.xaxis.set_label_position("top")
 
-    # Viusally separate the margins
+    # Visually separate the margins
     if include_total:
         ax.vlines(len(table.columns) - 1, ymin=0, ymax=len(table), color="grey")
         ax.hlines(len(table) - 1, xmin=0, xmax=len(table.columns), color="grey")

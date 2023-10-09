@@ -231,7 +231,7 @@ def show_multivariate_analysis(
         All numeric columns are used by default.
     color_col : str, optional
         Name of the column according to which to color points in the sections.
-        Both numberic and categorical columns are supported.
+        Both numeric and categorical columns are supported.
     """
     if columns is not None:
         df = df[columns]

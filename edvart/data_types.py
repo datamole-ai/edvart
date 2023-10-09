@@ -85,7 +85,7 @@ def is_numeric(series: pd.Series) -> bool:
     """
     if is_missing(series):
         return False
-    # When an unkown dtype is encountered, `np.issubdtype(series.dtype, np.number)`
+    # When an unknown dtype is encountered, `np.issubdtype(series.dtype, np.number)`
     # raises a TypeError. This happens for example if `series` is `pd.Categorical`
     # If the dtype is unknown, we treat it as non-numeric, therefore return False.
     try:
