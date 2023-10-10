@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
+import numpy as np
 import pandas as pd
 import seaborn as sns
 from IPython.display import HTML, Markdown, display
@@ -273,6 +274,16 @@ def histogram(
         boxplot_kwargs = {}
 
     series = series.dropna()
+    if bins is None:
+        bin_edges = np.histogram_bin_edges(series, bins="auto")
+        # Prevent too many bins, which slows down the visualization
+        # "auto" uses the maximum of the Sturges and Freedman-Diaconis estimators
+        # The Freedman-Diaconis rule can infer a huge number of bins for long-tailed distributions
+        # There should never be a good reason to use more than 1000 bins
+        if len(bin_edges) > 1000:
+            bins = "sturges"
+        else:
+            bins = bin_edges
 
     if box_plot:
         _fig, (ax_box, ax_hist) = plt.subplots(
@@ -284,7 +295,7 @@ def histogram(
         sns.boxplot(x=series, ax=ax_box, **boxplot_kwargs)
         sns.histplot(
             data=series,
-            bins=bins or "auto",
+            bins=bins,
             stat="density" if density else "count",
             ax=ax_hist,
             kde=False,
@@ -295,7 +306,7 @@ def histogram(
         plt.figure(figsize=figsize)
         sns.histplot(
             data=series,
-            bins=bins or "auto",
+            bins=bins,
             stat="density" if density else "count",
             kde=False,
             **distplot_kwargs,
