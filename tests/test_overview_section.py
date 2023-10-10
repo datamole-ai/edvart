@@ -17,7 +17,7 @@ from edvart.data_types import (
 from edvart.pandas_formatting import render_dictionary, series_to_frame
 from edvart.report_sections import dataset_overview
 from edvart.report_sections.code_string_formatting import get_code
-from edvart.report_sections.dataset_overview import Overview
+from edvart.report_sections.dataset_overview import Overview, OverviewSubsection
 from edvart.report_sections.section_base import Verbosity
 
 
@@ -100,11 +100,11 @@ def test_high_verbosities():
 def test_section_adding():
     overview_section = Overview(
         subsections=[
-            Overview.OverviewSubsection.QuickInfo,
-            Overview.OverviewSubsection.QuickInfo,
-            Overview.OverviewSubsection.MissingValues,
-            Overview.OverviewSubsection.DuplicateRows,
-            Overview.OverviewSubsection.DuplicateRows,
+            OverviewSubsection.QuickInfo,
+            OverviewSubsection.QuickInfo,
+            OverviewSubsection.MissingValues,
+            OverviewSubsection.DuplicateRows,
+            OverviewSubsection.DuplicateRows,
         ]
     )
     assert isinstance(
@@ -140,8 +140,8 @@ def test_code_export_verbosity_low():
 def test_code_export_verbosity_low_with_subsections():
     overview_section = Overview(
         subsections=[
-            Overview.OverviewSubsection.QuickInfo,
-            Overview.OverviewSubsection.MissingValues,
+            OverviewSubsection.QuickInfo,
+            OverviewSubsection.MissingValues,
         ],
         verbosity=Verbosity.LOW,
     )
@@ -152,8 +152,8 @@ def test_code_export_verbosity_low_with_subsections():
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
     expected_code = [
-        "show_overview(df=df, subsections=[Overview.OverviewSubsection.QuickInfo, "
-        "Overview.OverviewSubsection.MissingValues])"
+        "show_overview(df=df, subsections=[OverviewSubsection.QuickInfo, "
+        "OverviewSubsection.MissingValues])"
     ]
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
@@ -163,13 +163,13 @@ def test_code_export_verbosity_medium():
     # Construct overview section
     overview_section = Overview(
         subsections=[
-            Overview.OverviewSubsection.QuickInfo,
-            Overview.OverviewSubsection.DataTypes,
-            Overview.OverviewSubsection.DataPreview,
-            Overview.OverviewSubsection.MissingValues,
-            Overview.OverviewSubsection.RowsWithMissingValue,
-            Overview.OverviewSubsection.ConstantOccurrence,
-            Overview.OverviewSubsection.DuplicateRows,
+            OverviewSubsection.QuickInfo,
+            OverviewSubsection.DataTypes,
+            OverviewSubsection.DataPreview,
+            OverviewSubsection.MissingValues,
+            OverviewSubsection.RowsWithMissingValue,
+            OverviewSubsection.ConstantOccurrence,
+            OverviewSubsection.DuplicateRows,
         ],
         verbosity=Verbosity.MEDIUM,
     )
@@ -197,13 +197,13 @@ def test_code_export_verbosity_high():
     # Construct overview section
     overview_section = Overview(
         subsections=[
-            Overview.OverviewSubsection.QuickInfo,
-            Overview.OverviewSubsection.DataTypes,
-            Overview.OverviewSubsection.DataPreview,
-            Overview.OverviewSubsection.MissingValues,
-            Overview.OverviewSubsection.RowsWithMissingValue,
-            Overview.OverviewSubsection.ConstantOccurrence,
-            Overview.OverviewSubsection.DuplicateRows,
+            OverviewSubsection.QuickInfo,
+            OverviewSubsection.DataTypes,
+            OverviewSubsection.DataPreview,
+            OverviewSubsection.MissingValues,
+            OverviewSubsection.RowsWithMissingValue,
+            OverviewSubsection.ConstantOccurrence,
+            OverviewSubsection.DuplicateRows,
         ],
         verbosity=Verbosity.HIGH,
     )
@@ -284,11 +284,11 @@ def test_verbosity_low_different_subsection_verbosities():
 
     expected_code = [
         "show_overview(df=df, "
-        "subsections=[Overview.OverviewSubsection.DataTypes, "
-        "Overview.OverviewSubsection.DataPreview, "
-        "Overview.OverviewSubsection.MissingValues, "
-        "Overview.OverviewSubsection.RowsWithMissingValue, "
-        "Overview.OverviewSubsection.ConstantOccurrence])",
+        "subsections=[OverviewSubsection.DataTypes, "
+        "OverviewSubsection.DataPreview, "
+        "OverviewSubsection.MissingValues, "
+        "OverviewSubsection.RowsWithMissingValue, "
+        "OverviewSubsection.ConstantOccurrence])",
         "quick_info(df=df)",
         (
             get_code(render_dictionary)
@@ -355,7 +355,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
     expected_imports = {
         "from edvart.report_sections.dataset_overview import show_overview",
-        "from edvart.report_sections.dataset_overview import Overview",
+        "from edvart.report_sections.dataset_overview import OverviewSubsection",
     }
     for s in overview_section.subsections:
         if s.verbosity > Verbosity.LOW:

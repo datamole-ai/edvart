@@ -1,5 +1,3 @@
-"""Module defines data types and helper function for recognizing them."""
-
 from enum import IntEnum
 
 import numpy as np
@@ -180,7 +178,9 @@ def is_date(series: pd.Series) -> bool:
     if contains_numerics:
         return False
     try:
-        converted_series = pd.to_datetime(series, errors="coerce", format="mixed")
+        converted_series = pd.to_datetime(
+            series.dropna(), errors="coerce"
+        )
     except ValueError:
         return False
     return converted_series.notna().all()

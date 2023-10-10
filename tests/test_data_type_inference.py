@@ -110,3 +110,6 @@ def test_date_series():
     ), "Should not be type date"
     assert not data_types.is_date(pd.Series([1, 2, 3, 4, 5])), "Should not be type date"
     assert not data_types.is_date(pd.Series([None, 2.0, 3, 4, 5])), "Should not be type date"
+    assert data_types.is_date(
+        pd.Series([pd.Timestamp("20130101"), pd.Timestamp("20230102"), None])
+    ), "Should be type date"

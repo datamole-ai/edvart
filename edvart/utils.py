@@ -1,5 +1,3 @@
-"""Utils package."""
-
 import os
 from contextlib import contextmanager
 from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Tuple, Union
@@ -104,7 +102,7 @@ def reindex_to_period(
     period_column : str
         Which column containing periods to index by.
     freq : Union[str, pd.Offset]
-        One of pandas’ offset strings or an Offset object. Will be inferred by default.
+        One of pandas' offset strings or an Offset object. Will be inferred by default.
     keep_index : str, optional
         Name of column to store the original index. The original index will be discarded
         by default.

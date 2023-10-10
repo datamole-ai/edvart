@@ -1,5 +1,3 @@
-"""Short-time Fourier transform package."""
-
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
