@@ -1,4 +1,3 @@
-# Standard imorts
 from inspect import getsource
 from itertools import dropwhile
 from textwrap import dedent

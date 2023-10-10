@@ -1,5 +1,3 @@
-"""Multivariate analysis package."""
-
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -24,6 +22,20 @@ except ImportError:
     UMAP_AVAILABLE = False
 else:
     UMAP_AVAILABLE = True
+
+
+# pylint:disable=invalid-name
+class MultivariateAnalysisSubsection(IntEnum):
+    """Enum of all implemented multivariate analysis subsections."""
+
+    PCA = 0
+    if UMAP_AVAILABLE:
+        UMAP = 1
+    ParallelCoordinates = 2
+    ParallelCategories = 3
+
+    def __str__(self):
+        return self.name
 
 
 class MultivariateAnalysis(ReportSection):
@@ -55,19 +67,6 @@ class MultivariateAnalysis(ReportSection):
         Both numerical and categorical columns are supported.
     """
 
-    # pylint:disable=invalid-name
-    class MultivariateAnalysisSubsection(IntEnum):
-        """Enum of all implemented multivariate analysis subsections."""
-
-        PCA = 0
-        if UMAP_AVAILABLE:
-            UMAP = 1
-        ParallelCoordinates = 2
-        ParallelCategories = 3
-
-        def __str__(self):
-            return self.name
-
     # By default use all subsections
     _DEFAULT_SUBSECTIONS_TO_SHOW = list(MultivariateAnalysisSubsection)
 
@@ -95,14 +94,13 @@ class MultivariateAnalysis(ReportSection):
             else verbosity
         )
 
-        subsec = MultivariateAnalysis.MultivariateAnalysisSubsection
         self.subsection_verbosities = {
-            subsec.PCA: verbosity_pca,
-            subsec.ParallelCoordinates: verbosity_parallel_coordinates,
-            subsec.ParallelCategories: verbosity_parallel_categories,
+            MultivariateAnalysisSubsection.PCA: verbosity_pca,
+            MultivariateAnalysisSubsection.ParallelCoordinates: verbosity_parallel_coordinates,
+            MultivariateAnalysisSubsection.ParallelCategories: verbosity_parallel_categories,
         }
         if UMAP_AVAILABLE:
-            self.subsection_verbosities[subsec.UMAP] = verbosity_umap
+            self.subsection_verbosities[MultivariateAnalysisSubsection.UMAP] = verbosity_umap
 
         if subsections is None:
             self.subsections_to_show = self._DEFAULT_SUBSECTIONS_TO_SHOW
@@ -116,16 +114,18 @@ class MultivariateAnalysis(ReportSection):
         ]
 
         enum_to_implementation = {
-            subsec.PCA: PCA(verbosity_pca, columns, color_col=color_col),
-            subsec.ParallelCoordinates: ParallelCoordinates(
+            MultivariateAnalysisSubsection.PCA: PCA(verbosity_pca, columns, color_col=color_col),
+            MultivariateAnalysisSubsection.ParallelCoordinates: ParallelCoordinates(
                 verbosity_parallel_coordinates, columns, color_col=color_col
             ),
-            subsec.ParallelCategories: ParallelCategories(
+            MultivariateAnalysisSubsection.ParallelCategories: ParallelCategories(
                 verbosity_parallel_categories, columns, color_col=color_col
             ),
         }
         if UMAP_AVAILABLE:
-            enum_to_implementation[subsec.UMAP] = UMAP(verbosity_umap, columns, color_col=color_col)
+            enum_to_implementation[MultivariateAnalysisSubsection.UMAP] = UMAP(
+                verbosity_umap, columns, color_col=color_col
+            )
 
         subsections_implementations = [
             enum_to_implementation[sub] for sub in self.subsections_to_show
@@ -154,7 +154,8 @@ class MultivariateAnalysis(ReportSection):
             }
             if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 imports.add(
-                    "from edvart.report_sections.multivariate_analysis import MultivariateAnalysis"
+                    "from edvart.report_sections.multivariate_analysis import"
+                    " MultivariateAnalysisSubsection"
                 )
             for subsec in self.subsections:
                 if subsec.verbosity > Verbosity.LOW:
@@ -181,7 +182,7 @@ class MultivariateAnalysis(ReportSection):
             code = "show_multivariate_analysis(df=df"
             if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
-                    f"MultivariateAnalysis.MultivariateAnalysisSubsection.{str(sub)}"
+                    f"MultivariateAnalysisSubsection.{str(sub)}"
                     for sub in self.subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
@@ -211,7 +212,7 @@ class MultivariateAnalysis(ReportSection):
 
 def show_multivariate_analysis(
     df: pd.DataFrame,
-    subsections: Optional[List[MultivariateAnalysis.MultivariateAnalysisSubsection]] = None,
+    subsections: Optional[List[MultivariateAnalysisSubsection]] = None,
     columns: Optional[List[str]] = None,
     color_col: Optional[str] = None,
 ) -> None:
@@ -228,7 +229,7 @@ def show_multivariate_analysis(
         All numeric columns are used by default.
     color_col : str, optional
         Name of the column according to which to color points in the sections.
-        Both numberic and categorical columns are supported.
+        Both numeric and categorical columns are supported.
     """
     if columns is not None:
         df = df[columns]

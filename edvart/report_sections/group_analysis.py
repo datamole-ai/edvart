@@ -1,5 +1,3 @@
-"""Group analysis module."""
-
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import colorlover as cl
@@ -527,7 +525,7 @@ def group_barplot(
         Maximum number of unique values in column to plot. If the number of unique values
         is higher, a warning will be issued and plot will not be shown.
     conditional_probability : bool (default = True)
-        If True, conditional probability contitioned on group will be displayed,
+        If True, conditional probability conditioned on group will be displayed,
         otherwise conditional frequency will be displayed.
     xaxis_tickangle : float (default = 0)
         Rotation angle of ticks on the x axis.
@@ -607,24 +605,31 @@ def overlaid_histograms(
         Name of column to analyze.
     bins : int, optional
         Number of bins in the histogram. If None, number of bin will be inferred using
-        Modified Freedman-Diaconis bin number inference.
+        Freedman-Diaconis bin number inference.
     density : bool (default = True)
         If True, histograms will be normalized to display density.
     alpha : float
         Opacity of individual histograms.
     """
-    # Modified Freedman-Diaconis bin number inference if bins is None
+    data_min = df[column].min()
+    data_max = df[column].max()
+    data_range = data_max - data_min
     if bins is None:
-        iqr = df[column].quantile(0.75) - df[column].quantile(0.25)
-        bin_width = 1 / np.cbrt(len(df)) * iqr
+        # Freedman-Diaconis bin number inference if bins is None
+        iqr = utils.iqr(df[column])
+        bin_width = 2 * iqr / (len(df[column]) ** (1 / 3))
+        bins = int(np.ceil(data_range / bin_width))
+        if bins > 1000:
+            # Use Sturges' rule if number of bins is too large
+            bins = int(np.ceil(np.log2(bins) + 1))
+            bin_width = data_range / bins
     else:
-        bin_width = (df[column].max() - df[column].min()) / bins
-    bin_config = {
-        "start": df[column].min(),
-        "end": df[column].max(),
-        "size": bin_width,
-    }
-
+        bin_width = data_range / bins
+    bin_config = go.histogram.XBins(
+        start=data_min,
+        end=data_max,
+        size=bin_width,
+    )
     # Choose color palette
     colors = cl.scales["9"]["qual"]["Set1"]
     color_idx = 0
