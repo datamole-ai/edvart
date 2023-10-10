@@ -63,6 +63,7 @@ class UnivariateAnalysis(Section):
             ]
         # Verbosity.HIGH
         return [
+            "import numpy as np",
             "from edvart import utils",
             "from IPython.display import display",
             "from IPython.display import HTML",
