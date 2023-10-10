@@ -7,9 +7,14 @@ import pandas as pd
 
 from edvart import utils
 
+from .pyarrow_utils import pyarrow_parameterize
 
-def test_full_na_series():
+
+@pyarrow_parameterize
+def test_full_na_series(pyarrow_dtypes: bool):
     series = pd.Series([None, np.nan, None])
+    if pyarrow_dtypes:
+        series = series.convert_dtypes(dtype_backend="pyarrow")
     for func in (
         utils.quartile1,
         utils.median,

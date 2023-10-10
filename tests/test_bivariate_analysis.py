@@ -9,9 +9,13 @@ from edvart.report_sections.bivariate_analysis import BivariateAnalysis, Bivaria
 from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Verbosity
 
+from .pyarrow_utils import pyarrow_parameterize
 
-def get_test_df() -> pd.DataFrame:
+
+def get_test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
     test_df = pd.DataFrame(data=[[1.1, "a"], [2.2, "b"], [3.3, "c"]], columns=["A", "B"])
+    if pyarrow_dtypes:
+        test_df = test_df.convert_dtypes(dtype_backend="pyarrow")
 
     return test_df
 
@@ -407,9 +411,10 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     assert set(exported_imports) == set(expected_imports)
 
 
-def test_show():
+@pyarrow_parameterize
+def test_show(pyarrow_dtypes: bool):
     bivariate_section = BivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):
-            bivariate_section.show(get_test_df())
+            bivariate_section.show(get_test_df(pyarrow_dtypes=pyarrow_dtypes))

@@ -9,6 +9,16 @@ from edvart.report_sections import univariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.section_base import Verbosity
 
+from .pyarrow_utils import pyarrow_parameterize
+
+
+def get_test_df(pyarrow_dtypes: bool) -> pd.DataFrame:
+    test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
+    if pyarrow_dtypes:
+        test_df = test_df.convert_dtypes(dtype_backend="pyarrow")
+
+    return test_df
+
 
 def test_invalid_verbosity():
     with pytest.raises(ValueError):
@@ -21,8 +31,9 @@ def test_invalid_verbosity():
         univariate_analysis.UnivariateAnalysis(verbosity="1")
 
 
-def test_code_export_verbosity_low():
-    test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
+@pyarrow_parameterize
+def test_code_export_verbosity_low(pyarrow_dtypes: bool):
+    test_df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     # Construct univariate analysis section
     univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
@@ -36,8 +47,9 @@ def test_code_export_verbosity_low():
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
 
-def test_code_export_verbosity_medium():
-    test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
+@pyarrow_parameterize
+def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
+    test_df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     # Construct univariate analysis section
     univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.MEDIUM)
     # Export code
@@ -55,8 +67,9 @@ def test_code_export_verbosity_medium():
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
 
 
-def test_code_export_verbosity_high():
-    test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
+@pyarrow_parameterize
+def test_code_export_verbosity_high(pyarrow_dtypes: bool):
+    test_df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     # Construct univariate analysis section
     univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.HIGH)
     # Export code
@@ -105,8 +118,9 @@ def test_code_export_verbosity_high():
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
 
 
-def test_show():
-    test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
+@pyarrow_parameterize
+def test_show(pyarrow_dtypes: bool):
+    test_df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     univariate_section = univariate_analysis.UnivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
