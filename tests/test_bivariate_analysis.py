@@ -134,6 +134,7 @@ def test_code_export_verbosity_low():
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
     check_section_executes(bivariate_section, df=get_test_df())
 
 
@@ -159,6 +160,7 @@ def test_code_export_verbosity_low_with_subsections():
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
     check_section_executes(bivariate_section, df=get_test_df())
 
 

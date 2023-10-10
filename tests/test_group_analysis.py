@@ -124,6 +124,7 @@ def test_code_export_verbosity_medium():
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
     check_section_executes(group_section, df)
 
 
@@ -179,6 +180,7 @@ def test_code_export_verbosity_high():
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
     check_section_executes(group_section, df)
 
 

@@ -225,6 +225,7 @@ def test_code_export_verbosity_low_with_subsections():
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
     check_section_executes(ts_section, test_df)
 
 
@@ -254,6 +255,7 @@ def test_code_export_verbosity_low_with_fft_stft():
     # Test code equivalence
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
+
     check_section_executes(ts_section, test_df)
 
 
@@ -348,6 +350,7 @@ def test_generated_code_verbosity_high():
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
     check_section_executes(ts_section, test_df)
 
 
@@ -416,6 +419,7 @@ def test_boxplots_over_time_def():
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
     check_section_executes(boxplots_sub, get_test_df())
 
 
