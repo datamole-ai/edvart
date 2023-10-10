@@ -1,4 +1,3 @@
-"""Univariate analysis package."""
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt

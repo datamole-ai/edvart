@@ -1,5 +1,3 @@
-"""Stationarity tests package."""
-
 import warnings
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional

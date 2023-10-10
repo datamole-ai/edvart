@@ -1,5 +1,3 @@
-"""Time series analysis package."""
-
 from enum import IntEnum
 from typing import Any, Dict, List, Optional
 
@@ -19,6 +17,23 @@ from edvart.report_sections.timeseries_analysis import (
     StationarityTests,
     TimeSeriesLinePlot,
 )
+
+
+# pylint: disable=invalid-name
+class TimeseriesAnalysisSubsection(IntEnum):
+    """Enum of all implemented timeseries analysis subsections."""
+
+    TimeSeriesLinePlot = 0
+    RollingStatistics = 1
+    BoxplotsOverTime = 2
+    SeasonalDecomposition = 3
+    StationarityTests = 4
+    Autocorrelation = 5
+    FourierTransform = 6
+    ShortTimeFT = 7
+
+    def __str__(self):
+        return self.name
 
 
 class TimeseriesAnalysis(ReportSection):
@@ -64,22 +79,6 @@ class TimeseriesAnalysis(ReportSection):
         is not set.
     """
 
-    # pylint: disable=invalid-name
-    class TimeseriesAnalysisSubsection(IntEnum):
-        """Enum of all implemented timeseries analysis subsections."""
-
-        TimeSeriesLinePlot = 0
-        RollingStatistics = 1
-        BoxplotsOverTime = 2
-        SeasonalDecomposition = 3
-        StationarityTests = 4
-        Autocorrelation = 5
-        FourierTransform = 6
-        ShortTimeFT = 7
-
-        def __str__(self):
-            return self.name
-
     def __init__(
         self,
         subsections: Optional[List[TimeseriesAnalysisSubsection]] = None,
@@ -112,46 +111,56 @@ class TimeseriesAnalysis(ReportSection):
         verbosity_fourier_transform = verbosity_fourier_transform or verbosity
         verbosity_short_time_ft = verbosity_short_time_ft or verbosity
 
-        subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
-
         self.subsection_verbosities = {
-            subsec.TimeSeriesLinePlot: verbosity_time_series_line_plot,
-            subsec.RollingStatistics: verbosity_rolling_statistics,
-            subsec.BoxplotsOverTime: verbosity_boxplots_over_time,
-            subsec.SeasonalDecomposition: verbosity_seasonal_decomposition,
-            subsec.StationarityTests: verbosity_stationarity_tests,
-            subsec.Autocorrelation: verbosity_autocorrelation,
-            subsec.FourierTransform: verbosity_fourier_transform,
-            subsec.ShortTimeFT: verbosity_short_time_ft,
+            TimeseriesAnalysisSubsection.TimeSeriesLinePlot: verbosity_time_series_line_plot,
+            TimeseriesAnalysisSubsection.RollingStatistics: verbosity_rolling_statistics,
+            TimeseriesAnalysisSubsection.BoxplotsOverTime: verbosity_boxplots_over_time,
+            TimeseriesAnalysisSubsection.SeasonalDecomposition: verbosity_seasonal_decomposition,
+            TimeseriesAnalysisSubsection.StationarityTests: verbosity_stationarity_tests,
+            TimeseriesAnalysisSubsection.Autocorrelation: verbosity_autocorrelation,
+            TimeseriesAnalysisSubsection.FourierTransform: verbosity_fourier_transform,
+            TimeseriesAnalysisSubsection.ShortTimeFT: verbosity_short_time_ft,
         }
 
         enum_to_implementation = {
-            subsec.TimeSeriesLinePlot: TimeSeriesLinePlot(verbosity_time_series_line_plot, columns),
-            subsec.RollingStatistics: RollingStatistics(verbosity_rolling_statistics, columns),
-            subsec.BoxplotsOverTime: BoxplotsOverTime(verbosity_boxplots_over_time, columns),
-            subsec.SeasonalDecomposition: SeasonalDecomposition(
+            TimeseriesAnalysisSubsection.TimeSeriesLinePlot: TimeSeriesLinePlot(
+                verbosity_time_series_line_plot, columns
+            ),
+            TimeseriesAnalysisSubsection.RollingStatistics: RollingStatistics(
+                verbosity_rolling_statistics, columns
+            ),
+            TimeseriesAnalysisSubsection.BoxplotsOverTime: BoxplotsOverTime(
+                verbosity_boxplots_over_time, columns
+            ),
+            TimeseriesAnalysisSubsection.SeasonalDecomposition: SeasonalDecomposition(
                 verbosity_seasonal_decomposition, columns
             ),
-            subsec.StationarityTests: StationarityTests(verbosity_stationarity_tests, columns),
-            subsec.Autocorrelation: Autocorrelation(verbosity_autocorrelation, columns),
+            TimeseriesAnalysisSubsection.StationarityTests: StationarityTests(
+                verbosity_stationarity_tests, columns
+            ),
+            TimeseriesAnalysisSubsection.Autocorrelation: Autocorrelation(
+                verbosity_autocorrelation, columns
+            ),
         }
         # Add FT and STFT only if required parameters specified
         if sampling_rate is not None:
-            enum_to_implementation[subsec.FourierTransform] = FourierTransform(
-                sampling_rate, verbosity_fourier_transform, columns
-            )
+            enum_to_implementation[
+                TimeseriesAnalysisSubsection.FourierTransform
+            ] = FourierTransform(sampling_rate, verbosity_fourier_transform, columns)
             if stft_window_size is not None:
-                enum_to_implementation[subsec.ShortTimeFT] = ShortTimeFT(
+                enum_to_implementation[TimeseriesAnalysisSubsection.ShortTimeFT] = ShortTimeFT(
                     sampling_rate, stft_window_size, verbosity_short_time_ft, columns
                 )
-            elif subsections is not None and subsec.ShortTimeFT in subsections:
+            elif (
+                subsections is not None and TimeseriesAnalysisSubsection.ShortTimeFT in subsections
+            ):
                 raise ValueError(
                     "Need to set an `stft_window_size` to plot Short-time Fourier transform."
                 )
         elif subsections is not None:
-            if subsec.FourierTransform in subsections:
+            if TimeseriesAnalysisSubsection.FourierTransform in subsections:
                 raise ValueError("Need to set a `sampling_rate` to plot Fourier transform.")
-            if subsec.ShortTimeFT in subsections:
+            if TimeseriesAnalysisSubsection.ShortTimeFT in subsections:
                 raise ValueError(
                     "Need to set a `sampling_rate` to plot Short-time Fourier transform."
                 )
@@ -195,18 +204,21 @@ class TimeseriesAnalysis(ReportSection):
         cells.append(section_header)
 
         if self.verbosity == Verbosity.LOW:
-            subsec = TimeseriesAnalysis.TimeseriesAnalysisSubsection
             code = "show_timeseries_analysis(df=df"
             if self.subsections_to_show_with_low_verbosity != self.default_subsections_to_show:
                 arg_subsections_names = [
-                    f"TimeseriesAnalysis.TimeseriesAnalysisSubsection.{str(sub)}"
+                    f"TimeseriesAnalysisSubsection.{str(sub)}"
                     for sub in self.subsections_to_show_with_low_verbosity
                 ]
                 code += f", subsections={arg_subsections_names}".replace("'", "")
-            stft_included = subsec.ShortTimeFT in self.subsections_to_show_with_low_verbosity
+            stft_included = (
+                TimeseriesAnalysisSubsection.ShortTimeFT
+                in self.subsections_to_show_with_low_verbosity
+            )
             include_sampling_rate = self.sampling_rate is not None and (
                 stft_included
-                or subsec.FourierTransform in self.subsections_to_show_with_low_verbosity
+                or TimeseriesAnalysisSubsection.FourierTransform
+                in self.subsections_to_show_with_low_verbosity
             )
             if include_sampling_rate:
                 code += f", sampling_rate={self.sampling_rate}"
@@ -241,7 +253,7 @@ class TimeseriesAnalysis(ReportSection):
             if self.subsections_to_show_with_low_verbosity != self.default_subsections_to_show:
                 imports.add(
                     "from edvart.report_sections.timeseries_analysis.timeseries_analysis"
-                    " import TimeseriesAnalysis"
+                    " import TimeseriesAnalysisSubsection"
                 )
             for sub in self.subsections:
                 if sub.verbosity > Verbosity.LOW:
@@ -265,7 +277,7 @@ class TimeseriesAnalysis(ReportSection):
 @check_index_time_ascending
 def show_timeseries_analysis(
     df: pd.DataFrame,
-    subsections: Optional[List[TimeseriesAnalysis.TimeseriesAnalysisSubsection]] = None,
+    subsections: Optional[List[TimeseriesAnalysisSubsection]] = None,
     columns: Optional[List[str]] = None,
     sampling_rate: Optional[int] = None,
     stft_window_size: Optional[int] = None,

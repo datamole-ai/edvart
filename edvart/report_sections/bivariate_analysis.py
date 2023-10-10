@@ -1,5 +1,3 @@
-"""Bivariate analysis section package."""
-
 import itertools
 from enum import IntEnum
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -15,6 +13,18 @@ from edvart import utils
 from edvart.data_types import is_boolean, is_categorical, is_numeric
 from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import ReportSection, Section, Verbosity
+
+
+# pylint:disable=invalid-name
+class BivariateAnalysisSubsection(IntEnum):
+    """Enum of all implemented bivariate analysis subsections."""
+
+    CorrelationPlot = 0
+    PairPlot = 1
+    ContingencyTable = 2
+
+    def __str__(self):
+        return self.name
 
 
 class BivariateAnalysis(ReportSection):
@@ -69,17 +79,6 @@ class BivariateAnalysis(ReportSection):
         If exactly one of `columns_x`, `columns_y` is specified.
     """
 
-    # pylint:disable=invalid-name
-    class BivariateAnalysisSubsection(IntEnum):
-        """Enum of all implemented bivariate analysis subsections."""
-
-        CorrelationPlot = 0
-        PairPlot = 1
-        ContingencyTable = 2
-
-        def __str__(self):
-            return self.name
-
     # By default use all subsections
     _DEFAULT_SUBSECTIONS_TO_SHOW = list(BivariateAnalysisSubsection)
 
@@ -100,13 +99,11 @@ class BivariateAnalysis(ReportSection):
         verbosity_pairplot = verbosity_pairplot or verbosity
         verbosity_contingency_table = verbosity_contingency_table or verbosity
 
-        subsec = BivariateAnalysis.BivariateAnalysisSubsection
-
         # Store subsection verbosities
         self.subsection_verbosities = {
-            subsec.CorrelationPlot: verbosity_correlations,
-            subsec.PairPlot: verbosity_pairplot,
-            subsec.ContingencyTable: verbosity_contingency_table,
+            BivariateAnalysisSubsection.CorrelationPlot: verbosity_correlations,
+            BivariateAnalysisSubsection.PairPlot: verbosity_pairplot,
+            BivariateAnalysisSubsection.ContingencyTable: verbosity_contingency_table,
         }
 
         if subsections is None:
@@ -130,17 +127,17 @@ class BivariateAnalysis(ReportSection):
             columns_x_no_pairs = columns_x
             columns_y_no_pairs = columns_y
         enum_to_implementation = {
-            subsec.CorrelationPlot: CorrelationPlot(
+            BivariateAnalysisSubsection.CorrelationPlot: CorrelationPlot(
                 verbosity_correlations, columns, columns_x_no_pairs, columns_y_no_pairs
             ),
-            subsec.PairPlot: PairPlot(
+            BivariateAnalysisSubsection.PairPlot: PairPlot(
                 verbosity_pairplot,
                 columns,
                 columns_x_no_pairs,
                 columns_y_no_pairs,
                 color_col=color_col,
             ),
-            subsec.ContingencyTable: ContingencyTable(
+            BivariateAnalysisSubsection.ContingencyTable: ContingencyTable(
                 verbosity_contingency_table, columns, columns_x, columns_y, columns_pairs
             ),
         }
@@ -177,7 +174,7 @@ class BivariateAnalysis(ReportSection):
             code = "show_bivariate_analysis(df=df"
             if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
                 arg_subsections_names = [
-                    f"BivariateAnalysis.BivariateAnalysisSubsection.{str(sub)}"
+                    f"BivariateAnalysisSubsection.{str(sub)}"
                     for sub in self.subsections_to_show_with_low_verbosity
                 ]
 
@@ -213,7 +210,9 @@ class BivariateAnalysis(ReportSection):
 
         imports = {"from edvart.report_sections.bivariate_analysis import show_bivariate_analysis"}
         if self.subsections_to_show_with_low_verbosity != self._DEFAULT_SUBSECTIONS_TO_SHOW:
-            imports.add("from edvart.report_sections.bivariate_analysis import BivariateAnalysis")
+            imports.add(
+                "from edvart.report_sections.bivariate_analysis import BivariateAnalysisSubsection"
+            )
         for subsec in self.subsections:
             if subsec.verbosity > Verbosity.LOW:
                 imports.update(subsec.required_imports())
@@ -234,7 +233,7 @@ class BivariateAnalysis(ReportSection):
 
 def show_bivariate_analysis(
     df: pd.DataFrame,
-    subsections: Optional[List[BivariateAnalysis.BivariateAnalysisSubsection]] = None,
+    subsections: Optional[List[BivariateAnalysisSubsection]] = None,
     columns: Optional[List[str]] = None,
     columns_x: Optional[List[str]] = None,
     columns_y: Optional[List[str]] = None,
@@ -992,7 +991,7 @@ def contingency_table(
     ax.set_xlabel(ax.get_xlabel(), fontsize=fontsize)
     ax.xaxis.set_label_position("top")
 
-    # Viusally separate the margins
+    # Visually separate the margins
     if include_total:
         ax.vlines(len(table.columns) - 1, ymin=0, ymax=len(table), color="grey")
         ax.hlines(len(table) - 1, xmin=0, xmax=len(table.columns), color="grey")

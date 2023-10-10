@@ -1,5 +1,3 @@
-"""Module defines data types and helper function for recognizing them."""
-
 from enum import IntEnum
 
 import numpy as np
@@ -85,7 +83,7 @@ def is_numeric(series: pd.Series) -> bool:
     """
     if is_missing(series):
         return False
-    # When an unkown dtype is encountered, `np.issubdtype(series.dtype, np.number)`
+    # When an unknown dtype is encountered, `np.issubdtype(series.dtype, np.number)`
     # raises a TypeError. This happens for example if `series` is `pd.Categorical`
     # If the dtype is unknown, we treat it as non-numeric, therefore return False.
     try:
@@ -179,7 +177,9 @@ def is_date(series: pd.Series) -> bool:
     if contains_numerics:
         return False
     try:
-        converted_series = pd.to_datetime(series, errors="coerce", infer_datetime_format=True)
+        converted_series = pd.to_datetime(
+            series.dropna(), errors="coerce", infer_datetime_format=True
+        )
     except ValueError:
         return False
     return converted_series.notna().all()

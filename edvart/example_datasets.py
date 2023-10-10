@@ -1,4 +1,3 @@
-"""Module for loading example datasets."""
 import os
 
 import pandas as pd
