@@ -178,9 +178,7 @@ def is_date(series: pd.Series) -> bool:
     if contains_numerics:
         return False
     try:
-        converted_series = pd.to_datetime(
-            series.dropna(), errors="coerce"
-        )
+        converted_series = pd.to_datetime(series.dropna(), errors="coerce")
     except ValueError:
         return False
     return converted_series.notna().all()
