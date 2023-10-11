@@ -30,9 +30,6 @@ jobs:
         run: |
           curl -sSfL "https://github.com/convco/convco/releases/download/${{ env.CONVCO_VERSION }}/convco-ubuntu.zip" | zcat > /usr/local/bin/convco
           chmod +x /usr/local/bin/convco
-      - name: Install git-cliff
-        run: |
-          wget "https://github.com/orhun/git-cliff/releases/download/v${{ env.CONVCO_VERSION }}/git-cliff-${{ env.CONVCO_VERSION }}-x86_64-unknown-linux-gnu.tar.gz" | zcat > usr/local/bin/git-cliff
       - name: Set variables
         id: set-vars
         run: |
@@ -62,8 +59,9 @@ jobs:
           ########################################
           # Generate changelogs
           ########################################
-          git cliff --tag=${{ env.NEW_TAG }} --unreleased > ${{ env.CHANGELOG_FILE }}
-          git cliff --tag=${{ env.NEW_TAG }} > ${{ env.FULL_CHANGELOG_FILE }}
+          git_cliff_command="npx git-cliff@${{ env.GITCLIFF_VERSION } --tag=${{ env.NEW_TAG }}"
+          $git_cliff_command --unreleased > ${{ env.CHANGELOG_FILE }}
+          $git_cliff_command > ${{ env.FULL_CHANGELOG_FILE }}
           ########################################
           # Create GitHub Release
           ########################################
