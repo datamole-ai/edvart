@@ -9,6 +9,7 @@ from edvart.report_sections import univariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.section_base import Verbosity
 
+from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_parameterize
 
 
@@ -46,6 +47,8 @@ def test_code_export_verbosity_low(pyarrow_dtypes: bool):
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(univariate_section, test_df)
+
 
 @pyarrow_parameterize
 def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
@@ -65,6 +68,8 @@ def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
     # Test code equivalence
     for i in range(len(exported_code)):
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
+
+    check_section_executes(univariate_section, test_df)
 
 
 @pyarrow_parameterize
@@ -116,6 +121,8 @@ def test_code_export_verbosity_high(pyarrow_dtypes: bool):
     # Test code equivalence
     for i in range(len(exported_code)):
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
+
+    check_section_executes(univariate_section, test_df)
 
 
 @pyarrow_parameterize

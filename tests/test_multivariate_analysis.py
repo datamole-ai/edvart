@@ -19,6 +19,7 @@ from edvart.report_sections.multivariate_analysis import (
 from edvart.report_sections.section_base import Verbosity
 from edvart.utils import select_numeric_columns
 
+from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_parameterize
 
 
@@ -147,6 +148,8 @@ def test_code_export_verbosity_low(pyarrow_dtypes: bool):
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(multivariate_section, df)
+
 
 @pyarrow_parameterize
 def test_code_export_verbosity_low_with_subsections(pyarrow_dtypes: bool):
@@ -186,6 +189,8 @@ def test_code_export_verbosity_low_with_subsections(pyarrow_dtypes: bool):
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(multivariate_section, df)
+
 
 @pyarrow_parameterize
 def test_code_export_verbosity_medium_all_cols_valid(pyarrow_dtypes: bool):
@@ -214,6 +219,8 @@ def test_code_export_verbosity_medium_all_cols_valid(pyarrow_dtypes: bool):
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(multivariate_section, all_numeric_df)
 
 
 @pyarrow_parameterize
@@ -251,6 +258,8 @@ def test_generated_code_verbosity_1(pyarrow_dtypes: bool):
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(multivariate_section, df)
 
 
 @pyarrow_parameterize
@@ -314,6 +323,8 @@ def test_generated_code_verbosity_2(pyarrow_dtypes: bool):
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
+    check_section_executes(multivariate_section, df)
+
 
 @pyarrow_parameterize
 def test_verbosity_medium_non_categorical_col(pyarrow_dtypes: bool):
@@ -336,6 +347,8 @@ def test_verbosity_medium_non_categorical_col(pyarrow_dtypes: bool):
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(multivariate_section, random_df)
 
 
 @pyarrow_parameterize
@@ -381,6 +394,8 @@ def test_verbosity_low_different_subsection_verbosities(pyarrow_dtypes: bool):
     assert len(exported_code) == len(expected_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(multivariate_section, df)
 
 
 def test_imports_verbosity_low():

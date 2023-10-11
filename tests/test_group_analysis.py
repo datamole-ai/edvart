@@ -21,6 +21,7 @@ from edvart.report_sections.group_analysis import (
 )
 from edvart.report_sections.section_base import Verbosity
 
+from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_parameterize
 
 # Workaround to prevent multiple browser tabs opening with figures
@@ -105,6 +106,8 @@ def test_code_export_verbosity_low(pyarrow_dtypes: bool):
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
+    check_section_executes(group_section, df)
+
 
 @pyarrow_parameterize
 def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
@@ -131,6 +134,8 @@ def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(group_section, df)
 
 
 @pyarrow_parameterize
@@ -186,6 +191,8 @@ def test_code_export_verbosity_high(pyarrow_dtypes: bool):
     assert len(expected_code) == len(exported_code)
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
+
+    check_section_executes(group_section, df)
 
 
 @pyarrow_parameterize
