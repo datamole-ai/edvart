@@ -59,7 +59,7 @@ jobs:
           ########################################
           # Generate changelogs
           ########################################
-          git_cliff_command="npx git-cliff@${{ env.GITCLIFF_VERSION } --tag=${{ env.NEW_TAG }}"
+          git_cliff_command="npx git-cliff@${{ env.GITCLIFF_VERSION }} --tag=${{ env.NEW_TAG }}"
           $git_cliff_command --unreleased > ${{ env.CHANGELOG_FILE }}
           $git_cliff_command > ${{ env.FULL_CHANGELOG_FILE }}
           ########################################
