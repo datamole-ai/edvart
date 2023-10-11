@@ -378,6 +378,7 @@ class DataTypes(Section):
             "from enum import IntEnum",
             "import numpy as np",
             "from IPython.display import display",
+            "import warnings",
         ]
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
