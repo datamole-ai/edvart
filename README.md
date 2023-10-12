@@ -39,6 +39,10 @@ Edvart supports:
 * **Interactive Visualizations**: Many of the visualizations are interactive
     and can be used to explore the data in detail.
 
+## One-line Report
+
+![Edvart report demo](images/edvart-demo.gif)
+
 ## Installation
 
 Edvart is available on PyPI and can be installed using pip:
