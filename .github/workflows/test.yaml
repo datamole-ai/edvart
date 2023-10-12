@@ -42,7 +42,7 @@ jobs:
           poetry install -E all
       - name: Test python
         run: |
-          poetry run python -m pytest --disable-warnings --cov=edvart tests/
+          poetry run python -m pytest -n auto --disable-warnings --cov=edvart tests/
       - name: Lint
         run: |
           poetry run pylint --rcfile=.pylintrc edvart/
