@@ -29,6 +29,7 @@ umap-learn = { version = "^0.5.4", optional = true}
 # with newer version of LLVM binaries.
 numba = { version = "^0.57", optional = true }
 pyarrow = { version = "^13.0.0", optional = true }
+isort = "^5.10.1"
 
 [tool.poetry.extras]
 umap = ["umap-learn", "numba"]
@@ -44,7 +45,6 @@ toml = "^0.10.0"
 jupyter = "*"
 black = "^22.3.0"
 pylint = "^2.14.3"
-isort = "^5.10.1"
 sphinx-copybutton = "^0.5.2"
 
 [build-system]
