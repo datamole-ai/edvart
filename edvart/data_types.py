@@ -135,6 +135,7 @@ def is_categorical(series: pd.Series, unique_value_count_threshold: int = 10) ->
                 and pd.api.types.is_integer_dtype(series)
             )
             or pd.api.types.is_string_dtype(series)
+            or pd.api.types.is_object_dtype(series)
         )
     )
 
