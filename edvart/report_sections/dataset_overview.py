@@ -663,7 +663,7 @@ def missing_values(
     columns : Optional[List[str]], optional
         Subset of columns for which to calculate missing values percentage.
         If None, all columns of df are used.
-    bar_plot : bool
+    bar_plot : bool (default = False)
         Whether to also display a bar plot visualizing missing values percentages for each
         column.
     bar_plot_figsize : Tuple[int, int]
