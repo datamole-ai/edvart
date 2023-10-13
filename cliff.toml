@@ -30,20 +30,15 @@ body = """
     {% for commit in commits
         | filter(attribute="scope")
         | sort(attribute="scope") %}
-        {% set author_surname = commit.author.name | split(pat=" ") | last | truncate(length=1, end="") -%}
-        {% set author = author_name ~ " " ~ author_surname ~ "." -%}
             - *({{commit.scope}})*{% if commit.breaking %} [**BREAKING CHANGE**]{% endif %} \
-                {{ commit.message | upper_first }} by {{ author }}
+                {{ commit.message | upper_first }}
     {%- endfor -%}
     {% raw %}\n{% endraw -%}\
     {%- for commit in commits -%}
-        {% set author_name = commit.author.name | split(pat=" ") | first -%}
-        {% set author_surname = commit.author.name | split(pat=" ") | last | truncate(length=1, end="") -%}
-        {% set author = author_name ~ " " ~ author_surname ~ "." -%}
         {%- if commit.scope -%}
         {% else -%}
             - {% if commit.breaking %} [**BREAKING CHANGE**]{% endif %} \
-                {{ commit.message | upper_first }} by {{ author }}
+                {{ commit.message | upper_first }}
         {% endif -%}
     {% endfor -%}
 {% endfor %}\n
