@@ -1,10 +1,13 @@
+import pathlib
 import warnings
 from contextlib import redirect_stdout
 
+import nbconvert
+import nbformat
 import numpy as np
 import pandas as pd
 
-from edvart.report import DefaultReport, Report
+from edvart.report import DefaultReport, ExportDataMode, Report
 from edvart.report_sections.bivariate_analysis import BivariateAnalysis
 from edvart.report_sections.section_base import Verbosity
 from edvart.report_sections.univariate_analysis import UnivariateAnalysis
@@ -90,3 +93,17 @@ def test_show():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):
             report.show()
+
+
+def test_exported_notebook_executes(tmp_path: pathlib.Path):
+    report = Report(dataframe=_get_test_df())
+
+    report.add_overview()
+    for export_data_mode in (ExportDataMode.EMBED, ExportDataMode.FILE):
+        export_path = tmp_path / "export_{export_data_mode}.ipynb"
+        report.export_notebook(export_path, export_data_mode=export_data_mode)
+
+        notebook = nbformat.read(export_path, as_version=4)
+        preprocessor = nbconvert.preprocessors.ExecutePreprocessor(timeout=60)
+
+        preprocessor.preprocess(notebook)

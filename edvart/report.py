@@ -1,9 +1,11 @@
 import base64
 import logging
+import os
 import pickle
 import warnings
 from abc import ABC
 from copy import copy
+from enum import Enum, auto
 from typing import List, Optional, Tuple, Union
 
 import isort
@@ -35,6 +37,14 @@ class EmptyReportWarning(UserWarning):
     """Warning raised when a report contains no sections."""
 
 
+class ExportDataMode(str, Enum):
+    """Data export mode for the report."""
+
+    NONE = auto()
+    FILE = auto()
+    EMBED = auto()
+
+
 class ReportBase(ABC):
     """
     Abstract base class for reports.
@@ -54,6 +64,8 @@ class ReportBase(ABC):
         "import plotly.offline as py",
         "import plotly.io as pio",
     }
+
+    _DEFAULT_LOAD_DATA_CODE = "df = ...  # TODO: Fill in code for loading data"
 
     def __init__(
         self,
@@ -84,27 +96,76 @@ class ReportBase(ABC):
         for section in self.sections:
             section.show(self.df)
 
+    def _export_data(
+        self, export_data_mode: ExportDataMode, notebook_file_path: Union[str, os.PathLike]
+    ) -> Tuple[str, List[str]]:
+        """
+        Generates code for loading exported data into the exported notebook.
+
+        Parameters
+        ----------
+        export_data_mode : ExportDataMode
+            The mode of exporting the data.
+        notebook_file_path : str or PathLike
+            Filepath of the exported notebook.
+
+        -------
+        Tuple[str, List[str]]
+            A tuple containing the code for loading the data and a list of imports required for
+            the code.
+        """
+        if export_data_mode == ExportDataMode.NONE:
+            return self._DEFAULT_LOAD_DATA_CODE, []
+        if export_data_mode == ExportDataMode.FILE:
+            parquet_file_name = str(notebook_file_path).rstrip(".ipynb") + "-data.parquet"
+            self.df.to_parquet(parquet_file_name)
+            return f"df = pd.read_parquet('{parquet_file_name}')", ["import pandas as pd"]
+        assert export_data_mode == ExportDataMode.EMBED
+        buffer = base64.b85encode(self.df.to_parquet())
+        return (
+            code_dedent(
+                f"""
+                df_parquet = BytesIO(base64.b85decode({buffer}.decode()))
+                df = pd.read_parquet(df_parquet)"""
+            ),
+            ["import base64", "import pandas as pd", "from io import BytesIO"],
+        )
+
     def export_notebook(
         self,
-        notebook_filepath: str,
+        notebook_filepath: Union[str, os.PathLike],
         dataset_name: str = "[INSERT DATASET NAME]",
         dataset_description: str = "[INSERT DATASET DESCRIPTION]",
+        export_data_mode: ExportDataMode = ExportDataMode.NONE,
     ) -> None:
         """Exports the report as an .ipynb file.
 
         Parameters
         ----------
-        notebook_filepath : str
+        notebook_filepath : str or PathLike
             Filepath of the exported notebook.
         dataset_name : str (default = "[INSERT DATASET NAME]")
             Name of dataset to be used in the title of the report.
         dataset_description : str (default = "[INSERT DATASET DESCRIPTION]")
             Description of dataset to be used below the title of the report.
+        export_data_mode : ExportDataMode (default = ExportDataMode.NONE)
+            Mode for exporting the data to the notebook.
+            If ExportDataMode.NONE, the data is not exported to the notebook.
+            If ExportDataMode.FILE, the data is exported to a parquet file
+            and loaded from there.
+            If ExportDataMode.EMBED, the data is embedded into the notebook
+            as a base64 string.
         """
+        load_data_code, load_data_imports = self._export_data(
+            export_data_mode, notebook_file_path=notebook_filepath
+        )
         # Generate a notebook containing dataset name and description
         self._warn_if_empty()
         nb = self._generate_notebook(
-            dataset_name=dataset_name, dataset_description=dataset_description
+            dataset_name=dataset_name,
+            dataset_description=dataset_description,
+            load_df=load_data_code,
+            extra_imports=load_data_imports,
         )
 
         # Save notebook to file
@@ -113,9 +174,9 @@ class ReportBase(ABC):
 
     def _generate_notebook(
         self,
+        load_df: str,
         dataset_name: str = "[INSERT DATASET NAME]",
         dataset_description: str = "[INSERT DATASET DESCRIPTION]",
-        load_df: str = "df = ...",
         extra_imports: Optional[List[str]] = None,
         show_load_data: bool = True,
     ) -> nbf.NotebookNode:
