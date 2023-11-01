@@ -792,6 +792,7 @@ class ContingencyTable(Section):
             "from edvart import utils",
             "import seaborn as sns",
             "import matplotlib.pyplot as plt",
+            "from typing import Literal",
         ]
 
     def add_cells(self, cells: List[Dict[str, Any]], df: pd.DataFrame) -> None:
