@@ -3,6 +3,7 @@ import logging
 import pickle
 from abc import ABC
 from copy import copy
+from enum import Enum, auto
 from typing import List, Optional, Tuple, Union
 
 import isort
@@ -30,6 +31,12 @@ from edvart.report_sections.univariate_analysis import UnivariateAnalysis
 from edvart.utils import env_var
 
 
+class ExportDataMode(Enum):
+    NONE = auto()
+    FILE = auto()
+    EMBED = auto()
+
+
 class ReportBase(ABC):
     """
     Abstract base class for reports.
@@ -50,6 +57,8 @@ class ReportBase(ABC):
         "import plotly.io as pio",
     }
 
+    _DEFAULT_LOAD_DATA_CODE = "df = ...  # TODO: Fill in code for loading data"
+
     def __init__(
         self,
         dataframe: pd.DataFrame,
@@ -68,11 +77,29 @@ class ReportBase(ABC):
         for section in self.sections:
             section.show(self.df)
 
+    def _export_data(self, export_data_mode: ExportDataMode, notebook_file_path) -> str:
+        if export_data_mode == ExportDataMode.NONE:
+            return self._DEFAULT_LOAD_DATA_CODE
+        if export_data_mode == ExportDataMode.FILE:
+            parquet_file_name = notebook_file_path.rstrip(".ipynb") + "-data.parquet"
+            self.df.to_parquet(parquet_file_name)
+            return f"df = pd.read_parquet('{parquet_file_name}')"
+        if export_data_mode == ExportDataMode.EMBED:
+            buffer = self.df.to_parquet()
+            return code_dedent(
+                f"""
+                    df_pickled = {buffer}
+                    df = pd.read_pickle(df_pickled)
+                """
+            )
+
+
     def export_notebook(
         self,
         notebook_filepath: str,
         dataset_name: str = "[INSERT DATASET NAME]",
         dataset_description: str = "[INSERT DATASET DESCRIPTION]",
+        export_data_mode: ExportDataMode = ExportDataMode.EMBED,
     ) -> None:
         """Exports the report as an .ipynb file.
 
@@ -85,9 +112,12 @@ class ReportBase(ABC):
         dataset_description : str (default = "[INSERT DATASET DESCRIPTION]")
             Description of dataset to be used below the title of the report.
         """
+        load_data_code = self._export_data(export_data_mode)
         # Generate a notebook containing dataset name and description
         nb = self._generate_notebook(
-            dataset_name=dataset_name, dataset_description=dataset_description
+            dataset_name=dataset_name,
+            dataset_description=dataset_description,
+            load_df=load_data_code,
         )
 
         # Save notebook to file
@@ -96,9 +126,9 @@ class ReportBase(ABC):
 
     def _generate_notebook(
         self,
+        load_df: str,
         dataset_name: str = "[INSERT DATASET NAME]",
         dataset_description: str = "[INSERT DATASET DESCRIPTION]",
-        load_df: str = "df = ...",
         extra_imports: Optional[List[str]] = None,
         show_load_data: bool = True,
     ) -> nbf.NotebookNode:
