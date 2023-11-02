@@ -981,11 +981,16 @@ def contingency_table(
         square=True,
     )
     ax.figure.set_size_inches(size_factor * len(table.columns), size_factor * len(table))
-
-    ax.set_xticklabels(ax.get_xticklabels(), fontsize=fontsize)
-
+    # Set y axis
     ax.set_ylabel(ax.get_ylabel(), fontsize=fontsize)
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0, fontsize=fontsize)
+
+    # Set x axis
+    xticklabels = ax.get_xticklabels()
+    x_label_rotation = (
+        0 if max(len(xticklabel.get_text()) for xticklabel in xticklabels) < 5 else 30
+    )  # rotate if any x tick label is longer than 5 characters
+    ax.set_xticklabels(xticklabels, fontsize=fontsize, rotation=x_label_rotation)
 
     ax.xaxis.tick_top()
     ax.set_xlabel(ax.get_xlabel(), fontsize=fontsize)
