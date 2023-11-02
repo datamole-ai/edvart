@@ -10,7 +10,7 @@ import sklearn.decomposition
 from IPython.display import Markdown, display
 from sklearn.preprocessing import StandardScaler
 
-from edvart.data_types import is_boolean, is_categorical, is_numeric
+from edvart.data_types import DataType, infer_data_type, is_boolean, is_categorical, is_numeric
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.section_base import ReportSection, Section, Verbosity
@@ -620,7 +620,11 @@ def parallel_coordinates(
     if drop_na:
         df = df.dropna()
     if color_col is not None:
-        is_categorical_color = not is_numeric(df[color_col]) or is_boolean(df[color_col])
+        is_categorical_color = infer_data_type(df[color_col]) in (
+            DataType.CATEGORICAL,
+            DataType.UNIQUE,
+            DataType.BOOLEAN,
+        )
 
         if is_categorical_color:
             categories = df[color_col].unique()
@@ -799,7 +803,11 @@ def parallel_categories(
     if drop_na:
         df = df.dropna()
     if color_col is not None:
-        categorical_color = not is_numeric(df[color_col]) or is_boolean(df[color_col])
+        categorical_color = infer_data_type(df[color_col]) in (
+            DataType.CATEGORICAL,
+            DataType.UNIQUE,
+            DataType.BOOLEAN,
+        )
         if categorical_color:
             categories = df[color_col].unique()
             colorscale = list(discrete_colorscale(len(categories)))
