@@ -984,10 +984,10 @@ def contingency_table(
     )
     if size_factor == "auto":
         n_digits_max = 1 + np.floor(np.log10(table.max().max()))
-        # Constants chosen empirically to make the numbers fit in the cells
-        size_factor = max(
-            0.72,
-            0.18 * n_digits_max,
+        size_factor = (
+            # Constants chosen empirically to make the numbers fit in the cells
+            0.18
+            * max(4, n_digits_max)
         )
     ax.figure.set_size_inches(size_factor * len(table.columns), size_factor * len(table))
     # Set y axis
