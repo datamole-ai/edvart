@@ -647,6 +647,13 @@ def parallel_coordinates(
                     "len": min(40 * len(categories), 300),
                 }
             )
+            # Align the colorbar with the categories
+            line.update(
+                {
+                    "cmin": -0.5,
+                    "cmax": len(categories) - 0.5,
+                }
+            )
     else:
         line = None
 
@@ -815,6 +822,13 @@ def parallel_categories(
                     "ticktext": categories,
                     "lenmode": "pixels",
                     "len": min(40 * len(categories), 300),
+                }
+            )
+            # Align the colorbar with the categories
+            line.update(
+                {
+                    "cmin": -0.5,
+                    "cmax": len(categories) - 0.5,
                 }
             )
     else:
