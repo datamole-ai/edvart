@@ -28,7 +28,7 @@ umap-learn = { version = "^0.5.4", optional = true}
 # which also installs an older version of llmvlite, which is incompatible
 # with newer version of LLVM binaries.
 numba = { version = "^0.57", optional = true }
-pyarrow = { version = "^13.0.0", optional = true }
+pyarrow = { version = "^14.0.1", optional = true }
 isort = "^5.10.1"
 
 [tool.poetry.extras]
