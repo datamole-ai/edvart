@@ -550,16 +550,14 @@ def group_barplot(
 
     # Choose color palette
     colors = cl.scales["9"]["qual"]["Set1"]
-    color_idx = 0
 
     fig = go.Figure()
-    for idx, row in pivot.iterrows():
+    for color_idx, (idx, row) in enumerate(pivot.iterrows()):
         if hasattr(idx, "__len__") and not isinstance(idx, str):
             group_name = "_".join([str(i) for i in idx])
         else:
             group_name = idx
         color = colors[color_idx % len(colors)]
-        color_idx += 1
         fig.add_trace(
             go.Bar(
                 x=pivot.columns,
@@ -632,7 +630,6 @@ def overlaid_histograms(
     )
     # Choose color palette
     colors = cl.scales["9"]["qual"]["Set1"]
-    color_idx = 0
 
     # Distribution plot
     fig = make_subplots(
@@ -643,15 +640,13 @@ def overlaid_histograms(
         vertical_spacing=0.02,
     )
 
-    for name, group in df.groupby(
-        by=(groupby[0] if isinstance(groupby, list) and len(groupby) == 1 else groupby)
-    ):
+
+    for color_idx, (name, group) in enumerate(df.groupby(groupby)):
         if hasattr(name, "__len__") and not isinstance(name, str):
             group_name = "_".join([str(i) for i in name])
         else:
             group_name = name
         color = colors[color_idx % len(colors)]
-        color_idx += 1
         # Add to boxplot
         fig.add_trace(
             go.Box(
