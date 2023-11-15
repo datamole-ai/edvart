@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Tuple, Union
 
 import pandas as pd
+import plotly
 import statsmodels.api as sm
 from scipy import stats
 
@@ -126,23 +127,60 @@ def reindex_to_period(
     return df
 
 
-def discrete_colorscale(n, saturation=0.5, lightness=0.5) -> Iterable[Tuple[float, str]]:
+def hsl_wheel_colorscale(n: int, saturation=0.5, lightness=0.5) -> Iterable[str]:
     """
     Generate a colorscale of n discrete colors.
 
-    Colours are equally spaced around the complete HSL wheel with constant saturation and lightness.
+    Colors are equally spaced around the complete HSL wheel with constant saturation and lightness.
+
+    Returns
+    -------
+    Iterable[Tuple[float, str]]
+        An iterable of n plotly-compatible HSL strings.
+    """
+    for i in range(n):
+        yield f"hsl({(i / n) * 360 :.2f}, {saturation * 100 :.2f}%, {lightness * 100 :.2f}%)"
+
+
+def make_discrete_colorscale(colorscale: list[str], n_colors: int) -> Iterable[tuple[float, str]]:
+    """
+    Generate a colorscale of n discrete colors.
 
     Returns
     -------
     Iterable[Tuple[float, str]]
         An iterable of 2n tuples, where each tuple contains a value between 0 and 1
-        (the values are equally and each value appears twice) and an HSL string containing
-        an HSL color string with hue corresponding to the value.
+        (the values are equally and each value appears twice) and one of the colors from the
+        `colorscale`.
     """
-    for i in range(n):
-        color = f"hsl({(i / n) * 360 :.2f}, {saturation * 100 :.2f}%, {lightness * 100 :.2f}%)"
-        yield (i / n, color)
-        yield ((i + 1) / n, color)
+    for i in range(n_colors):
+        color = colorscale[i % len(colorscale)]
+        yield (i / n_colors, color)
+        yield ((i + 1) / n_colors, color)
+
+
+def get_default_discrete_colorscale(n_colors: int) -> list[tuple[float, str]]:
+    """
+    Get a default colorscale of n discrete colors.
+
+    Parameters
+    ----------
+    n_colors : int
+        Number of colors.
+
+    Returns
+    -------
+    list[tuple[float, str]]
+        A list of 2n tuples, where each tuple contains a value between 0 and 1 and a
+        plotly-compatible color string.
+    """
+    if n_colors <= 10:
+        colorscale = plotly.colors.qualitative.Plotly
+    elif n_colors <= 24:
+        colorscale = plotly.colors.qualitative.Light24
+    else:
+        colorscale = list(hsl_wheel_colorscale(n_colors))
+    return list(make_discrete_colorscale(colorscale, n_colors))
 
 
 def select_numeric_columns(df: pd.DataFrame, columns: Optional[List[str]]) -> List[str]:
