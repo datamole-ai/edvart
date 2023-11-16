@@ -640,7 +640,6 @@ def overlaid_histograms(
         vertical_spacing=0.02,
     )
 
-
     for color_idx, (name, group) in enumerate(df.groupby(groupby)):
         if hasattr(name, "__len__") and not isinstance(name, str):
             group_name = "_".join([str(i) for i in name])
