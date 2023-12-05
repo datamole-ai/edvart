@@ -142,7 +142,7 @@ def hsl_wheel_colorscale(n: int, saturation=0.5, lightness=0.5) -> Iterable[str]
         yield f"hsl({(i / n) * 360 :.2f}, {saturation * 100 :.2f}%, {lightness * 100 :.2f}%)"
 
 
-def make_discrete_colorscale(colorscale: list[str], n_colors: int) -> Iterable[tuple[float, str]]:
+def make_discrete_colorscale(colorscale: List[str], n_colors: int) -> Iterable[Tuple[float, str]]:
     """
     Generate a colorscale of n discrete colors.
 
@@ -159,7 +159,7 @@ def make_discrete_colorscale(colorscale: list[str], n_colors: int) -> Iterable[t
         yield ((i + 1) / n_colors, color)
 
 
-def get_default_discrete_colorscale(n_colors: int) -> list[tuple[float, str]]:
+def get_default_discrete_colorscale(n_colors: int) -> List[Tuple[float, str]]:
     """
     Get a default colorscale of n discrete colors.
 
