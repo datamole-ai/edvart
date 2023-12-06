@@ -11,7 +11,10 @@ exclude = ["tests"]
 [tool.poetry.dependencies]
 python = ">=3.8, <3.12"
 ipykernel = "*"
-pandas = ">=1.5, <2.1"
+pandas = [
+    { version = ">=1.5, <2.1", python = "~3.8" },
+    { version = ">=1.5, <2.2", python = ">=3.9" }
+]
 numpy = "*"
 matplotlib = "^3.3"
 seaborn = "^0.12"
