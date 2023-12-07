@@ -3,7 +3,7 @@ name: Publish
 on: workflow_dispatch
 
 env:
-  POETRY_VERSION: 1.6.1
+  POETRY_VERSION: 1.7.1
   CONVCO_VERSION: v0.4.2
   GITCLIFF_VERSION: 1.3.0
   CHANGELOG_FILE: CHANGELOG.md
