@@ -159,7 +159,7 @@ def show_fourier_transform(
 
         y = 10 * np.log10(amplitude) if log else amplitude
         _fig, ax = plt.subplots(figsize=figsize)
-        ax.stem(fft_freq, y, use_line_collection=True, markerfmt="")
+        ax.stem(fft_freq, y, markerfmt="")
         ax.set_xlabel(f"Frequency [1 / {sampling_rate}{index_freq}]")
         ax.set_ylabel("Amplitude" + (" [dB]" if log else ""))
         ax.set_xlim(freq_min, freq_max)
