@@ -146,7 +146,8 @@ def make_discrete_colorscale(colorscale: List[str], n_colors: int) -> Iterable[T
     """
     Generate a colorscale of n discrete colors for use in `plotly.graph_objects`.
 
-    Note that when using `plotly.express`, the parameter `color_discrete_sequence` can be used instead.
+    Note that when using `plotly.express`, the parameter `color_discrete_sequence`
+    can be used instead.
 
     Parameters
     ----------
