@@ -644,10 +644,10 @@ def parallel_coordinates(
             color_series = pd.Series(pd.Categorical(df[color_col]).codes)
         else:
             color_series = df[color_col]
-            colorscale = "Bluered"
+            colorscale = "Bluered_r"
 
         line = {
-            "color": color_series.to_list(),
+            "color": color_series,
             "colorscale": colorscale,
             "showscale": show_colorscale,
             "colorbar": {"title": color_col, "lenmode": "pixels", "len": 300},

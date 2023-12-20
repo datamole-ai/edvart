@@ -135,7 +135,7 @@ def hsl_wheel_colorscale(n: int, saturation=0.5, lightness=0.5) -> Iterable[str]
 
     Returns
     -------
-    Iterable[Tuple[float, str]]
+    Iterable[str]
         An iterable of n plotly-compatible HSL strings.
     """
     for i in range(n):
@@ -144,14 +144,33 @@ def hsl_wheel_colorscale(n: int, saturation=0.5, lightness=0.5) -> Iterable[str]
 
 def make_discrete_colorscale(colorscale: List[str], n_colors: int) -> Iterable[Tuple[float, str]]:
     """
-    Generate a colorscale of n discrete colors.
+    Generate a colorscale of n discrete colors for use in `plotly.graph_objects`.
+
+    Note that when using `plotly.express`, the parameter `color_discrete_sequence` can be used instead.
+
+    Parameters
+    ----------
+    colorscale : List[str]
+        A list of plotly-compatible colors.
+    n_colors : int
+        Number of colors to in the generated colorscale.
 
     Returns
     -------
     Iterable[Tuple[float, str]]
         An iterable of 2n tuples, where each tuple contains a value between 0 and 1
-        (the values are equally and each value appears twice) and one of the colors from the
-        `colorscale`.
+        (the values are equally spaced in the interval and each value appears twice), and one of the
+        colors from the `colorscale`.
+
+    Examples
+    --------
+    >>> list(make_discrete_colorscale(["red", "green", "blue"], 4))
+    [
+        (0, "red"), (0.25, "red"),
+        (0.25, "green"), (0.5, "green"),
+        (0.5, "blue"), (0.75, "blue"),
+        (0.75, "red"), (1, "red")
+    ]
     """
     for i in range(n_colors):
         color = colorscale[i % len(colorscale)]
@@ -161,7 +180,7 @@ def make_discrete_colorscale(colorscale: List[str], n_colors: int) -> Iterable[T
 
 def get_default_discrete_colorscale(n_colors: int) -> List[Tuple[float, str]]:
     """
-    Get a default colorscale of n discrete colors.
+    Get a default Plotly-compatible colorscale of n discrete colors.
 
     Parameters
     ----------
