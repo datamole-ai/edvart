@@ -14,7 +14,12 @@ from edvart.data_types import DataType, infer_data_type, is_boolean, is_categori
 from edvart.plots import scatter_plot_2d
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.section_base import ReportSection, Section, Verbosity
-from edvart.utils import discrete_colorscale, select_numeric_columns
+from edvart.utils import (
+    get_default_discrete_colorscale,
+    hsl_wheel_colorscale,
+    make_discrete_colorscale,
+    select_numeric_columns,
+)
 
 try:
     from edvart.report_sections.umap import UMAP  # pylint: disable=cyclic-import
@@ -529,7 +534,9 @@ class ParallelCoordinates(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             return ["from edvart.report_sections.multivariate_analysis import parallel_coordinates"]
         return [
-            "from edvart.utils import discrete_colorscale",
+            "from edvart.utils import ("
+            "    get_default_discrete_colorscale, make_discrete_colorscale, hsl_wheel_colorscale"
+            ")",
             "from typing import Iterable",
             "import plotly",
             "import plotly.graph_objects as go",
@@ -560,7 +567,11 @@ class ParallelCoordinates(Section):
             code = default_call
         else:
             code = (
-                get_code(discrete_colorscale)
+                get_code(hsl_wheel_colorscale)
+                + "\n\n"
+                + get_code(make_discrete_colorscale)
+                + "\n\n"
+                + get_code(get_default_discrete_colorscale)
                 + "\n\n"
                 + get_code(parallel_coordinates)
                 + "\n\n"
@@ -628,7 +639,7 @@ def parallel_coordinates(
 
         if is_categorical_color:
             categories = df[color_col].unique()
-            colorscale = list(discrete_colorscale(len(categories)))
+            colorscale = get_default_discrete_colorscale(n_colors=len(categories))
             # encode categories into numbers
             color_series = pd.Series(pd.Categorical(df[color_col]).codes)
         else:
@@ -660,7 +671,6 @@ def parallel_coordinates(
             )
     else:
         line = None
-
     # Add numeric columns to dimensions
     dimensions = [{"label": col_name, "values": df[col_name]} for col_name in numeric_columns]
     # Add categorical columns to dimensions
@@ -721,7 +731,9 @@ class ParallelCategories(Section):
         if self.verbosity <= Verbosity.MEDIUM:
             return ["from edvart.report_sections.multivariate_analysis import parallel_categories"]
         return [
-            "from edvart.utils import discrete_colorscale",
+            "from edvart.utils import ("
+            "    get_default_discrete_colorscale, make_discrete_colorscale, hsl_wheel_colorscale"
+            ")",
             "import plotly.graph_objects as go",
         ]
 
@@ -749,7 +761,11 @@ class ParallelCategories(Section):
             code = default_call
         else:
             code = (
-                get_code(discrete_colorscale)
+                get_code(hsl_wheel_colorscale)
+                + "\n\n"
+                + get_code(make_discrete_colorscale)
+                + "\n\n"
+                + get_code(get_default_discrete_colorscale)
                 + "\n\n"
                 + get_code(parallel_categories)
                 + "\n\n"
@@ -810,7 +826,7 @@ def parallel_categories(
         )
         if categorical_color:
             categories = df[color_col].unique()
-            colorscale = list(discrete_colorscale(len(categories)))
+            colorscale = get_default_discrete_colorscale(n_colors=len(categories))
             # encode categories into numbers
             color_series = pd.Series(pd.Categorical(df[color_col]).codes)
         else:

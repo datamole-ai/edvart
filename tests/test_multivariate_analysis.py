@@ -17,7 +17,11 @@ from edvart.report_sections.multivariate_analysis import (
     MultivariateAnalysisSubsection,
 )
 from edvart.report_sections.section_base import Verbosity
-from edvart.utils import select_numeric_columns
+from edvart.utils import (
+    get_default_discrete_colorscale,
+    make_discrete_colorscale,
+    select_numeric_columns,
+)
 
 from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_parameterize
@@ -286,14 +290,18 @@ def test_generated_code_verbosity_2(pyarrow_dtypes: bool):
         ),
         "\n\n".join(
             (
-                get_code(utils.discrete_colorscale),
+                get_code(utils.hsl_wheel_colorscale),
+                get_code(utils.make_discrete_colorscale),
+                get_code(utils.get_default_discrete_colorscale),
                 get_code(multivariate_analysis.parallel_coordinates),
                 "parallel_coordinates(df=df)",
             )
         ),
         "\n\n".join(
             (
-                get_code(utils.discrete_colorscale),
+                get_code(utils.hsl_wheel_colorscale),
+                get_code(utils.make_discrete_colorscale),
+                get_code(utils.get_default_discrete_colorscale),
                 get_code(multivariate_analysis.parallel_categories),
                 "parallel_categories(df=df)",
             )
@@ -384,7 +392,9 @@ def test_verbosity_low_different_subsection_verbosities(pyarrow_dtypes: bool):
         "parallel_categories(df=df)",
         "\n\n".join(
             (
-                get_code(utils.discrete_colorscale),
+                get_code(utils.hsl_wheel_colorscale),
+                get_code(utils.make_discrete_colorscale),
+                get_code(utils.get_default_discrete_colorscale),
                 get_code(multivariate_analysis.parallel_coordinates),
                 "parallel_coordinates(df=df)",
             )
