@@ -1,6 +1,7 @@
 import base64
 import logging
 import pickle
+import warnings
 from abc import ABC
 from copy import copy
 from typing import List, Optional, Tuple, Union
@@ -28,6 +29,10 @@ from edvart.report_sections.timeseries_analysis import (
 )
 from edvart.report_sections.univariate_analysis import UnivariateAnalysis
 from edvart.utils import env_var
+
+
+class EmptyReportWarning(UserWarning):
+    """Warning raised when a report contains no sections."""
 
 
 class ReportBase(ABC):
@@ -61,8 +66,19 @@ class ReportBase(ABC):
         self.verbosity = Verbosity(verbosity)
         self._table_of_contents = None
 
+    def _warn_if_empty(self) -> None:
+        """Warns if the report contains no sections."""
+        if len(self.sections) == 0:
+            warnings.warn(
+                "Report contains no sections. Use `add_*` methods"
+                " to add sections, or use one of `DefaultReport`"
+                " or `DefaultTimeSeriesReport`.",
+                category=EmptyReportWarning,
+            )
+
     def show(self) -> None:
         """Renders the report in the calling notebook."""
+        self._warn_if_empty()
         if self._table_of_contents is not None:
             self._table_of_contents.show(self.sections)
         for section in self.sections:
@@ -86,6 +102,7 @@ class ReportBase(ABC):
             Description of dataset to be used below the title of the report.
         """
         # Generate a notebook containing dataset name and description
+        self._warn_if_empty()
         nb = self._generate_notebook(
             dataset_name=dataset_name, dataset_description=dataset_description
         )
@@ -243,6 +260,7 @@ class ReportBase(ABC):
         timeout: int (default = 120)
             Maximum number of seconds to wait for a cell to finish execution.
         """
+        self._warn_if_empty()
         self._class_logger.info(
             "Exporting report to HTML requires generating and executing a notebook, "
             "which may take some time."
