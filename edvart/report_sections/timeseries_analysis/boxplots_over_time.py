@@ -274,10 +274,12 @@ def show_boxplots_over_time(
         if not is_numeric(df[column]):
             raise ValueError(f"Cannot plot boxplot for non-numeric column `{column}`")
         display(Markdown(f"---\n### {column}"))
+        x = df.index.to_series().apply(grouping_function)
         ax = sns.boxplot(
-            x=df.index.to_series().apply(grouping_function),
+            x=x,
             y=df[column],
             color=color,
+            hue=x,
         )
 
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
