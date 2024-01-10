@@ -17,7 +17,7 @@ pandas = [
 ]
 numpy = "*"
 matplotlib = "^3.3"
-seaborn = "^0.12"
+seaborn = "^0.13"
 plotly = ">=4.0.0, <6"
 statsmodels = ">0.10.2"
 nbformat = "*"
