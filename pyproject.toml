@@ -7,6 +7,7 @@ description = "Effective data visualization and reporting tool"
 authors = ["Michal Belak <michal.belak@datamole.ai>"]
 include = ["example-datasets/*.csv"]
 exclude = ["tests"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.8, <3.12"

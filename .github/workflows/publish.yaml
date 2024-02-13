@@ -13,11 +13,13 @@ env:
 concurrency:
   group: "publish"
   cancel-in-progress: false
-
 jobs:
   publish-python:
     runs-on: ubuntu-22.04  # convco needs GLIBC_2.32 which is not in 20.04
     environment: publish
+    # IMPORTANT: trusted publishing requires permission: id-token: write! Without it, the trusted publishing will not work!
+    # If the permission is the only one that is set, all other permissions are automatically set to none, which may cause permissions issues within the job.
+    permissions: write-all
     outputs:
       new_version: ${{ steps.set-vars.outputs.new_version }}
     steps:
@@ -49,7 +51,7 @@ jobs:
           echo "old version: $old_version"
           echo "new version: $new_version"
           echo "new tag: $new_tag"
-      - name: Release and publish
+      - name: Release
         # Only run if the version has changed.
         # Only start publishing automatically when the major version is 1 or higher.
         if: ${{ env.OLD_VERSION != env.NEW_VERSION && env.NEW_MAJOR_VERSION >= 1 }}
@@ -71,11 +73,12 @@ jobs:
             --notes-file ${{ env.CHANGELOG_FILE }} \
             ${{ env.FULL_CHANGELOG_FILE }}
           ########################################
-          # Publish to PyPI
+          # Build package
           ########################################
-          poetry config http-basic.pypi ${{ secrets.PYPI_USERNAME}} ${{ secrets.PYPI_PASSWORD }}
           poetry version ${{ env.NEW_VERSION }}
-          poetry publish --build
+          poetry build
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
 
   build-docs:
     runs-on: ubuntu-22.04
