@@ -30,7 +30,7 @@ Edvart supports:
     - Univariate analysis,
     - Bivariate analysis,
     - Multivariate analysis,
-    - Grouped analysis
+    - Grouped analysis,
     - Time series analysis.
 * **Customizable Reports**: Produce, iterate, and style detailed reports
     in Jupyter notebooks and HTML formats.
