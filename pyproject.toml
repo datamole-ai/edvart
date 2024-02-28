@@ -14,7 +14,7 @@ python = ">=3.8, <3.12"
 ipykernel = "*"
 pandas = [
     { version = ">=1.5, <2.1", python = "~3.8" },
-    { version = ">=1.5, <2.2", python = ">=3.9" }
+    { version = ">=1.5, <2.3", python = ">=3.9" }
 ]
 numpy = "*"
 matplotlib = "^3.3"
