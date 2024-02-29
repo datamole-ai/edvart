@@ -27,7 +27,8 @@ from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_parameterize
 
 
-def get_test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
+@pytest.fixture
+def test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
     test_df = pd.DataFrame(
         data=[
             [1.1, "a", 3.7, 3.9],
@@ -138,8 +139,8 @@ def test_section_adding():
 
 
 @pyarrow_parameterize
-def test_code_export_verbosity_low(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_code_export_verbosity_low(pyarrow_dtypes: bool, test_df: pd.DataFrame):
+    df = test_df
     multivariate_section = MultivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
@@ -156,12 +157,12 @@ def test_code_export_verbosity_low(pyarrow_dtypes: bool):
 
 
 @pyarrow_parameterize
-def test_code_export_verbosity_low_with_subsections(pyarrow_dtypes: bool):
+def test_code_export_verbosity_low_with_subsections(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     subsec = MultivariateAnalysisSubsection
     subsections = [subsec.ParallelCategories, subsec.PCA, subsec.ParallelCoordinates, subsec.PCA]
     if UMAP_AVAILABLE:
         subsections.append(subsec.UMAP)
-    df = get_test_df()
+    df = test_df
     multivariate_section = multivariate_analysis.MultivariateAnalysis(
         subsections=subsections, verbosity=Verbosity.LOW
     )
@@ -196,8 +197,7 @@ def test_code_export_verbosity_low_with_subsections(pyarrow_dtypes: bool):
     check_section_executes(multivariate_section, df)
 
 
-@pyarrow_parameterize
-def test_code_export_verbosity_medium_all_cols_valid(pyarrow_dtypes: bool):
+def test_code_export_verbosity_medium_all_cols_valid():
     all_numeric_df = pd.DataFrame(
         data=[[1.1, 1, -2], [2.2, 2, -5.3], [3.3, 3, 4]], columns=["col1", "col2", "col3"]
     )
@@ -228,12 +228,11 @@ def test_code_export_verbosity_medium_all_cols_valid(pyarrow_dtypes: bool):
 
 
 @pyarrow_parameterize
-def test_generated_code_verbosity_1(pyarrow_dtypes: bool):
+def test_generated_code_verbosity_1(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     multivariate_section = MultivariateAnalysis(verbosity=Verbosity.MEDIUM)
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
 
     exported_cells = []
-    multivariate_section.add_cells(exported_cells, df=df)
+    multivariate_section.add_cells(exported_cells, df=test_df)
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     if UMAP_AVAILABLE:
         expected_code = [
@@ -263,16 +262,15 @@ def test_generated_code_verbosity_1(pyarrow_dtypes: bool):
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(multivariate_section, df)
+    check_section_executes(multivariate_section, test_df)
 
 
 @pyarrow_parameterize
-def test_generated_code_verbosity_2(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_generated_code_verbosity_2(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     multivariate_section = MultivariateAnalysis(verbosity=Verbosity.HIGH)
 
     multivariate_cells = []
-    multivariate_section.add_cells(multivariate_cells, df=df)
+    multivariate_section.add_cells(multivariate_cells, df=test_df)
     exported_code = [cell["source"] for cell in multivariate_cells if cell["cell_type"] == "code"]
     expected_code = [
         get_code(select_numeric_columns),
@@ -331,7 +329,7 @@ def test_generated_code_verbosity_2(pyarrow_dtypes: bool):
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(multivariate_section, df)
+    check_section_executes(multivariate_section, test_df)
 
 
 @pyarrow_parameterize
@@ -360,7 +358,9 @@ def test_verbosity_medium_non_categorical_col(pyarrow_dtypes: bool):
 
 
 @pyarrow_parameterize
-def test_verbosity_low_different_subsection_verbosities(pyarrow_dtypes: bool):
+def test_verbosity_low_different_subsection_verbosities(
+    pyarrow_dtypes: bool, test_df: pd.DataFrame
+):
     subsections = [
         MultivariateAnalysisSubsection.PCA,
         MultivariateAnalysisSubsection.PCA,
@@ -369,7 +369,6 @@ def test_verbosity_low_different_subsection_verbosities(pyarrow_dtypes: bool):
     ]
     if UMAP_AVAILABLE:
         subsections.insert(2, MultivariateAnalysisSubsection.UMAP)
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
     multivariate_section = MultivariateAnalysis(
         verbosity=Verbosity.LOW,
         subsections=subsections,
@@ -378,7 +377,7 @@ def test_verbosity_low_different_subsection_verbosities(pyarrow_dtypes: bool):
     )
 
     multivariate_cells = []
-    multivariate_section.add_cells(multivariate_cells, df=df)
+    multivariate_section.add_cells(multivariate_cells, df=test_df)
     exported_code = [cell["source"] for cell in multivariate_cells if cell["cell_type"] == "code"]
     expected_subsections = [
         "MultivariateAnalysisSubsection.PCA",
@@ -405,7 +404,7 @@ def test_verbosity_low_different_subsection_verbosities(pyarrow_dtypes: bool):
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(multivariate_section, df)
+    check_section_executes(multivariate_section, test_df)
 
 
 def test_imports_verbosity_low():
@@ -481,10 +480,9 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
 
 @pyarrow_parameterize
-def test_show(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_show(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     multivariate_section = MultivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):
-            multivariate_section.show(df)
+            multivariate_section.show(test_df)

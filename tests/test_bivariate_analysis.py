@@ -14,7 +14,8 @@ from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_parameterize
 
 
-def get_test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
+@pytest.fixture
+def test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
     test_df = pd.DataFrame(data=[[1.1, "a"], [2.2, "b"], [3.3, "c"]], columns=["A", "B"])
     if pyarrow_dtypes:
         test_df = test_df.convert_dtypes(dtype_backend="pyarrow")
@@ -125,7 +126,7 @@ def test_section_adding():
     ), "Subsection should be ContingencyTable"
 
 
-def test_code_export_verbosity_low():
+def test_code_export_verbosity_low(test_df: pd.DataFrame):
     bivariate_section = bivariate_analysis.BivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
@@ -138,10 +139,10 @@ def test_code_export_verbosity_low():
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
-    check_section_executes(bivariate_section, df=get_test_df())
+    check_section_executes(bivariate_section, df=test_df)
 
 
-def test_code_export_verbosity_low_with_subsections():
+def test_code_export_verbosity_low_with_subsections(test_df: pd.DataFrame):
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         subsections=[
             BivariateAnalysisSubsection.ContingencyTable,
@@ -164,7 +165,7 @@ def test_code_export_verbosity_low_with_subsections():
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
-    check_section_executes(bivariate_section, df=get_test_df())
+    check_section_executes(bivariate_section, df=test_df)
 
 
 def test_generated_code_verbosity_low_columns():
@@ -209,7 +210,7 @@ def test_generated_code_verbosity_low_columns():
     check_section_executes(bivariate_section, df=test_df)
 
 
-def test_generated_code_verbosity_medium():
+def test_generated_code_verbosity_medium(test_df: pd.DataFrame):
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         verbosity=Verbosity.MEDIUM,
         subsections=[
@@ -233,7 +234,7 @@ def test_generated_code_verbosity_medium():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(bivariate_section, df=get_test_df())
+    check_section_executes(bivariate_section, df=test_df)
 
 
 def test_generated_code_verbosity_medium_columns_x_y():
@@ -307,7 +308,7 @@ def test_generated_code_verbosity_medium_columns_pairs():
     check_section_executes(bivariate_section, df=test_df)
 
 
-def test_generated_code_verbosity_high():
+def test_generated_code_verbosity_high(test_df: pd.DataFrame):
     bivariate_section = bivariate_analysis.BivariateAnalysis(
         verbosity=Verbosity.HIGH,
         subsections=[
@@ -345,10 +346,10 @@ def test_generated_code_verbosity_high():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(bivariate_section, df=get_test_df())
+    check_section_executes(bivariate_section, df=test_df)
 
 
-def test_verbosity_low_different_subsection_verbosities():
+def test_verbosity_low_different_subsection_verbosities(test_df: pd.DataFrame):
     bivariate_section = BivariateAnalysis(
         verbosity=Verbosity.LOW,
         subsections=[
@@ -377,7 +378,7 @@ def test_verbosity_low_different_subsection_verbosities():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(bivariate_section, df=get_test_df())
+    check_section_executes(bivariate_section, df=test_df)
 
 
 def test_imports_verbosity_low():
@@ -450,9 +451,9 @@ def test_imports_verbosity_low_different_subsection_verbosities():
 
 
 @pyarrow_parameterize
-def test_show(pyarrow_dtypes: bool):
+def test_show(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     bivariate_section = BivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):
-            bivariate_section.show(get_test_df(pyarrow_dtypes=pyarrow_dtypes))
+            bivariate_section.show(test_df)

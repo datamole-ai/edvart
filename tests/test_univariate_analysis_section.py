@@ -13,7 +13,8 @@ from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_parameterize
 
 
-def get_test_df(pyarrow_dtypes: bool) -> pd.DataFrame:
+@pytest.fixture
+def test_df(pyarrow_dtypes: bool) -> pd.DataFrame:
     test_df = pd.DataFrame(data=[[1.9, "a"], [2.1, "b"], [3.3, "c"]], columns=["A", "B"])
     if pyarrow_dtypes:
         test_df = test_df.convert_dtypes(dtype_backend="pyarrow")
@@ -33,8 +34,7 @@ def test_invalid_verbosity():
 
 
 @pyarrow_parameterize
-def test_code_export_verbosity_low(pyarrow_dtypes: bool):
-    test_df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_code_export_verbosity_low(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     # Construct univariate analysis section
     univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
@@ -51,8 +51,7 @@ def test_code_export_verbosity_low(pyarrow_dtypes: bool):
 
 
 @pyarrow_parameterize
-def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
-    test_df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_code_export_verbosity_medium(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     # Construct univariate analysis section
     univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.MEDIUM)
     # Export code
@@ -73,8 +72,7 @@ def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
 
 
 @pyarrow_parameterize
-def test_code_export_verbosity_high(pyarrow_dtypes: bool):
-    test_df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_code_export_verbosity_high(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     # Construct univariate analysis section
     univariate_section = univariate_analysis.UnivariateAnalysis(verbosity=Verbosity.HIGH)
     # Export code
@@ -126,8 +124,7 @@ def test_code_export_verbosity_high(pyarrow_dtypes: bool):
 
 
 @pyarrow_parameterize
-def test_show(pyarrow_dtypes: bool):
-    test_df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_show(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     univariate_section = univariate_analysis.UnivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)

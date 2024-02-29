@@ -23,7 +23,8 @@ from edvart.report_sections.section_base import Verbosity
 from .execution_utils import check_section_executes
 
 
-def get_test_df() -> pd.DataFrame:
+@pytest.fixture
+def test_df() -> pd.DataFrame:
     test_df = pd.DataFrame(data=[[1.1, "a"], [2.2, "b"], [3.3, "c"]], columns=["A", "B"])
 
     return test_df
@@ -126,7 +127,7 @@ def test_section_adding():
     ), "Subsection should be DuplicateRows"
 
 
-def test_code_export_verbosity_low():
+def test_code_export_verbosity_low(test_df: pd.DataFrame):
     overview_section = Overview(verbosity=Verbosity.LOW)
     # Export code
     exported_cells = []
@@ -138,10 +139,10 @@ def test_code_export_verbosity_low():
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
-    check_section_executes(overview_section, df=get_test_df())
+    check_section_executes(overview_section, df=test_df)
 
 
-def test_code_export_verbosity_low_with_subsections():
+def test_code_export_verbosity_low_with_subsections(test_df: pd.DataFrame):
     overview_section = Overview(
         subsections=[
             OverviewSubsection.QuickInfo,
@@ -162,10 +163,10 @@ def test_code_export_verbosity_low_with_subsections():
     # Test code equivalence
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
-    check_section_executes(overview_section, df=get_test_df())
+    check_section_executes(overview_section, df=test_df)
 
 
-def test_code_export_verbosity_medium():
+def test_code_export_verbosity_medium(test_df: pd.DataFrame):
     # Construct overview section
     overview_section = Overview(
         subsections=[
@@ -198,10 +199,10 @@ def test_code_export_verbosity_medium():
     for i in range(len(exported_code)):
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
 
-    check_section_executes(overview_section, df=get_test_df())
+    check_section_executes(overview_section, df=test_df)
 
 
-def test_code_export_verbosity_high():
+def test_code_export_verbosity_high(test_df: pd.DataFrame):
     # Construct overview section
     overview_section = Overview(
         subsections=[
@@ -278,10 +279,10 @@ def test_code_export_verbosity_high():
     for i in range(len(exported_code)):
         assert exported_code[i] == expected_code[i], "Exported code mismatch"
 
-    check_section_executes(overview_section, df=get_test_df())
+    check_section_executes(overview_section, df=test_df)
 
 
-def test_verbosity_low_different_subsection_verbosities():
+def test_verbosity_low_different_subsection_verbosities(test_df: pd.DataFrame):
     overview_section = Overview(
         verbosity=Verbosity.LOW,
         verbosity_quick_info=Verbosity.MEDIUM,
@@ -313,7 +314,7 @@ def test_verbosity_low_different_subsection_verbosities():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(overview_section, df=get_test_df())
+    check_section_executes(overview_section, df=test_df)
 
 
 def test_imports_verbosity_low():
@@ -377,9 +378,9 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     assert set(exported_imports) == set(expected_imports)
 
 
-def test_show():
+def test_show(test_df: pd.DataFrame):
     overview_section = Overview()
-    df = get_test_df()
+    df = test_df
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):
