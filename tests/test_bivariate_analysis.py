@@ -11,13 +11,13 @@ from edvart.report_sections.code_string_formatting import get_code
 from edvart.report_sections.section_base import Verbosity
 
 from .execution_utils import check_section_executes
-from .pyarrow_utils import pyarrow_parameterize
+from .pyarrow_utils import pyarrow_params
 
 
-@pytest.fixture
-def test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
+@pytest.fixture(params=pyarrow_params)
+def test_df(request) -> pd.DataFrame:
     test_df = pd.DataFrame(data=[[1.1, "a"], [2.2, "b"], [3.3, "c"]], columns=["A", "B"])
-    if pyarrow_dtypes:
+    if request.param:
         test_df = test_df.convert_dtypes(dtype_backend="pyarrow")
 
     return test_df
@@ -450,8 +450,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     assert set(exported_imports) == set(expected_imports)
 
 
-@pyarrow_parameterize
-def test_show(pyarrow_dtypes: bool, test_df: pd.DataFrame):
+def test_show(test_df: pd.DataFrame):
     bivariate_section = BivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)

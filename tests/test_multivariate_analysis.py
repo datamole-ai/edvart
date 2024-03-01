@@ -17,18 +17,14 @@ from edvart.report_sections.multivariate_analysis import (
     MultivariateAnalysisSubsection,
 )
 from edvart.report_sections.section_base import Verbosity
-from edvart.utils import (
-    get_default_discrete_colorscale,
-    make_discrete_colorscale,
-    select_numeric_columns,
-)
+from edvart.utils import select_numeric_columns
 
 from .execution_utils import check_section_executes
-from .pyarrow_utils import pyarrow_parameterize
+from .pyarrow_utils import pyarrow_params
 
 
-@pytest.fixture
-def test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
+@pytest.fixture(params=pyarrow_params)
+def test_df(request) -> pd.DataFrame:
     test_df = pd.DataFrame(
         data=[
             [1.1, "a", 3.7, 3.9],
@@ -39,7 +35,7 @@ def test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
         ],
         columns=["A", "B", "C", "D"],
     )
-    if pyarrow_dtypes:
+    if request.param:
         test_df = test_df.convert_dtypes(dtype_backend="pyarrow")
 
     return test_df
@@ -138,8 +134,7 @@ def test_section_adding():
         ), "Subsection should be UMAP"
 
 
-@pyarrow_parameterize
-def test_code_export_verbosity_low(pyarrow_dtypes: bool, test_df: pd.DataFrame):
+def test_code_export_verbosity_low(test_df: pd.DataFrame):
     df = test_df
     multivariate_section = MultivariateAnalysis(verbosity=Verbosity.LOW)
     # Export code
@@ -156,8 +151,7 @@ def test_code_export_verbosity_low(pyarrow_dtypes: bool, test_df: pd.DataFrame):
     check_section_executes(multivariate_section, df)
 
 
-@pyarrow_parameterize
-def test_code_export_verbosity_low_with_subsections(pyarrow_dtypes: bool, test_df: pd.DataFrame):
+def test_code_export_verbosity_low_with_subsections(test_df: pd.DataFrame):
     subsec = MultivariateAnalysisSubsection
     subsections = [subsec.ParallelCategories, subsec.PCA, subsec.ParallelCoordinates, subsec.PCA]
     if UMAP_AVAILABLE:
@@ -227,8 +221,7 @@ def test_code_export_verbosity_medium_all_cols_valid():
     check_section_executes(multivariate_section, all_numeric_df)
 
 
-@pyarrow_parameterize
-def test_generated_code_verbosity_1(pyarrow_dtypes: bool, test_df: pd.DataFrame):
+def test_generated_code_verbosity_1(test_df: pd.DataFrame):
     multivariate_section = MultivariateAnalysis(verbosity=Verbosity.MEDIUM)
 
     exported_cells = []
@@ -265,8 +258,7 @@ def test_generated_code_verbosity_1(pyarrow_dtypes: bool, test_df: pd.DataFrame)
     check_section_executes(multivariate_section, test_df)
 
 
-@pyarrow_parameterize
-def test_generated_code_verbosity_2(pyarrow_dtypes: bool, test_df: pd.DataFrame):
+def test_generated_code_verbosity_2(test_df: pd.DataFrame):
     multivariate_section = MultivariateAnalysis(verbosity=Verbosity.HIGH)
 
     multivariate_cells = []
@@ -332,7 +324,7 @@ def test_generated_code_verbosity_2(pyarrow_dtypes: bool, test_df: pd.DataFrame)
     check_section_executes(multivariate_section, test_df)
 
 
-@pyarrow_parameterize
+@pytest.mark.parametrize("pyarrow_dtypes", pyarrow_params)
 def test_verbosity_medium_non_categorical_col(pyarrow_dtypes: bool):
     random_array = np.random.randint(low=1, high=40, size=(100, 3))
     random_df = pd.DataFrame(data=random_array, columns=["integral", "floating", "cat"])
@@ -357,10 +349,7 @@ def test_verbosity_medium_non_categorical_col(pyarrow_dtypes: bool):
     check_section_executes(multivariate_section, random_df)
 
 
-@pyarrow_parameterize
-def test_verbosity_low_different_subsection_verbosities(
-    pyarrow_dtypes: bool, test_df: pd.DataFrame
-):
+def test_verbosity_low_different_subsection_verbosities(test_df: pd.DataFrame):
     subsections = [
         MultivariateAnalysisSubsection.PCA,
         MultivariateAnalysisSubsection.PCA,
@@ -479,8 +468,7 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     assert set(exported_imports) == set(expected_imports)
 
 
-@pyarrow_parameterize
-def test_show(pyarrow_dtypes: bool, test_df: pd.DataFrame):
+def test_show(test_df: pd.DataFrame):
     multivariate_section = MultivariateAnalysis()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
