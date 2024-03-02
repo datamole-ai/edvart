@@ -23,14 +23,14 @@ jobs:
         # Specified only minor version: the latest patch is used
         python-version: ['3.11', '3.10', '3.9', '3.8']
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install poetry
         run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }}
       - id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv/
           key: ${{ runner.os }}-python-${{ matrix.python-version }}-poetry-${{ hashFiles('pyproject.toml') }}
@@ -64,7 +64,7 @@ jobs:
   commit-check:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # actions/checkout checks out HEAD only by default
       - name: Get convco
