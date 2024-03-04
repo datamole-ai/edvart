@@ -164,7 +164,8 @@ class ReportBase(ABC):
         nb = self._generate_notebook(
             dataset_name=dataset_name,
             dataset_description=dataset_description,
-            load_df=load_data_code,
+            load_data_code=load_data_code,
+            hide_load_data_code=export_data_mode == ExportDataMode.EMBED,
             extra_imports=load_data_imports,
         )
 
@@ -174,7 +175,8 @@ class ReportBase(ABC):
 
     def _generate_notebook(
         self,
-        load_df: str,
+        load_data_code: str,
+        hide_load_data_code: bool,
         dataset_name: str = "[INSERT DATASET NAME]",
         dataset_description: str = "[INSERT DATASET DESCRIPTION]",
         extra_imports: Optional[List[str]] = None,
@@ -188,7 +190,7 @@ class ReportBase(ABC):
             Name of dataset to be used in the title of the report.
         dataset_description : str (default = "[INSERT DATASET DESCRIPTION]")
             Description of dataset to be used below the title of the report.
-        load_df : str (default = 'df = ...')
+        load_data_code : str (default = 'df = ...')
             Code string for loading a dataset to variable `df`.
         extra_imports : List[str], optional
             Any additional imports to be included in imports section
@@ -227,8 +229,9 @@ class ReportBase(ABC):
         # Add load data cell
         if show_load_data:
             nb["cells"].append(nbf4.new_markdown_cell("## Load Data\n---"))
-        load_data_cell = nbf4.new_code_cell(load_df)
-        load_data_cell["metadata"] = {"jupyter": {"source_hidden": True}}
+        load_data_cell = nbf4.new_code_cell(load_data_code)
+        if hide_load_data_code:
+            load_data_cell["metadata"] = {"jupyter": {"source_hidden": True}}
         nb["cells"].append(load_data_cell)
 
         # Generate code for each report section
@@ -376,7 +379,7 @@ class ReportBase(ABC):
         """
         nb = self._generate_notebook(
             extra_imports=["import edvart"],
-            load_df="df = edvart.example_datasets.dataset_titanic()",
+            load_data_code="df = edvart.example_datasets.dataset_titanic()",
         )
 
         # Save notebook to file
