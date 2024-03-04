@@ -9,7 +9,7 @@ import pytest
 pio.renderers.default = "json"
 
 from edvart import utils
-from edvart.report_sections import multivariate_analysis, umap
+from edvart.report_sections import multivariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
 from edvart.report_sections.multivariate_analysis import (
     UMAP_AVAILABLE,
@@ -17,11 +17,10 @@ from edvart.report_sections.multivariate_analysis import (
     MultivariateAnalysisSubsection,
 )
 from edvart.report_sections.section_base import Verbosity
-from edvart.utils import (
-    get_default_discrete_colorscale,
-    make_discrete_colorscale,
-    select_numeric_columns,
-)
+from edvart.utils import select_numeric_columns
+
+if UMAP_AVAILABLE:
+    from edvart.report_sections import umap
 
 from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_parameterize
