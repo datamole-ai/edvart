@@ -107,7 +107,9 @@ def test_notebook_export(tmp_path: pathlib.Path):
         "none",
         "file",
     ):
-        report.export_notebook(tmp_path / f"export_{export_data_mode}.ipynb", export_data_mode)
+        report.export_notebook(
+            tmp_path / f"export_{export_data_mode}.ipynb", export_data_mode=export_data_mode
+        )
 
 
 def test_exported_notebook_executes(tmp_path: pathlib.Path):
