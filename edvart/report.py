@@ -380,6 +380,7 @@ class ReportBase(ABC):
         nb = self._generate_notebook(
             extra_imports=["import edvart"],
             load_data_code="df = edvart.example_datasets.dataset_titanic()",
+            hide_load_data_code=False,
         )
 
         # Save notebook to file
