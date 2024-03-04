@@ -21,7 +21,7 @@ jobs:
       matrix:
         # Test against all supported Python minor versions
         # Specified only minor version: the latest patch is used
-        python-version: ['3.11', '3.10', '3.9', '3.8']
+        python-version: ['3.12', '3.11', '3.10', '3.9']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
