@@ -2,10 +2,11 @@ import base64
 import logging
 import os
 import pickle
+import sys
 import warnings
 from abc import ABC
 from copy import copy
-from enum import Enum, auto
+from enum import auto
 from typing import List, Optional, Tuple, Union
 
 import isort
@@ -32,12 +33,18 @@ from edvart.report_sections.timeseries_analysis import (
 from edvart.report_sections.univariate_analysis import UnivariateAnalysis
 from edvart.utils import env_var
 
+if sys.version_info < (3, 11):
+    # Python 3.11+ StrEnum behaves as LowercaseStrEnum from strenum package
+    from strenum import LowercaseStrEnum as StrEnum
+else:
+    from enum import StrEnum
+
 
 class EmptyReportWarning(UserWarning):
     """Warning raised when a report contains no sections."""
 
 
-class ExportDataMode(str, Enum):
+class ExportDataMode(StrEnum):
     """Data export mode for the report."""
 
     NONE = auto()
