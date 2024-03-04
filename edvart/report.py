@@ -227,7 +227,9 @@ class ReportBase(ABC):
         # Add load data cell
         if show_load_data:
             nb["cells"].append(nbf4.new_markdown_cell("## Load Data\n---"))
-        nb["cells"].append(nbf4.new_code_cell(load_df))
+        load_data_cell = nbf4.new_code_cell(load_df)
+        load_data_cell["metadata"] = {"jupyter": {"source_hidden": True}}
+        nb["cells"].append(load_data_cell)
 
         # Generate code for each report section
         if self._table_of_contents is not None:
