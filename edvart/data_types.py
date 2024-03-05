@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 try:
-    import pyarrow  # pylint: disable=unused-import
+    import pyarrow  # noqa: F401
 except ImportError:
     PYARROW_PANDAS_BACKEND_AVAILABLE = False
 else:

@@ -128,7 +128,7 @@ def show_short_time_ft(
     columns: Optional[List[str]] = None,
     overlap: Optional[int] = None,
     log: bool = True,
-    window: Union[str, Tuple, "array-like"] = "hamming",
+    window: Union[str, Tuple, np.typing.ArrayLike] = "hamming",
     scaling: str = "spectrum",
     figsize: Tuple[float, float] = (20, 7),
     colormap: Any = "viridis",
