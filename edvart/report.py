@@ -3,8 +3,8 @@ import logging
 import pickle
 import warnings
 from abc import ABC
-from copy import copy
 from collections.abc import Sized
+from copy import copy
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import isort
