@@ -161,8 +161,8 @@ def show_rolling_statistics(
     index = df.index[window_size - 1 :]
 
     layout = dict(xaxis_rangeslider_visible=True)
-
-    data = []
+    import plotly
+    data: List[List[plotly.basedatatypes.BaseTraceType]] = []
     for col in columns:
         data.append([])
         if show_std_dev:

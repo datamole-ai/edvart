@@ -128,7 +128,7 @@ def show_short_time_ft(
     columns: Optional[List[str]] = None,
     overlap: Optional[int] = None,
     log: bool = True,
-    window: Union[str, Tuple, "array-like"] = "hamming",
+    window: Union[str, Tuple, np.typing.ArrayLike] = "hamming",
     scaling: str = "spectrum",
     figsize: Tuple[float, float] = (20, 7),
     colormap: Any = "viridis",
@@ -185,7 +185,7 @@ def show_short_time_ft(
         for col in columns:
             if not is_numeric(df[col]):
                 raise ValueError(f"Cannot perform STFT for non-numeric column {col}")
-    index_freq = pd.infer_freq(df.index) or ""
+    index_freq = pd.infer_freq(df.index.to_series()) or ""
     for col in columns:
         display(Markdown(f"---\n### {col}"))
         freqs, times, sx = signal.spectrogram(  # pylint: disable=invalid-name

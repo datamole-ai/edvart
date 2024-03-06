@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
@@ -243,7 +243,7 @@ def default_quantile_statistics():
 
 def histogram(
     series: pd.Series,
-    bins: Optional[int] = None,
+    bins: Optional[Union[int, str, np.ndarray]] = None,
     density: bool = False,
     box_plot: bool = True,
     figsize: Tuple[float, float] = (20, 7),
@@ -256,8 +256,10 @@ def histogram(
     ----------
     series : pd.Series
         Numerical series.
-    bins : int, optional
-        Number of bins of the histogram. If None, the number of bins is inferred.
+    bins : int or str or array_like, optional
+        If bins is an int, it defines the number of equal-width bins in the range of the series.
+        If bins is a string, it defines the method used to calculate the optimal bin width.
+        If bins is an array, it defines the bin edges.
     density : bool (default = False)
         If True, the area of the histogram bars will sum up to 1.
     box_plot : bool (default = True)
@@ -285,7 +287,7 @@ def histogram(
             bins = "sturges"
         else:
             bins = bin_edges
-
+    assert bins is not None
     if box_plot:
         _fig, (ax_box, ax_hist) = plt.subplots(
             nrows=2,
@@ -295,7 +297,7 @@ def histogram(
         )
         sns.boxplot(x=series, ax=ax_box, **boxplot_kwargs)
         sns.histplot(
-            data=series,
+            data=series.to_frame(),
             bins=bins,
             stat="density" if density else "count",
             ax=ax_hist,
@@ -306,7 +308,7 @@ def histogram(
     else:
         plt.figure(figsize=figsize)
         sns.histplot(
-            data=series,
+            data=series.to_frame(),
             bins=bins,
             stat="density" if density else "count",
             kde=False,
@@ -320,7 +322,7 @@ def bar_plot(
     relative_count: bool = False,
     figsize: Tuple[float, float] = (20, 7),
     plotting_threshold: int = 50,
-    **bar_plot_args: Dict[str, Any],
+    **bar_plot_args: Any,
 ) -> None:
     """Plots a bar plot visualizing frequencies of series elements.
 
@@ -335,7 +337,7 @@ def bar_plot(
     plotting_threshold : int
         If the number of unique values in the series is greater than this, no plot is created
         instead a warning is issued.
-    bar_plot_args : Dict[str, Any]
+    bar_plot_args : Any
         Additional kwargs passed to pandas.Series.bar.
     """
     if series.nunique() > plotting_threshold:
@@ -406,7 +408,7 @@ def top_most_frequent(series: pd.Series, n_top: int = 5) -> None:
     n_top : int
         The number of most frequent values to include in the table.
     """
-    frequent_values = dict_to_html(utils.top_frequent_values(series, n_top=n_top))
+    frequent_values = dict_to_html(dict(utils.top_frequent_values(series, n_top=n_top)))
     frequent_values_html = add_html_heading(frequent_values, "Most frequent values", 3)
     display(HTML(frequent_values_html))
 

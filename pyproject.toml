@@ -52,7 +52,14 @@ black = "^22.3.0"
 pylint = "~3.1"
 sphinx-copybutton = "^0.5.2"
 pytest-xdist = "^3.3.1"
+pandas-stubs = "^2.2.0"
+mypy = "^1.8.0"
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+ignore_missing_imports = true
+python_version = "3.9"
+plugins = "numpy.typing.mypy_plugin"

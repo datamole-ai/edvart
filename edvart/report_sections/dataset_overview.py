@@ -449,7 +449,7 @@ def data_types(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
     """
     if columns is not None:
         df = df[columns]
-    dtypes = df.apply(
+    dtypes = df.apply(  # type: ignore
         func=lambda x_: str(infer_data_type(x_)),
         axis=0,
         result_type="expand",
@@ -652,7 +652,7 @@ def missing_values(
     bar_plot_title: str = "Missing Values Percentage of Each Column",
     bar_plot_ylim: float = 0,
     bar_plot_color: str = "#FFA07A",
-    **bar_plot_args: Dict[str, Any],
+    **bar_plot_args: Any,
 ) -> None:
     """Displays a table of missing values percentages for each column of df and a bar plot
     of the percentages.
@@ -675,7 +675,7 @@ def missing_values(
         Bar plot y axis bottom limit.
     bar_plot_color : str
         Color of bars in the bar plot in hex format.
-    bar_plot_args : Dict[str, Any]
+    bar_plot_args : Any
         Additional kwargs passed to pandas.Series.bar.
     """
     if columns is not None:
@@ -717,7 +717,7 @@ def missing_values(
                 title=bar_plot_title,
                 ylim=bar_plot_ylim,
                 color=bar_plot_color,
-                **bar_plot_args,
+                **bar_plot_args,  # type: ignore
             )
             .set_ylabel("Missing Values [%]")
         )

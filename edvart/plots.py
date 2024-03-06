@@ -107,7 +107,7 @@ def _scatter_plot_2d_noninteractive(
             color_categorical = pd.Categorical(df[color_col])
             color_codes = color_categorical.codes
         else:
-            color_codes = df[color_col]
+            color_codes = df[color_col].values.astype(np.signedinteger)
         scatter = ax.scatter(x, y, c=color_codes, alpha=opacity)
 
         if is_color_categorical:

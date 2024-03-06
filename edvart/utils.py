@@ -1,6 +1,6 @@
 import os
 from contextlib import contextmanager
-from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, Iterator, List, Literal, Mapping, Optional, Tuple, Union
 
 import pandas as pd
 import plotly
@@ -10,7 +10,7 @@ from scipy import stats
 from edvart.data_types import is_numeric
 
 
-def top_frequent_values(series: pd.Series, n_top: int = 10) -> Dict[Any, float]:
+def top_frequent_values(series: pd.Series, n_top: int = 10) -> Mapping[str, Any]:
     """
     Counts top n most frequent values in series along with other value counts and NULL value counts.
 
@@ -30,7 +30,7 @@ def top_frequent_values(series: pd.Series, n_top: int = 10) -> Dict[Any, float]:
     # Calculate frequencies
     counts = series.value_counts()
     nan_count = series.isna().sum()
-    result_dict = {
+    result_dict: Dict[str, Any] = {
         **(counts[:n_top].to_dict()),
         "Other values count": counts[n_top:].sum(),
         "Null": nan_count,
@@ -446,7 +446,7 @@ def mode(series: pd.Series) -> float:
     most_frequent = series.mode(dropna=True)
     if len(most_frequent) == 0:
         return float("nan")
-    return most_frequent[0]
+    return float(most_frequent[0])
 
 
 def std(series: pd.Series) -> float:
@@ -622,4 +622,5 @@ def env_var(name: str, value: str) -> Iterator[None]:
     try:
         yield
     finally:
-        os.environ = original_env
+        os.environ.clear()
+        os.environ.update(original_env)

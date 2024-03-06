@@ -4,7 +4,7 @@ import pickle
 import warnings
 from abc import ABC
 from copy import copy
-from typing import List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Sized, Tuple, Union
 
 import isort
 import nbconvert
@@ -64,7 +64,7 @@ class ReportBase(ABC):
         self.df = dataframe
         self.sections: list[Section] = []
         self.verbosity = Verbosity(verbosity)
-        self._table_of_contents = None
+        self._table_of_contents: Optional[TableOfContents] = None
 
     def _warn_if_empty(self) -> None:
         """Warns if the report contains no sections."""
@@ -207,7 +207,7 @@ class ReportBase(ABC):
             Maximum number of seconds to wait for a cell to finish execution.
         """
         # Execute notebook to produce output of cells
-        html_exp_kwargs = dict(
+        html_exp_kwargs: Dict[str, Any] = dict(
             preprocessors=[nbconvert.preprocessors.ExecutePreprocessor(timeout=timeout)]
         )
         if template_name is not None:
@@ -275,7 +275,7 @@ class ReportBase(ABC):
         # and unpickles the the whole report object from the decoded binary data
         unpickle_report = code_dedent(
             f"""
-                data = {buffer_base64}
+                data = {buffer_base64!r}
                 report = pickle.loads(base64.b85decode(data), fix_imports=False)
             """
         )
@@ -676,7 +676,7 @@ class DefaultReport(Report):
         columns_bivariate_analysis: Optional[List[str]] = None,
         columns_multivariate_analysis: Optional[List[str]] = None,
         columns_group_analysis: Optional[List[str]] = None,
-        groupby: Union[str, List[str]] = None,
+        groupby: Optional[Union[str, List[str]]] = None,
     ):
         super().__init__(dataframe, verbosity)
 
@@ -699,7 +699,7 @@ class DefaultReport(Report):
         )
         if isinstance(groupby, str):
             color_col = groupby
-        elif hasattr(groupby, "__len__") and len(groupby) == 1:
+        elif isinstance(groupby, Sized) and len(groupby) == 1:
             color_col = groupby[0]
         else:
             color_col = None
@@ -740,7 +740,7 @@ class TimeseriesReport(ReportBase):
         verbosity: Verbosity = Verbosity.LOW,
     ):
         super().__init__(dataframe, verbosity)
-        if not is_date(dataframe.index):
+        if not is_date(dataframe.index.to_series()):
             raise ValueError(
                 "Input dataframe needs to be indexed by time."
                 "Please reindex your data to be indexed by either a DatetimeIndex or a PeriodIndex."

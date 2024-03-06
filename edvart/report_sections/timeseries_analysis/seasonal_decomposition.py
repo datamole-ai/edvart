@@ -149,7 +149,7 @@ def show_seasonal_decomposition(
         If the input data is not indexed by time in ascending order.
     """
     df = df.interpolate(method="time")
-    if pd.infer_freq(df.index) is None and period is None:
+    if pd.infer_freq(df.index.to_series()) is None and period is None:
         display(
             Markdown(
                 "<div class='alert alert-block alert-warning'>"
