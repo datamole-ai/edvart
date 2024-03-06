@@ -4,7 +4,8 @@ import pickle
 import warnings
 from abc import ABC
 from copy import copy
-from typing import Any, Dict, List, Optional, Sized, Tuple, Union
+from collections.abc import Sized
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import isort
 import nbconvert

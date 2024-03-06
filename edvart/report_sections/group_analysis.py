@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, Hashable, Iterable, List, Optional, Union
+from collections.abc import Hashable
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
 import colorlover as cl
 import nbformat.v4 as nbfv4
