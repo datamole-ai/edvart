@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 
 import nbformat.v4 as nbfv4
 import pandas as pd
+import plotly
 import plotly.graph_objects as go
 from IPython.display import Markdown, display
 
@@ -161,7 +162,6 @@ def show_rolling_statistics(
     index = df.index[window_size - 1 :]
 
     layout = dict(xaxis_rangeslider_visible=True)
-    import plotly
     data: List[List[plotly.basedatatypes.BaseTraceType]] = []
     for col in columns:
         data.append([])
