@@ -144,9 +144,9 @@ class TimeseriesAnalysis(ReportSection):
         }
         # Add FT and STFT only if required parameters specified
         if sampling_rate is not None:
-            enum_to_implementation[
-                TimeseriesAnalysisSubsection.FourierTransform
-            ] = FourierTransform(sampling_rate, verbosity_fourier_transform, columns)
+            enum_to_implementation[TimeseriesAnalysisSubsection.FourierTransform] = (
+                FourierTransform(sampling_rate, verbosity_fourier_transform, columns)
+            )
             if stft_window_size is not None:
                 enum_to_implementation[TimeseriesAnalysisSubsection.ShortTimeFT] = ShortTimeFT(
                     sampling_rate, stft_window_size, verbosity_short_time_ft, columns

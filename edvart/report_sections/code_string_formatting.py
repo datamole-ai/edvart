@@ -18,7 +18,7 @@ def total_dedent(input_string: str) -> str:
         input_string with no whitespace at the beginning of each line.
     """
     input_string = input_string.strip()
-    lstripped_lines = [l.strip() for l in input_string.split("\n")]
+    lstripped_lines = [line.strip() for line in input_string.split("\n")]
     return "\n".join(lstripped_lines)
 
 
@@ -53,7 +53,7 @@ def dedecorate(input_string: str) -> str:
         input_string with beginning lines starting with '@' removed.
     """
     lines = input_string.splitlines()
-    filtered_lines = dropwhile(lambda l: l.lstrip().startswith("@"), lines)
+    filtered_lines = dropwhile(lambda line_: line_.lstrip().startswith("@"), lines)
 
     return "\n".join(filtered_lines)
 
