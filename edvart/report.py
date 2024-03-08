@@ -133,7 +133,7 @@ class ReportBase(ABC):
         return (
             code_dedent(
                 f"""
-                df_parquet = BytesIO(base64.b85decode({buffer}.decode()))
+                df_parquet = BytesIO(base64.b85decode({buffer!r}.decode()))
                 df = pd.read_parquet(df_parquet)"""
             ),
             ["import base64", "import pandas as pd", "from io import BytesIO"],
@@ -144,7 +144,7 @@ class ReportBase(ABC):
         notebook_filepath: Union[str, os.PathLike],
         dataset_name: str = "[INSERT DATASET NAME]",
         dataset_description: str = "[INSERT DATASET DESCRIPTION]",
-        export_data_mode: ExportDataMode = ExportDataMode.NONE,
+        export_data_mode: ExportDataMode = ExportDataMode.NONE,  # type: ignore
     ) -> None:
         """Exports the report as an .ipynb file.
 
