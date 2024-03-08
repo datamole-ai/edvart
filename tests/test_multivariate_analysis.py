@@ -6,8 +6,6 @@ import pandas as pd
 import plotly.io as pio
 import pytest
 
-pio.renderers.default = "json"
-
 from edvart import utils
 from edvart.report_sections import multivariate_analysis
 from edvart.report_sections.code_string_formatting import code_dedent, get_code
@@ -24,6 +22,8 @@ if UMAP_AVAILABLE:
 
 from .execution_utils import check_section_executes
 from .pyarrow_utils import pyarrow_params
+
+pio.renderers.default = "json"
 
 
 @pytest.fixture(params=pyarrow_params)

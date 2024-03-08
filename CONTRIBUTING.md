@@ -85,30 +85,20 @@ If you add a new section, add the section description into `docs/sections.rst`
 
 ## Code style
 
-* The line length is limited to 100 characters in Python code, except if it would make the code less readable.
-* `black` is used for formatting Python code. The following command can be used to properly format the code:
+* The line length is limited to 100 characters in Python code,
+except if it would make the code less readable.
+* `ruff` is used for formatting and linting Python code.
+The following commands can be used to properly format the code and check
+for linting errors with automatic fixing:
 ```bash
-poetry run black --line-length 100 edvart/ tests/
+poetry run ruff format .
+poetry run ruff check . --fix
 ```
-The following command can be used to check if the code is properly formatted:
+The following command can be used to check if the code is properly
+formatted and check for linting errors:
 ```bash
-poetry run black --check --line-length 100 edvart/ tests/
-````
-
-* `isort` is used for sorting imports.
-The following command can be used to properly sort imports:
-```bash
-poetry run isort --line-length 100 --profile black edvart/ tests/
-```
-The following command can be used to check if the imports are properly sorted:
-```bash
-poetry run isort --check --line-length 100 --profile black edvart/ tests/
-```
-
-* `pylint` is used to lint Python code. Tests are not required to be linted.
-The following command can be used to lint the code:
-```bash
-poetry run pylint --rcfile=".pylintrc" edvart
+poetry run ruff format --check .
+poetry run ruff check .
 ```
 
 All of the above code style requirements are enforced by the CI pipeline.
