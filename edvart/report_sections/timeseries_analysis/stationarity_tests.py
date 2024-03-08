@@ -1,6 +1,6 @@
 import warnings
 from functools import partial
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import nbformat.v4 as nbfv4
 import pandas as pd
@@ -96,7 +96,7 @@ class StationarityTests(Section):
         show_stationarity_tests(df=df, columns=self.columns)
 
 
-def default_stationarity_tests() -> Dict[pd.Series, Callable[[pd.Series], "test_result"]]:
+def default_stationarity_tests() -> Dict[str, Callable[[pd.Series], Tuple]]:
     """Return a dictionary of stationarity test and functions.
 
     Stationarity tests are:
