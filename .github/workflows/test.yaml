@@ -10,7 +10,7 @@ on:
     branches: [main]
 
 env:
-  POETRY_VERSION: 1.7.1
+  POETRY_VERSION: 1.8.2
   CONVCO_VERSION: v0.4.2
 
 jobs:
@@ -45,10 +45,9 @@ jobs:
           poetry run python -m pytest -n auto --disable-warnings --cov=edvart tests/
       - name: Lint
         run: |
-          poetry run pylint --rcfile=.pylintrc edvart/
-          poetry run black --check --line-length 100 edvart/ tests/
-          poetry run isort --check --line-length 100 --profile black edvart/ tests/
           poetry run mypy edvart/
+          poetry run ruff check .
+          poetry run ruff format --check .
 
   dismiss-stale-reviews:
     runs-on: ubuntu-22.04

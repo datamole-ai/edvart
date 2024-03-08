@@ -168,18 +168,18 @@ def test_ft_stft_included():
 
 def test_ft_no_sampling_rate_error():
     with pytest.raises(ValueError):
-        ts = TimeseriesAnalysis(subsections=[TimeseriesAnalysisSubsection.FourierTransform])
+        _ts = TimeseriesAnalysis(subsections=[TimeseriesAnalysisSubsection.FourierTransform])
     with pytest.raises(ValueError):
-        ts = TimeseriesAnalysis(
+        _ts = TimeseriesAnalysis(
             subsections=[TimeseriesAnalysisSubsection.FourierTransform],
             stft_window_size=2,
         )
     with pytest.raises(ValueError):
-        ts = TimeseriesAnalysis(
+        _ts = TimeseriesAnalysis(
             subsections=[TimeseriesAnalysisSubsection.ShortTimeFT],
         )
     with pytest.raises(ValueError):
-        ts = TimeseriesAnalysis(
+        _ts = TimeseriesAnalysis(
             subsections=[TimeseriesAnalysisSubsection.ShortTimeFT],
             sampling_rate=1,
         )
@@ -424,7 +424,7 @@ def test_boxplots_over_time_def():
 
 
 def test_boxplots_over_time_lambda():
-    month_lambda = lambda x: x.month
+    month_lambda = lambda x: x.month  # noqa: E731
 
     boxplots_sub = BoxplotsOverTime(grouping_name="Month", grouping_function=month_lambda)
 
@@ -451,7 +451,7 @@ def test_imports_verbosity_low():
 
     exported_imports = ts_section.required_imports()
     expected_imports = [
-        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import show_timeseries_analysis"
+        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import show_timeseries_analysis"  # noqa: E501
     ]
 
     assert isinstance(exported_imports, list)
@@ -504,8 +504,8 @@ def test_imports_verbosity_low_different_subsection_verbosities():
     exported_imports = ts_section.required_imports()
 
     expected_imports = {
-        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import show_timeseries_analysis",
-        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import TimeseriesAnalysisSubsection",
+        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import show_timeseries_analysis",  # noqa: E501
+        "from edvart.report_sections.timeseries_analysis.timeseries_analysis import TimeseriesAnalysisSubsection",  # noqa: E501
     }
     for s in ts_section.subsections:
         if s.verbosity > Verbosity.LOW:
