@@ -95,8 +95,8 @@ def test_show(test_df: pd.DataFrame):
             report.show()
 
 
-def test_notebook_export(tmp_path: pathlib.Path):
-    report = Report(dataframe=_get_test_df())
+def test_notebook_export(tmp_path: pathlib.Path, test_df: pd.DataFrame):
+    report = Report(dataframe=test_df)
 
     report.add_overview()
     for export_data_mode in (
@@ -112,8 +112,8 @@ def test_notebook_export(tmp_path: pathlib.Path):
         )
 
 
-def test_exported_notebook_executes(tmp_path: pathlib.Path):
-    report = Report(dataframe=_get_test_df())
+def test_exported_notebook_executes(tmp_path: pathlib.Path, test_df: pd.DataFrame):
+    report = Report(dataframe=test_df)
 
     report.add_overview()
     for export_data_mode in (ExportDataMode.EMBED, ExportDataMode.FILE):
