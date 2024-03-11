@@ -22,7 +22,8 @@ from .execution_utils import check_section_executes
 pio.renderers.default = "json"
 
 
-def get_test_df() -> pd.DataFrame:
+@pytest.fixture
+def test_df() -> pd.DataFrame:
     n_rows = 20
     columns = ["a", "b", "c"]
     return pd.DataFrame(
@@ -185,9 +186,9 @@ def test_ft_no_sampling_rate_error():
         )
 
 
-def test_code_export_verbosity_low():
+def test_code_export_verbosity_low(test_df: pd.DataFrame):
     ts_section = TimeseriesAnalysis(verbosity=Verbosity.LOW)
-    test_df = get_test_df()
+    test_df = test_df
     # Export code
     exported_cells = []
     ts_section.add_cells(exported_cells, df=test_df)
@@ -202,7 +203,7 @@ def test_code_export_verbosity_low():
     check_section_executes(ts_section, test_df)
 
 
-def test_code_export_verbosity_low_with_subsections():
+def test_code_export_verbosity_low_with_subsections(test_df: pd.DataFrame):
     ts_section = TimeseriesAnalysis(
         subsections=[
             TimeseriesAnalysisSubsection.RollingStatistics,
@@ -210,10 +211,10 @@ def test_code_export_verbosity_low_with_subsections():
         ],
         verbosity=Verbosity.LOW,
     )
-    test_df = get_test_df()
+    test_df = test_df
     # Export code
     exported_cells = []
-    ts_section.add_cells(exported_cells, df=get_test_df())
+    ts_section.add_cells(exported_cells, df=test_df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -229,7 +230,7 @@ def test_code_export_verbosity_low_with_subsections():
     check_section_executes(ts_section, test_df)
 
 
-def test_code_export_verbosity_low_with_fft_stft():
+def test_code_export_verbosity_low_with_fft_stft(test_df: pd.DataFrame):
     ts_section = TimeseriesAnalysis(
         subsections=[
             TimeseriesAnalysisSubsection.FourierTransform,
@@ -239,7 +240,6 @@ def test_code_export_verbosity_low_with_fft_stft():
         sampling_rate=1,
         stft_window_size=1,
     )
-    test_df = get_test_df()
     # Export code
     exported_cells = []
     ts_section.add_cells(exported_cells, df=test_df)
@@ -259,9 +259,8 @@ def test_code_export_verbosity_low_with_fft_stft():
     check_section_executes(ts_section, test_df)
 
 
-def test_generated_code_verbosity_medium():
+def test_generated_code_verbosity_medium(test_df: pd.DataFrame):
     ts_section = TimeseriesAnalysis(verbosity=Verbosity.MEDIUM)
-    test_df = get_test_df()
 
     exported_cells = []
     ts_section.add_cells(exported_cells, df=test_df)
@@ -283,8 +282,7 @@ def test_generated_code_verbosity_medium():
     check_section_executes(ts_section, test_df)
 
 
-def test_generated_code_verbosity_high():
-    test_df = get_test_df()
+def test_generated_code_verbosity_high(test_df: pd.DataFrame):
     ts_section = TimeseriesAnalysis(verbosity=Verbosity.HIGH, sampling_rate=1, stft_window_size=1)
 
     pairplot_cells = []
@@ -354,8 +352,7 @@ def test_generated_code_verbosity_high():
     check_section_executes(ts_section, test_df)
 
 
-def test_verbosity_low_different_subsection_verbosities():
-    test_df = get_test_df()
+def test_verbosity_low_different_subsection_verbosities(test_df: pd.DataFrame):
     ts_section = TimeseriesAnalysis(
         verbosity=Verbosity.LOW,
         subsections=[
@@ -396,7 +393,7 @@ def test_verbosity_low_different_subsection_verbosities():
         assert expected_line == exported_line, "Exported code mismatch"
 
 
-def test_boxplots_over_time_def():
+def test_boxplots_over_time_def(test_df: pd.DataFrame):
     def month_func(x: datetime) -> str:
         return str(x.month)
 
@@ -420,10 +417,10 @@ def test_boxplots_over_time_def():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(boxplots_sub, get_test_df())
+    check_section_executes(boxplots_sub, test_df)
 
 
-def test_boxplots_over_time_lambda():
+def test_boxplots_over_time_lambda(test_df: pd.DataFrame):
     month_lambda = lambda x: x.month  # noqa: E731
 
     boxplots_sub = BoxplotsOverTime(grouping_name="Month", grouping_function=month_lambda)
@@ -443,7 +440,7 @@ def test_boxplots_over_time_lambda():
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(boxplots_sub, get_test_df())
+    check_section_executes(boxplots_sub, test_df)
 
 
 def test_imports_verbosity_low():

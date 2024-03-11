@@ -4,13 +4,14 @@ import warnings
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from edvart import utils
 
-from .pyarrow_utils import pyarrow_parameterize
+from .pyarrow_utils import pyarrow_params
 
 
-@pyarrow_parameterize
+@pytest.mark.parametrize("pyarrow_dtypes", pyarrow_params)
 def test_full_na_series(pyarrow_dtypes: bool):
     series = pd.Series([None, np.nan, None])
     if pyarrow_dtypes:
