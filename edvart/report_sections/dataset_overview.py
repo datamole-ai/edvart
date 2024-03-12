@@ -449,8 +449,11 @@ def data_types(df: pd.DataFrame, columns: Optional[List[str]] = None) -> None:
     """
     if columns is not None:
         df = df[columns]
-    dtypes = df.apply(  # type: ignore
-        func=lambda x_: str(infer_data_type(x_)),
+
+    # Type ignored because the apply is not properly typed: the type hints for
+    # the parameter `func` do not cover the complete set of possible inputs.
+    dtypes: pd.Series[str] = df.apply(
+        func=lambda x_: str(infer_data_type(x_)),  # type: ignore
         axis=0,
         result_type="expand",
     )
@@ -717,7 +720,7 @@ def missing_values(
                 title=bar_plot_title,
                 ylim=bar_plot_ylim,
                 color=bar_plot_color,
-                **bar_plot_args,  # type: ignore
+                **bar_plot_args,
             )
             .set_ylabel("Missing Values [%]")
         )

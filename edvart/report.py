@@ -144,6 +144,8 @@ class ReportBase(ABC):
         notebook_filepath: Union[str, os.PathLike],
         dataset_name: str = "[INSERT DATASET NAME]",
         dataset_description: str = "[INSERT DATASET DESCRIPTION]",
+        # mypy assumes that the type of `ExportDataMode.NONE`` is `auto` instead of `ExportDataMode`
+        # since `auto()` is assigned to it in the enum
         export_data_mode: ExportDataMode = ExportDataMode.NONE,  # type: ignore
     ) -> None:
         """Exports the report as an .ipynb file.
