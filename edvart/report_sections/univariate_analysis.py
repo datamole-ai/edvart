@@ -264,6 +264,7 @@ def histogram(
         If bins is an array, it defines the bin edges.
 
         Can be any valid input for parameter `bins` of `numpy.histogram_bin_edges`.
+        https://numpy.org/doc/stable/reference/generated/numpy.histogram_bin_edges.html#numpy.histogram_bin_edges
 
         By default, the number of bins is inferred based on the input data.
     density : bool (default = False)
