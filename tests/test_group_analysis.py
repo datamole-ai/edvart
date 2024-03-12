@@ -22,13 +22,14 @@ from edvart.report_sections.group_analysis import (
 from edvart.report_sections.section_base import Verbosity
 
 from .execution_utils import check_section_executes
-from .pyarrow_utils import pyarrow_parameterize
+from .pyarrow_utils import pyarrow_params
 
 # Workaround to prevent multiple browser tabs opening with figures
 plotly.io.renderers.default = "json"
 
 
-def get_test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
+@pytest.fixture(params=pyarrow_params)
+def test_df(request) -> pd.DataFrame:
     test_df = pd.DataFrame(
         data=[
             ["P" if np.random.uniform() < 0.4 else "N", 1.5 * i, "X" if i % 2 == 0 else "Y"]
@@ -36,7 +37,7 @@ def get_test_df(pyarrow_dtypes: bool = False) -> pd.DataFrame:
         ],
         columns=["A", "B", "C"],
     )
-    if pyarrow_dtypes:
+    if request.param:
         test_df = test_df.convert_dtypes(dtype_backend="pyarrow")
     return test_df
 
@@ -53,51 +54,44 @@ def test_invalid_verbosities():
         GroupAnalysis(groupby=[], verbosity=-1)
 
 
-@pyarrow_parameterize
-def test_groupby_nonexistent_col(pyarrow_dtypes: bool):
+def test_groupby_nonexistent_col(test_df: pd.DataFrame):
     with pytest.raises(ValueError):
-        show_group_analysis(df=get_test_df(pyarrow_dtypes=pyarrow_dtypes), groupby=["non-existent"])
+        show_group_analysis(df=test_df, groupby=["non-existent"])
     with pytest.raises(ValueError):
-        group_missing_values(
-            df=get_test_df(pyarrow_dtypes=pyarrow_dtypes), groupby=["non-existent"]
-        )
+        group_missing_values(df=test_df, groupby=["non-existent"])
 
 
-@pyarrow_parameterize
-def test_static_methods(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_static_methods(test_df: pd.DataFrame):
     with redirect_stdout(None):
-        show_group_analysis(df=df, groupby="C")
-        show_group_analysis(df=df, groupby=["C"], columns=["A"])
-        show_group_analysis(df=df, groupby=["C"], columns=["A", "B"])
-        show_group_analysis(df=df, groupby="C", columns=["A", "B", "C"])
-        show_group_analysis(df=df, groupby="C", columns=["C"])
+        show_group_analysis(df=test_df, groupby="C")
+        show_group_analysis(df=test_df, groupby=["C"], columns=["A"])
+        show_group_analysis(df=test_df, groupby=["C"], columns=["A", "B"])
+        show_group_analysis(df=test_df, groupby="C", columns=["A", "B", "C"])
+        show_group_analysis(df=test_df, groupby="C", columns=["C"])
 
-        group_barplot(df, groupby=["A"], column="B")
-        group_barplot(df, groupby=["A"], column="A")
-        group_barplot(df, groupby=["A", "C"], column="B")
-        group_barplot(df, groupby=["A"], column="C")
-        group_barplot(df, groupby=["A"], column="C")
+        group_barplot(test_df, groupby=["A"], column="B")
+        group_barplot(test_df, groupby=["A"], column="A")
+        group_barplot(test_df, groupby=["A", "C"], column="B")
+        group_barplot(test_df, groupby=["A"], column="C")
+        group_barplot(test_df, groupby=["A"], column="C")
 
-        group_missing_values(df, groupby=["C"])
-        group_missing_values(df, groupby=["C"], columns=["A", "B"])
-        group_missing_values(df, groupby=["C"], columns=["A", "B", "C"])
-        group_missing_values(df, groupby=["C"], columns=["C"])
+        group_missing_values(test_df, groupby=["C"])
+        group_missing_values(test_df, groupby=["C"], columns=["A", "B"])
+        group_missing_values(test_df, groupby=["C"], columns=["A", "B", "C"])
+        group_missing_values(test_df, groupby=["C"], columns=["C"])
 
-        overlaid_histograms(df, groupby=["A"], column="B")
-        overlaid_histograms(df, groupby=["A", "C"], column="B")
-        overlaid_histograms(df, groupby=["A", "C"], column="B")
-        overlaid_histograms(df, groupby=["B"], column="B")
+        overlaid_histograms(test_df, groupby=["A"], column="B")
+        overlaid_histograms(test_df, groupby=["A", "C"], column="B")
+        overlaid_histograms(test_df, groupby=["A", "C"], column="B")
+        overlaid_histograms(test_df, groupby=["B"], column="B")
 
 
-@pyarrow_parameterize
-def test_code_export_verbosity_low(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_code_export_verbosity_low(test_df: pd.DataFrame):
     group_section = GroupAnalysis(groupby="B", verbosity=Verbosity.LOW)
 
     # Export code
     exported_cells = []
-    group_section.add_cells(exported_cells, df=df)
+    group_section.add_cells(exported_cells, df=test_df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -106,17 +100,15 @@ def test_code_export_verbosity_low(pyarrow_dtypes: bool):
     assert len(exported_code) == 1
     assert exported_code[0] == expected_code[0], "Exported code mismatch"
 
-    check_section_executes(group_section, df)
+    check_section_executes(group_section, test_df)
 
 
-@pyarrow_parameterize
-def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_code_export_verbosity_medium(test_df: pd.DataFrame):
     group_section = GroupAnalysis(groupby="A", verbosity=Verbosity.MEDIUM)
 
     # Export code
     exported_cells = []
-    group_section.add_cells(exported_cells, df=df)
+    group_section.add_cells(exported_cells, df=test_df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -135,17 +127,15 @@ def test_code_export_verbosity_medium(pyarrow_dtypes: bool):
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(group_section, df)
+    check_section_executes(group_section, test_df)
 
 
-@pyarrow_parameterize
-def test_code_export_verbosity_high(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_code_export_verbosity_high(test_df: pd.DataFrame):
     group_section = GroupAnalysis(groupby="A", verbosity=Verbosity.HIGH)
 
     # Export code
     exported_cells = []
-    group_section.add_cells(exported_cells, df=df)
+    group_section.add_cells(exported_cells, df=test_df)
     # Remove markdown and other cells and get code strings
     exported_code = [cell["source"] for cell in exported_cells if cell["cell_type"] == "code"]
     # Define expected code
@@ -192,12 +182,10 @@ def test_code_export_verbosity_high(pyarrow_dtypes: bool):
     for expected_line, exported_line in zip(expected_code, exported_code):
         assert expected_line == exported_line, "Exported code mismatch"
 
-    check_section_executes(group_section, df)
+    check_section_executes(group_section, test_df)
 
 
-@pyarrow_parameterize
-def test_columns_parameter(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_columns_parameter(test_df: pd.DataFrame):
     ga = GroupAnalysis(groupby="A", columns=["B"])
     assert ga.groupby == ["A"]
     assert ga.columns == ["B"]
@@ -205,8 +193,8 @@ def test_columns_parameter(pyarrow_dtypes: bool):
     ga = GroupAnalysis(groupby="A")
     assert ga.groupby == ["A"]
     assert ga.columns is None
-    ga.show(df)
-    ga.add_cells([], df=df)
+    ga.show(test_df)
+    ga.add_cells([], df=test_df)
     assert ga.groupby == ["A"]
     assert ga.columns is None
 
@@ -217,11 +205,9 @@ def test_column_list_not_modified():
     assert columns == ["C"], "Column list modified"
 
 
-@pyarrow_parameterize
-def test_show(pyarrow_dtypes: bool):
-    df = get_test_df(pyarrow_dtypes=pyarrow_dtypes)
+def test_show(test_df: pd.DataFrame):
     group_section = GroupAnalysis(groupby="A")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with redirect_stdout(None):
-            group_section.show(df)
+            group_section.show(test_df)

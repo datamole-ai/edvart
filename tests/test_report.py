@@ -6,6 +6,7 @@ import nbconvert
 import nbformat
 import numpy as np
 import pandas as pd
+import pytest
 
 from edvart.report import DefaultReport, ExportDataMode, Report
 from edvart.report_sections.bivariate_analysis import BivariateAnalysis
@@ -13,14 +14,15 @@ from edvart.report_sections.section_base import Verbosity
 from edvart.report_sections.univariate_analysis import UnivariateAnalysis
 
 
-def _get_test_df() -> pd.DataFrame:
+@pytest.fixture
+def test_df() -> pd.DataFrame:
     return pd.DataFrame(
         data=np.random.random_sample((50, 20)), columns=[f"Col{i}" for i in range(20)]
     )
 
 
-def test_report():
-    report = Report(dataframe=_get_test_df())
+def test_report(test_df: pd.DataFrame):
+    report = Report(dataframe=test_df)
     assert len(report.sections) == 0, "Report should be empty"
 
     report.add_overview(verbosity=Verbosity.MEDIUM)
@@ -36,11 +38,11 @@ def test_report():
     assert report.sections[1].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
 
 
-def test_add_section():
+def test_add_section(test_df: pd.DataFrame):
     bivariate_analysis_section = BivariateAnalysis()
     univariate_analysis_section = UnivariateAnalysis()
     report = (
-        Report(dataframe=_get_test_df())
+        Report(dataframe=test_df)
         .add_section(bivariate_analysis_section)
         .add_section(univariate_analysis_section)
     )
@@ -48,9 +50,9 @@ def test_add_section():
     assert report.sections == [bivariate_analysis_section, univariate_analysis_section]
 
 
-def test_default_report():
+def test_default_report(test_df: pd.DataFrame):
     report = DefaultReport(
-        dataframe=_get_test_df(),
+        dataframe=test_df,
         verbosity_overview=Verbosity.MEDIUM,
         verbosity_univariate_analysis=Verbosity.HIGH,
         columns_bivariate_analysis=["Col1", "Col2", "Col3"],
@@ -67,8 +69,7 @@ def test_default_report():
     assert report.sections[2].columns == ["Col1", "Col2", "Col3"], "Wrong columns"
 
 
-def test_column_selection():
-    test_df = _get_test_df()
+def test_column_selection(test_df: pd.DataFrame):
     report = Report(dataframe=test_df)
 
     # Default column selection
@@ -85,8 +86,7 @@ def test_column_selection():
     assert set(report.sections[2].columns) == {"Col5", "Col7", "Col13"}, "Wrong column selection"
 
 
-def test_show():
-    test_df = _get_test_df()
+def test_show(test_df: pd.DataFrame):
     report = Report(dataframe=test_df)
 
     with warnings.catch_warnings():
@@ -95,8 +95,8 @@ def test_show():
             report.show()
 
 
-def test_notebook_export(tmp_path: pathlib.Path):
-    report = Report(dataframe=_get_test_df())
+def test_notebook_export(tmp_path: pathlib.Path, test_df: pd.DataFrame):
+    report = Report(dataframe=test_df)
 
     report.add_overview()
     for export_data_mode in (
@@ -112,8 +112,8 @@ def test_notebook_export(tmp_path: pathlib.Path):
         )
 
 
-def test_exported_notebook_executes(tmp_path: pathlib.Path):
-    report = Report(dataframe=_get_test_df())
+def test_exported_notebook_executes(tmp_path: pathlib.Path, test_df: pd.DataFrame):
+    report = Report(dataframe=test_df)
 
     report.add_overview()
     for export_data_mode in (ExportDataMode.EMBED, ExportDataMode.FILE):
