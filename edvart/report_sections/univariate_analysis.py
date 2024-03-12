@@ -3,6 +3,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import seaborn as sns
 from IPython.display import HTML, Markdown, display
@@ -64,6 +65,7 @@ class UnivariateAnalysis(Section):
         # Verbosity.HIGH
         return [
             "import numpy as np",
+            "import numpy.typing as npt",
             "from edvart import utils",
             "from IPython.display import display",
             "from IPython.display import HTML",
@@ -243,7 +245,7 @@ def default_quantile_statistics():
 
 def histogram(
     series: pd.Series,
-    bins: Optional[Union[int, str, np.ndarray]] = None,
+    bins: Optional[Union[int, str, npt.ArrayLike]] = None,
     density: bool = False,
     box_plot: bool = True,
     figsize: Tuple[float, float] = (20, 7),
@@ -260,6 +262,10 @@ def histogram(
         If bins is an int, it defines the number of equal-width bins in the range of the series.
         If bins is a string, it defines the method used to calculate the optimal bin width.
         If bins is an array, it defines the bin edges.
+
+        Can be any valid input for parameter `bins` of `numpy.histogram_bin_edges`.
+
+        By default, the number of bins is inferred based on the input data.
     density : bool (default = False)
         If True, the area of the histogram bars will sum up to 1.
     box_plot : bool (default = True)

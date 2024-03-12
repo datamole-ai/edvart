@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from IPython.display import Markdown, display
 from scipy import signal
@@ -68,6 +69,7 @@ class ShortTimeFT(Section):
                 )
             ]
         return [
+            "import numpy.typing as npt",
             "from IPython.display import display, Markdown",
             "from edvart.data_types import is_numeric",
             "import matplotlib.pyplot as plt",
@@ -128,7 +130,7 @@ def show_short_time_ft(
     columns: Optional[List[str]] = None,
     overlap: Optional[int] = None,
     log: bool = True,
-    window: Union[str, Tuple, np.typing.ArrayLike] = "hamming",
+    window: Union[str, Tuple, npt.ArrayLike] = "hamming",
     scaling: str = "spectrum",
     figsize: Tuple[float, float] = (20, 7),
     colormap: Any = "viridis",
