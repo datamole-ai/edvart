@@ -94,7 +94,7 @@ class TableOfContents:
         """
         display(Markdown(self._title))
 
-        lines = []
+        lines: List[str] = []
         for section in sections:
             self._add_section_lines(section, 1, lines, self._include_subsections)
         display(Markdown("\n".join(lines)))

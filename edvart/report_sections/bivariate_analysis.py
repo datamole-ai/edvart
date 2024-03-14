@@ -120,6 +120,8 @@ class BivariateAnalysis(ReportSection):
             raise ValueError("Either both or neither of columns_x, columns_y must be specified.")
         # For analyses which do not take columns_pairs, prepare columns_x and columns_y in case
         # columns_pairs is the only parameter specified
+        columns_x_no_pairs: Optional[List[str]]
+        columns_y_no_pairs: Optional[List[str]]
         if columns is None and columns_x is None and columns_pairs is not None:
             columns_x_no_pairs = [pair[0] for pair in columns_pairs]
             columns_y_no_pairs = [pair[1] for pair in columns_pairs]
@@ -456,6 +458,7 @@ def _get_columns_x_y(
         if columns is None:
             columns = list(df.columns)
         columns_x = columns_y = columns
+    assert columns_y is not None
     columns_x = [col for col in columns_x if is_numeric(df[col])]
     columns_y = [col for col in columns_y if is_numeric(df[col])]
 
@@ -722,6 +725,7 @@ def plot_pairplot(
         columns_x = columns
         columns_y = columns
     if not allow_categorical:
+        assert columns_y is not None
         columns_x = list(filter(include_column, columns_x))
         columns_y = list(filter(include_column, columns_y))
     sns.pairplot(df, x_vars=columns_x, y_vars=columns_y, hue=color_col)
@@ -908,6 +912,8 @@ def contingency_tables(
         if columns_x is None:
             columns_pairs = list(itertools.combinations(columns, 2))
         else:
+            assert columns_x is not None
+            assert columns_y is not None
             columns_pairs = [
                 (col_x, col_y)
                 for (col_x, col_y) in itertools.product(columns_x, columns_y)
@@ -971,7 +977,7 @@ def contingency_table(
     annot = table.replace(0, "") if hide_zeros else table
 
     ax = sns.heatmap(
-        scaling_func(table),
+        scaling_func(table.values),
         annot=annot,
         fmt="",
         cbar=False,

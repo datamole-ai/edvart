@@ -145,7 +145,7 @@ def show_fourier_transform(
         for col in columns:
             if not is_numeric(df[col]):
                 raise ValueError(f"Cannot perform Fourier transform for non-numeric column `{col}`")
-    index_freq = pd.infer_freq(df.index) or ""
+    index_freq = pd.infer_freq(df.index.to_series()) or ""
     for col in columns:
         # FFT requires samples at regular intervals
         df_col = df[col].interpolate(method="time")

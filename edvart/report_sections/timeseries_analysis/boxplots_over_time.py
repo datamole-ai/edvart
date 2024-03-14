@@ -1,4 +1,3 @@
-from datetime import datetime
 from itertools import takewhile
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -48,7 +47,7 @@ class BoxplotsOverTime(Section):
         self,
         verbosity: Verbosity = Verbosity.LOW,
         columns: Optional[List[str]] = None,
-        grouping_function: Callable[[Any], str] = None,
+        grouping_function: Optional[Callable[[Any], str]] = None,
         grouping_function_imports: Optional[List[str]] = None,
         grouping_name: Optional[str] = None,
         default_nunique_max: int = 80,
@@ -161,7 +160,7 @@ class BoxplotsOverTime(Section):
         )
 
 
-def default_grouping_functions() -> Dict[str, Callable[[datetime], str]]:
+def default_grouping_functions() -> Dict[str, Callable[[pd.Timestamp], str]]:
     """Return a dictionary of function names and functions.
 
     The function takes a pandas datetime and represents it as a rougher (in terms of time)
@@ -170,7 +169,7 @@ def default_grouping_functions() -> Dict[str, Callable[[datetime], str]]:
 
     Returns
     -------
-    Dict[str, Callable[[datetime], str]]
+    Dict[str, Callable[[pandas.Timestamp], str]]
         Dictionary from grouping function names to grouping functions.
     """
     return {
@@ -217,7 +216,7 @@ def get_default_grouping_func(df: pd.DataFrame, nunique_max: int = 80) -> Tuple[
 def show_boxplots_over_time(
     df: pd.DataFrame,
     columns: Optional[List[str]] = None,
-    grouping_function: Callable[[Any], str] = None,
+    grouping_function: Optional[Callable[[Any], str]] = None,
     grouping_name: Optional[str] = None,
     default_nunique_max: int = 80,
     figsize: Tuple[float, float] = (20, 7),
@@ -264,7 +263,7 @@ def show_boxplots_over_time(
         grouping_name, grouping_function = get_default_grouping_func(
             df, nunique_max=default_nunique_max
         )
-    elif default_grouping_funcs.get(grouping_name) is not None:
+    elif grouping_name is not None and default_grouping_funcs.get(grouping_name) is not None:
         grouping_function = default_grouping_funcs[grouping_name]
 
     if columns is None:

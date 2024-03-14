@@ -1,5 +1,5 @@
 from enum import IntEnum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import nbformat.v4 as nbfv4
@@ -487,7 +487,7 @@ def pca_explained_variance(
     plt.ylabel("Explained variance ratio")
     plt.xticks(
         ticks=range(len(pca.explained_variance_ratio_)),
-        labels=range(1, (len(pca.explained_variance_ratio_) + 1)),
+        labels=[str(label) for label in range(1, (len(pca.explained_variance_ratio_) + 1))],
     )
     if show_grid:
         plt.grid()
@@ -630,13 +630,15 @@ def parallel_coordinates(
         columns = [col for col in columns if col not in hide_columns]
     if drop_na:
         df = df.dropna()
+
+    line: Optional[Dict[str, Any]] = None
     if color_col is not None:
         is_categorical_color = infer_data_type(df[color_col]) in (
             DataType.CATEGORICAL,
             DataType.UNIQUE,
             DataType.BOOLEAN,
         )
-
+        colorscale: Union[List[Tuple[float, str]], str]
         if is_categorical_color:
             categories = df[color_col].unique()
             colorscale = get_default_discrete_colorscale(n_colors=len(categories))
@@ -669,8 +671,6 @@ def parallel_coordinates(
                     "cmax": len(categories) - 0.5,
                 }
             )
-    else:
-        line = None
     # Add numeric columns to dimensions
     dimensions = [{"label": col_name, "values": df[col_name]} for col_name in numeric_columns]
     # Add categorical columns to dimensions
@@ -818,12 +818,15 @@ def parallel_categories(
         columns = [col for col in columns if col not in hide_columns]
     if drop_na:
         df = df.dropna()
+
+    line: Optional[Dict[str, Any]] = None
     if color_col is not None:
         categorical_color = infer_data_type(df[color_col]) in (
             DataType.CATEGORICAL,
             DataType.UNIQUE,
             DataType.BOOLEAN,
         )
+        colorscale: Union[List[Tuple[float, str]], str]
         if categorical_color:
             categories = df[color_col].unique()
             colorscale = get_default_discrete_colorscale(n_colors=len(categories))
@@ -833,14 +836,15 @@ def parallel_categories(
             color_series = df[color_col]
             colorscale = "Bluered_r"
 
+        colorbar: Dict[str, Any] = {"title": color_col}
         line = {
             "color": color_series,
             "colorscale": colorscale,
-            "colorbar": {"title": color_col},
+            "colorbar": colorbar,
         }
 
         if categorical_color:
-            line["colorbar"].update(
+            colorbar.update(
                 {
                     "tickvals": color_series.unique(),
                     "ticktext": categories,
@@ -855,8 +859,6 @@ def parallel_categories(
                     "cmax": len(categories) - 0.5,
                 }
             )
-    else:
-        line = None
 
     dimensions = [go.parcats.Dimension(values=df[col_name], label=col_name) for col_name in columns]
 

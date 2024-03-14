@@ -45,6 +45,7 @@ jobs:
           poetry run python -m pytest -n auto --disable-warnings --cov=edvart tests/
       - name: Lint
         run: |
+          poetry run mypy edvart/
           poetry run ruff check .
           poetry run ruff format --check .
 

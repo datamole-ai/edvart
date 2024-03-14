@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Hashable
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
 import colorlover as cl
 import nbformat.v4 as nbfv4
@@ -102,7 +103,7 @@ class GroupAnalysis(Section):
             "import plotly.graph_objects as go",
             "from edvart.data_types import infer_data_type, DataType",
             "from edvart import utils",
-            "from typing import List, Dict, Optional, Callable",
+            "from typing import List, Dict, Optional, Callable, Iterable",
             "from plotly.subplots import make_subplots",
         ]
 
@@ -218,7 +219,7 @@ class GroupAnalysis(Section):
                 )
             cells.append(nbfv4.new_code_cell(code))
 
-        columns = self.columns if self.columns is not None else df.columns
+        columns = self.columns if self.columns is not None else df.columns.to_list()
 
         if not self.show_statistics and not self.show_dist:
             return
@@ -362,7 +363,7 @@ def within_group_stats(
     df: pd.DataFrame,
     groupby: List[str],
     column: str,
-    stats: Dict[str, Callable[[pd.Series], float]] = None,
+    stats: Optional[Dict[str, Callable[[pd.Series], float]]] = None,
     round_decimals: int = 2,
 ) -> None:
     """Display withing group statistics for a column of df grouped by one or other more columns.
@@ -448,7 +449,9 @@ def group_missing_values(
     df_grouped = df.groupby(groupby)[columns]
 
     # Calculate number of samples in each group
-    sizes = df_grouped.size().rename("Group Size")
+    sizes = df_grouped.size()
+    assert isinstance(sizes, pd.Series)
+    sizes = sizes.rename("Group Size")
 
     # Calculate missing values percentage of each column for each group
     missing = df_grouped.apply(lambda g: g.isna().sum(axis=0))
@@ -490,7 +493,7 @@ def group_missing_values(
                 background-color: {bg_hex};
             """
 
-        render = final_table.style.applymap(
+        render = final_table.style.map(
             func=color_cell, subset=pd.IndexSlice[:, colored_columns]
         ).format(formatter="{0:.2f} %", subset=pd.IndexSlice[:, colored_columns])
     else:
@@ -553,7 +556,8 @@ def group_barplot(
 
     fig = go.Figure()
     for color_idx, (idx, row) in enumerate(pivot.iterrows()):
-        if hasattr(idx, "__len__") and not isinstance(idx, str):
+        group_name: Hashable
+        if isinstance(idx, Iterable) and not isinstance(idx, str):
             group_name = "_".join([str(i) for i in idx])
         else:
             group_name = idx
@@ -641,7 +645,8 @@ def overlaid_histograms(
     )
 
     for color_idx, (name, group) in enumerate(df.groupby(groupby)):
-        if hasattr(name, "__len__") and not isinstance(name, str):
+        group_name: Hashable
+        if isinstance(name, Iterable) and not isinstance(name, str):
             group_name = "_".join([str(i) for i in name])
         else:
             group_name = name

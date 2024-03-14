@@ -29,6 +29,10 @@ def embed_image_base64(image_path: str, mime: str = "image/png") -> str:
     # Look up directory where currently executed template is located
     # Jinja's @environmentfilter or @contextfilter does not seem to provide
     # any information about the path of the template.
-    template_dir = os.path.dirname(inspect.getfile(inspect.currentframe().f_back))
+    current_frame = inspect.currentframe()
+    assert current_frame is not None
+    frame_back = current_frame.f_back
+    assert frame_back is not None
+    template_dir = os.path.dirname(inspect.getfile(frame_back))
     with open(os.path.join(template_dir, image_path), "rb") as img:
         return f"data:{mime};base64," + str(base64.b64encode(img.read()).decode("utf-8"))
