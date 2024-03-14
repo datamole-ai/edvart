@@ -22,7 +22,7 @@ jobs:
     # however when permissions are explicitly set, the default is overridden.
     permissions:
       id-token: write
-      contents: read
+      contents: write
     outputs:
       new_version: ${{ steps.set-vars.outputs.new_version }}
     steps:
