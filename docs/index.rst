@@ -1,6 +1,8 @@
 EDVART
 ================================
 
+.. caution:: This project is no longer maintained.
+
 Edvart is an open-source Python library designed to simplify and streamline
 your exploratory data analysis (EDA) process.
 Edvart supports different levels of customization:

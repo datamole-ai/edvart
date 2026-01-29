@@ -1,5 +1,10 @@
 # Edvart
 
+
+> [!WARNING]
+> This project is no longer maintained.
+
+
 <p align="center">
     <a href="https://pypi.org/project/edvart">
         <img src="https://img.shields.io/pypi/pyversions/edvart.svg?color=%2334D058" alt="Supported Python versions">
