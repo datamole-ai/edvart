@@ -1,6 +1,13 @@
 name: Publish
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version to publish"
+        required: false
+        default: null
+
 
 env:
   POETRY_VERSION: 1.8.2
@@ -36,15 +43,21 @@ jobs:
           curl -sSfL "https://github.com/convco/convco/releases/download/${{ env.CONVCO_VERSION }}/convco-ubuntu.zip" | zcat > /usr/local/bin/convco
           chmod +x /usr/local/bin/convco
       - name: Set variables
+        env:
+          INPUT_VERSION: ${{ inputs.version || '' }}
         id: set-vars
         run: |
           base_version_command="
-            convco
-            version
-            --prefix=v
-          "
+              convco
+              version
+              --prefix=v
+            "
           old_version=$($base_version_command)
-          new_version=$($base_version_command --bump)
+          if [ -z "$INPUT_VERSION" ]; then
+            new_version=$($base_version_command --bump)
+          else
+            new_version=$INPUT_VERSION
+          fi
           new_tag=v"$new_version"
           echo "OLD_VERSION=$old_version" >> $GITHUB_ENV
           echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
@@ -57,7 +70,7 @@ jobs:
       - name: Release
         # Only run if the version has changed.
         # Only start publishing automatically when the major version is 1 or higher.
-        if: ${{ env.OLD_VERSION != env.NEW_VERSION && env.NEW_MAJOR_VERSION >= 1 }}
+        if: ${{ inputs.version != null || (env.OLD_VERSION != env.NEW_VERSION && env.NEW_MAJOR_VERSION >= 1) }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -81,6 +94,7 @@ jobs:
           poetry version ${{ env.NEW_VERSION }}
           poetry build
       - name: Publish
+        if: ${{ inputs.version != null || (env.OLD_VERSION != env.NEW_VERSION && env.NEW_MAJOR_VERSION >= 1) }}
         uses: pypa/gh-action-pypi-publish@release/v1
 
   build-docs:
@@ -94,6 +108,7 @@ jobs:
       - name: Install poetry
         run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }}
       - uses: actions/cache@v4
+        id: cache
         with:
           path: .venv/
           key: ${{ runner.os }}-python-3.11-poetry-${{ hashFiles('pyproject.toml') }}
