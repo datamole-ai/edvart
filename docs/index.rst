@@ -1,7 +1,7 @@
 EDVART
 ================================
 
-.. caution:: This project is no longer maintained.
+.. caution:: This project is no longer maintained. We recommend using agentic coding tools to generate one-time EDA reports.
 
 Edvart is an open-source Python library designed to simplify and streamline
 your exploratory data analysis (EDA) process.

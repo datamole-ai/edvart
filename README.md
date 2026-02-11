@@ -3,6 +3,7 @@
 
 > [!WARNING]
 > This project is no longer maintained.
+> We recommend using agentic coding tools to generate one-time EDA reports.
 
 
 <p align="center">
